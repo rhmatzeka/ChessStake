@@ -25,6 +25,18 @@
     "viem": "^2.13.5",
     "connectkit": "^1.8.2"
   },
+  "onlyBuiltDependencies": [
+    "@prisma/client",
+    "prisma",
+    "@prisma/engines",
+    "esbuild",
+    "keccak",
+    "secp256k1",
+    "sharp",
+    "bufferutil",
+    "utf-8-validate",
+    "styled-components"
+  ],
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
