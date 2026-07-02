@@ -66,9 +66,9 @@ export class GamesService {
     });
 
     const voteTalies = ['PAWN', 'KNIGHT', 'BISHOP', 'ROOK', 'QUEEN', 'KING'].map((p) => {
-      const pieceBets = bets.filter((b) => b.piece === p);
+      const pieceBets = bets.filter((b: any) => b.piece === p);
       const totalAmountWei = pieceBets
-        .reduce((sum, b) => sum + parseFloat(b.amountWei), 0)
+        .reduce((sum: number, b: any) => sum + parseFloat(b.amountWei), 0)
         .toFixed(4); // simulate string fixed float atau simpan wei string
 
       return {
