@@ -11,7 +11,11 @@
     "test": "turbo test"
   },
   "devDependencies": {
+    "prettier": "^3.9.4",
     "turbo": "^2.0.0",
     "typescript": "^5.0.0"
+  },
+  "overrides": {
+    "prettier": "^3.9.4"
   }
 }
