@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useArenaStore, TurnStatus } from '../stores/arena-store';
+import { Team, PieceType } from '../types/chess';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:4000';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
@@ -95,11 +96,18 @@ export const useArenaSocket = () => {
 
     socket.on('piece:moving', (data: { piece: string; from: string; to: string; uci: string }) => {
       setGameState({ turnStatus: 'MOVING' });
+      
+      const [teamStr, pieceTypeStr] = data.piece.split('_');
+      
       addMove({
         id: `move_${Date.now()}`,
         from: data.from,
         to: data.to,
-        piece: data.piece,
+        piece: {
+          team: teamStr as Team,
+          type: pieceTypeStr as PieceType,
+          id: `${data.piece}_${Date.now()}`,
+        },
         san: data.uci, // Gunakan uci sebagai fallback san
         turnNumber: useArenaStore.getState().turnNumber,
         createdAt: new Date().toISOString(),

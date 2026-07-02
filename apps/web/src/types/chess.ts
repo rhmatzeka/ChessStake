@@ -13,8 +13,11 @@ export type Square = string; // e.g., 'a1', 'e4'
 export type BoardState = Record<Square, ChessPiece | null>;
 
 export interface Move {
+  id: string;
   from: Square;
   to: Square;
   piece: ChessPiece;
   san?: string;
+  turnNumber?: number;
+  createdAt?: string;
 }
