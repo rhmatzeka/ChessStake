@@ -1,5 +1,5 @@
-export const CHAIN_ID = 84532;
-export const CHAIN_NAME = 'Base Sepolia';
+export const CHAIN_ID = 11155111;
+export const CHAIN_NAME = 'Sepolia';
 export const VOTING_DURATION_SECONDS = 20;
 export const MAX_NO_VOTE_REOPEN = 3;
 export const MAX_HALF_MOVES = 120;

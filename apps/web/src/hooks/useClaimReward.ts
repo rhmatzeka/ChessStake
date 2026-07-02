@@ -2,8 +2,7 @@
 
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { PawnPoolABI, CHAIN_ID } from 'shared';
-
-const CONTRACT_ADDRESS = '0x1234567890123456789012345678901234567890';
+import { PAWNPOOL_ADDRESS } from '../config/contracts';
 
 export function useClaimReward() {
   const { writeContract, data: hash, error, isPending } = useWriteContract();
@@ -17,7 +16,7 @@ export function useClaimReward() {
     const gameIdUint = BigInt(cleanGameId);
 
     writeContract({
-      address: CONTRACT_ADDRESS as `0x${string}`,
+      address: PAWNPOOL_ADDRESS,
       abi: PawnPoolABI,
       functionName: 'claimReward',
       args: [gameIdUint],

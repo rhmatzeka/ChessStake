@@ -4,9 +4,7 @@ import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { PawnPoolABI, CHAIN_ID, PIECE_PRICES } from 'shared';
 import { parseEther } from 'viem';
 import { Team, PieceType } from '../types/chess';
-
-// Address Base Sepolia dummy/placeholder
-const CONTRACT_ADDRESS = '0x1234567890123456789012345678901234567890';
+import { PAWNPOOL_ADDRESS } from '../config/contracts';
 
 export function usePlaceBet() {
   const { writeContract, data: hash, error, isPending } = useWriteContract();
@@ -40,7 +38,7 @@ export function usePlaceBet() {
     const gameIdUint = BigInt(cleanGameId);
 
     writeContract({
-      address: CONTRACT_ADDRESS as `0x${string}`,
+      address: PAWNPOOL_ADDRESS,
       abi: PawnPoolABI,
       functionName: 'placeBet',
       args: [gameIdUint, BigInt(turnNumber), teamNum, pieceNum],

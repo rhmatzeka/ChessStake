@@ -17,5 +17,9 @@ module.exports = {
       url: process.env.RPC_BASE_SEPOLIA || "https://sepolia.base.org",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
+    sepolia: {
+      url: process.env.RPC_ETHEREUM_SEPOLIA || "https://ethereum-sepolia-rpc.publicnode.com",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    },
   },
 };
