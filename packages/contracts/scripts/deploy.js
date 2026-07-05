@@ -35,7 +35,7 @@ async function main() {
     );
 
     const addresses = {
-      baseSepolia: contractAddress,
+      ethereumSepolia: contractAddress,
       localhost: contractAddress
     };
     fs.writeFileSync(

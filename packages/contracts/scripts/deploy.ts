@@ -40,7 +40,7 @@ async function main() {
 
     // Simpan address
     const addresses = {
-      baseSepolia: contractAddress,
+      ethereumSepolia: contractAddress,
       localhost: contractAddress
     };
     fs.writeFileSync(

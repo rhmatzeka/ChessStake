@@ -215,7 +215,7 @@ export const VotingPanel: React.FC = () => {
                 <div className="w-full text-center">
                   <div className="text-xs font-bold text-[#eedcbf]">{name}</div>
                   <div className="text-[10px] text-[#b58863] font-semibold">
-                    {isWrongChain ? 'Switch to Base Sepolia' : isBusy ? 'Submitting...' : `${price} ETH`}
+                    {isWrongChain ? 'Switch to Ethereum Sepolia' : isBusy ? 'Submitting...' : `${price} ETH`}
                   </div>
                 </div>
 

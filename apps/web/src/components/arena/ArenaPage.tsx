@@ -29,7 +29,7 @@ export const ArenaPage: React.FC = () => {
 
         <div className="flex items-center gap-4">
           <div className="text-xs bg-[#b58863]/10 border border-[#b58863]/30 px-3 py-1.5 rounded-lg font-bold text-[#b58863] hidden md:inline-block">
-            Testnet Mode (Base Sepolia)
+            Testnet Mode (Ethereum Sepolia)
           </div>
           <WalletConnectButton />
         </div>
@@ -61,7 +61,7 @@ export const ArenaPage: React.FC = () => {
       
       {/* Footer */}
       <footer className="w-full bg-[#110d0a] border-t border-[#b58863]/10 py-4 px-6 text-center text-xs text-[#eedcbf]/40">
-        PawnPool &copy; {new Date().getFullYear()} - Play responsibly. Base Sepolia testnet only.
+        PawnPool &copy; {new Date().getFullYear()} - Play responsibly. Ethereum Sepolia testnet only.
       </footer>
     </div>
   );

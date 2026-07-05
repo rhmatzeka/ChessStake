@@ -6,7 +6,7 @@ export default function Home() {
       <section className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-16">
         <div className="max-w-3xl">
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-[#b58863]">
-            Base Sepolia Testnet Arena
+            Ethereum Sepolia Testnet Arena
           </p>
           <h1 className="text-5xl font-black tracking-tight md:text-7xl">
             Vote the piece. AI makes the move.
@@ -18,8 +18,8 @@ export default function Home() {
             <Link href="/arena/live" className="rounded-xl bg-[#d6a15f] px-6 py-3 text-center font-black text-[#120d0a] transition hover:bg-[#f0c178]">
               Enter Live Arena
             </Link>
-            <a href="https://sepolia.basescan.org" target="_blank" rel="noreferrer" className="rounded-xl border border-[#d6a15f]/40 px-6 py-3 text-center font-bold text-[#f3dfbf] transition hover:bg-[#d6a15f]/10">
-              View Base Sepolia
+            <a href="https://sepolia.etherscan.io" target="_blank" rel="noreferrer" className="rounded-xl border border-[#d6a15f]/40 px-6 py-3 text-center font-bold text-[#f3dfbf] transition hover:bg-[#d6a15f]/10">
+              View Ethereum Sepolia
             </a>
           </div>
         </div>
@@ -34,7 +34,7 @@ export default function Home() {
         </div>
 
         <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {['Connect an EVM wallet on Base Sepolia.', 'Choose a team, then vote for a piece type.', 'AI picks the best legal move and broadcasts it live.'].map((step, index) => (
+          {['Connect an EVM wallet on Ethereum Sepolia.', 'Choose a team, then vote for a piece type.', 'AI picks the best legal move and broadcasts it live.'].map((step, index) => (
             <div key={step} className="rounded-2xl bg-[#1a120f] p-5 text-[#f3dfbf]/70">
               <span className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#b58863] font-black text-[#120d0a]">{index + 1}</span>
               <p>{step}</p>

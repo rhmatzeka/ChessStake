@@ -3,7 +3,7 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider, createConfig, http } from 'wagmi';
-import { baseSepolia, localhost } from 'wagmi/chains';
+import { sepolia, localhost } from 'wagmi/chains';
 import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your_project_id_placeholder';
@@ -12,9 +12,9 @@ const config = createConfig(
   getDefaultConfig({
     appName: 'PawnPool',
     walletConnectProjectId: projectId,
-    chains: [baseSepolia, localhost],
+    chains: [sepolia, localhost],
     transports: {
-      [baseSepolia.id]: http(),
+      [sepolia.id]: http(),
       [localhost.id]: http(),
     },
   })

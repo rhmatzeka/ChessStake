@@ -32,7 +32,7 @@ PawnPool adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di ma
 
 - **Frontend**: Next.js App Router (TypeScript, Tailwind CSS, Zustand, TanStack Query, ConnectKit + Wagmi v2 + Viem)
 - **Backend**: Express.js (TypeScript, Socket.IO, Prisma ORM + PostgreSQL)
-- **Smart Contract**: Solidity (Hardhat, OpenZeppelin v5, deployed on Base Sepolia)
+- **Smart Contract**: Solidity (Hardhat, OpenZeppelin v5, deployed on Ethereum Sepolia)
 - **AI Logic**: chess.js + Stockfish heuristik resolver
 
 ---
@@ -71,7 +71,7 @@ pnpm install --no-frozen-lockfile --ignore-scripts
 Salin `.env.example` ke `.env` di root project dan sesuaikan nilainya:
 ```bash
 DATABASE_URL=postgresql://user:password@localhost:5432/pawnpool
-RPC_BASE_SEPOLIA=https://sepolia.base.org
+RPC_ETHEREUM_SEPOLIA=https://ethereum-sepolia-rpc.publicnode.com
 PRIVATE_KEY=your_private_key
 ```
 

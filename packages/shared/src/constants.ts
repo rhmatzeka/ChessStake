@@ -1,17 +1,17 @@
-export const CHAIN_ID = 84532;
-export const CHAIN_NAME = 'Base Sepolia';
+export const CHAIN_ID = 11155111;
+export const CHAIN_NAME = 'Ethereum Sepolia';
 export const SUPPORTED_CHAINS = {
-  baseSepolia: {
-    id: 84532,
-    name: 'Base Sepolia',
-    currency: 'ETH',
-    explorer: 'https://sepolia.basescan.org',
-  },
   ethereumSepolia: {
     id: 11155111,
     name: 'Ethereum Sepolia',
     currency: 'ETH',
     explorer: 'https://sepolia.etherscan.io',
+  },
+  baseSepolia: {
+    id: 84532,
+    name: 'Base Sepolia',
+    currency: 'ETH',
+    explorer: 'https://sepolia.basescan.org',
   },
 } as const;
 export const VOTING_DURATION_SECONDS = 20;
