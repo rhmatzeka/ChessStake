@@ -9,6 +9,37 @@ export const VotingTimer: React.FC = () => {
   const { activeGameId, timeLeft, turnNumber, turnStatus, setGameState, currentTurn, turnEndsAt } = useArenaStore();
   const resolvedTurnRef = useRef<string | null>(null);
 
+  const syncGameState = async (gameId: string) => {
+    const res = await fetch(`${API_URL}/games/${gameId}/state`, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) return;
+
+    const json = await res.json();
+    if (!json.ok || !json.data) return;
+
+    const game = json.data;
+    const nextTimeLeft = game.turnEndsAt
+      ? Math.max(0, Math.floor((new Date(game.turnEndsAt).getTime() - Date.now()) / 1000))
+      : 0;
+
+    setGameState({
+      activeGameId: game.gameId,
+      status: game.status,
+      result: game.result,
+      fen: game.fen,
+      currentTurn: game.currentTurn,
+      turnNumber: game.turnNumber,
+      turnStatus: game.turnStatus,
+      turnEndsAt: game.turnEndsAt,
+      timeLeft: nextTimeLeft,
+      whitePoolWei: game.whitePoolWei,
+      blackPoolWei: game.blackPoolWei,
+      votes: game.votes,
+    });
+  };
+
   useEffect(() => {
     if (turnStatus !== 'OPEN') return;
 
@@ -35,6 +66,7 @@ export const VotingTimer: React.FC = () => {
     resolvedTurnRef.current = resolveKey;
 
     let cancelled = false;
+    setGameState({ turnStatus: 'LOCKED', timeLeft: 0 });
 
     const resolveExpiredTurn = async () => {
       try {
@@ -46,9 +78,26 @@ export const VotingTimer: React.FC = () => {
           const json = await res.json().catch(() => null);
           console.error('Failed to resolve expired turn:', json?.error?.message || res.statusText);
         }
+
+        if (!cancelled) {
+          setGameState({ turnStatus: 'AI_THINKING' });
+        }
+
+        const delays = [750, 1800, 3500, 6000];
+        for (const delay of delays) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          if (cancelled) return;
+          await syncGameState(activeGameId);
+
+          const state = useArenaStore.getState();
+          if (state.turnNumber !== turnNumber || state.turnStatus !== 'OPEN') {
+            return;
+          }
+        }
       } catch (err) {
         if (!cancelled) {
           console.error('Failed to resolve expired turn:', err);
+          setGameState({ turnStatus: 'FAILED' });
         }
       }
     };
