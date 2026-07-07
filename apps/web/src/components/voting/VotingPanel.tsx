@@ -19,6 +19,7 @@ const PIECE_NAMES: Record<PieceType, string> = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const MOCK_CHAIN = process.env.NEXT_PUBLIC_MOCK_CHAIN === 'true';
 
 export const VotingPanel: React.FC = () => {
   const {
@@ -47,7 +48,7 @@ export const VotingPanel: React.FC = () => {
     // Hanya boleh vote untuk current turn team
     if (myLockedTeam !== currentTurn) return;
 
-    if (isConnected && address && chainId === CHAIN_ID) {
+    if (!MOCK_CHAIN && isConnected && address && chainId === CHAIN_ID) {
       // ON-CHAIN VOTE VIA WALLET
       try {
         await placeBet(activeGameId, turnNumber, currentTurn, piece);
@@ -58,8 +59,8 @@ export const VotingPanel: React.FC = () => {
       // OFF-CHAIN MOCK VOTE (FALLBACK)
       setIsVotingLoading(true);
       try {
-        // Dapatkan mock address unik per session agar tidak double-bet error
-        let mockAddress = localStorage.getItem('pawn_pool_mock_address');
+        // Use the connected wallet for demo-mode identity when available.
+        let mockAddress = address || localStorage.getItem('pawn_pool_mock_address');
         if (!mockAddress) {
           mockAddress = `0xmock_user_${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}`;
           localStorage.setItem('pawn_pool_mock_address', mockAddress);
@@ -117,13 +118,13 @@ export const VotingPanel: React.FC = () => {
 
   const handleSelectTeam = (team: Team) => {
     setGameState({ myLockedTeam: team });
-    localStorage.setItem(`pawnpool_locked_team_${activeGameId}`, team);
+    localStorage.setItem(`chessstake_locked_team_${activeGameId}`, team);
   };
 
   // Efek samping untuk me-restore team dari localStorage jika ada
   React.useEffect(() => {
     if (activeGameId) {
-      const storedTeam = localStorage.getItem(`pawnpool_locked_team_${activeGameId}`);
+      const storedTeam = localStorage.getItem(`chessstake_locked_team_${activeGameId}`);
       if (storedTeam === 'WHITE' || storedTeam === 'BLACK') {
         setGameState({ myLockedTeam: storedTeam as Team });
       }
@@ -169,15 +170,28 @@ export const VotingPanel: React.FC = () => {
 
       <div>
         <div className="mb-4">
-          <h3 className="text-sm font-bold text-[#eedcbf] uppercase tracking-wider mb-1">
-            Place Your Bet
-          </h3>
+          <div className="mb-1 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-bold text-[#eedcbf] uppercase tracking-wider">
+              Place Your Bet
+            </h3>
+            <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${
+              MOCK_CHAIN
+                ? 'bg-amber-500/10 text-amber-300 border border-amber-400/30'
+                : 'bg-emerald-500/10 text-emerald-300 border border-emerald-400/30'
+            }`}>
+              {MOCK_CHAIN ? 'Demo Mode' : 'Web3 Mode'}
+            </span>
+          </div>
           <p className="text-xs text-[#eedcbf]/60">
-            {!myLockedTeam 
-              ? 'Select your team above to unlock betting.'
-              : myLockedTeam !== currentTurn
-                ? `Waiting for your team's turn (${myLockedTeam}). Currently it's ${currentTurn}'s turn.`
-                : `Place your bets on pieces for Team ${myLockedTeam}!`}
+            {MOCK_CHAIN
+              ? 'Demo mode uses backend mock votes. Set NEXT_PUBLIC_MOCK_CHAIN=false for wallet transactions.'
+              : !isConnected
+                ? 'Connect your wallet on Ethereum Sepolia to place an on-chain bet.'
+                : !myLockedTeam 
+                  ? 'Select your team above to unlock betting.'
+                  : myLockedTeam !== currentTurn
+                    ? `Waiting for your team's turn (${myLockedTeam}). Currently it's ${currentTurn}'s turn.`
+                    : `Place an on-chain bet for Team ${myLockedTeam}.`}
           </p>
         </div>
 
@@ -188,8 +202,8 @@ export const VotingPanel: React.FC = () => {
             const voteData = votes.find((v) => v.piece === piece) || { totalAmountWei: '0', bettorCount: 0 };
             const imgUrl = getAssetPath(piece, currentTurn);
             const isBusy = isPending || isConfirming || isVotingLoading;
-            const isWrongChain = isConnected && chainId !== CHAIN_ID;
-            const isDisabled = !myLockedTeam || turnStatus !== 'OPEN' || isBusy || myLockedTeam !== currentTurn || isWrongChain;
+            const isWrongChain = !MOCK_CHAIN && isConnected && chainId !== CHAIN_ID;
+            const isDisabled = !myLockedTeam || turnStatus !== 'OPEN' || isBusy || myLockedTeam !== currentTurn || isWrongChain || (!MOCK_CHAIN && !isConnected);
 
             return (
               <button
@@ -215,7 +229,7 @@ export const VotingPanel: React.FC = () => {
                 <div className="w-full text-center">
                   <div className="text-xs font-bold text-[#eedcbf]">{name}</div>
                   <div className="text-[10px] text-[#b58863] font-semibold">
-                    {isWrongChain ? 'Switch to Ethereum Sepolia' : isBusy ? 'Submitting...' : `${price} ETH`}
+                    {MOCK_CHAIN ? 'Demo vote' : isWrongChain ? 'Switch to Ethereum Sepolia' : isBusy ? 'Submitting...' : `${price} ETH`}
                   </div>
                 </div>
 

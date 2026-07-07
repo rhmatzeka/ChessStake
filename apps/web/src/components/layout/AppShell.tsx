@@ -10,7 +10,7 @@ const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your_proj
 
 const config = createConfig(
   getDefaultConfig({
-    appName: 'PawnPool',
+    appName: 'ChessStake',
     walletConnectProjectId: projectId,
     chains: [sepolia, localhost],
     transports: {

@@ -20,7 +20,7 @@ export const ArenaPage: React.FC = () => {
       <header className="w-full bg-[#110d0a] border-b border-[#b58863]/20 py-4 px-6 flex justify-between items-center shadow-lg">
         <div className="flex items-center gap-2">
           <div className="bg-[#b58863] text-[#110d0a] font-extrabold px-3 py-1.5 rounded-lg text-lg uppercase tracking-wider font-mono">
-            PawnPool
+            ChessStake
           </div>
           <span className="text-xs uppercase tracking-wider font-bold opacity-40 ml-2 hidden sm:inline">
             Web3 AI Chess Betting
@@ -61,7 +61,7 @@ export const ArenaPage: React.FC = () => {
       
       {/* Footer */}
       <footer className="w-full bg-[#110d0a] border-t border-[#b58863]/10 py-4 px-6 text-center text-xs text-[#eedcbf]/40">
-        PawnPool &copy; {new Date().getFullYear()} - Play responsibly. Ethereum Sepolia testnet only.
+        ChessStake &copy; {new Date().getFullYear()} - Play responsibly. Ethereum Sepolia testnet only.
       </footer>
     </div>
   );

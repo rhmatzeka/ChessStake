@@ -236,6 +236,29 @@ export class GamesService {
     return bet;
   }
 
+  public static async resolveExpiredTurn(gameId: string) {
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: {
+        turns: {
+          orderBy: { turnNumber: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
+    if (!game || game.status !== 'ACTIVE' || game.turnStatus !== 'OPEN') {
+      throw new Error('GAME_NOT_RESOLVABLE');
+    }
+
+    const currentTurn = game.turns[0];
+    if (!currentTurn?.endsAt || new Date() < currentTurn.endsAt) {
+      throw new Error('TURN_NOT_EXPIRED');
+    }
+
+    return this.resolveTurnMock(gameId);
+  }
+
   /**
    * Menjelaskan turn resolution lokal (MOCK MODE)
    */

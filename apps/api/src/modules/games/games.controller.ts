@@ -178,4 +178,37 @@ export class GamesController {
       });
     }
   }
+
+  public static async resolveExpiredTurn(req: Request, res: Response) {
+    try {
+      const { gameId } = req.params;
+      const resolution = await GamesService.resolveExpiredTurn(gameId);
+
+      res.json({
+        ok: true,
+        data: resolution,
+        error: null,
+      });
+    } catch (e: any) {
+      let status = 500;
+      let code = 'INTERNAL_ERROR';
+
+      if (e.message === 'TURN_NOT_EXPIRED') {
+        status = 409;
+        code = 'TURN_NOT_EXPIRED';
+      } else if (e.message === 'GAME_NOT_RESOLVABLE') {
+        status = 409;
+        code = 'GAME_NOT_RESOLVABLE';
+      }
+
+      res.status(status).json({
+        ok: false,
+        data: null,
+        error: {
+          code,
+          message: e.message,
+        },
+      });
+    }
+  }
 }

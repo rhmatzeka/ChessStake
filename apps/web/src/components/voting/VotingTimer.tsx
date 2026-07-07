@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useArenaStore } from '../../stores/arena-store';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+
 export const VotingTimer: React.FC = () => {
-  const { timeLeft, turnStatus, setGameState, currentTurn, turnEndsAt } = useArenaStore();
+  const { activeGameId, timeLeft, turnNumber, turnStatus, setGameState, currentTurn, turnEndsAt } = useArenaStore();
+  const resolvedTurnRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (turnStatus !== 'OPEN') return;
@@ -22,6 +25,40 @@ export const VotingTimer: React.FC = () => {
 
     return () => clearInterval(timer);
   }, [timeLeft, turnStatus, setGameState, turnEndsAt]);
+
+  useEffect(() => {
+    if (!activeGameId || turnStatus !== 'OPEN' || timeLeft !== 0) return;
+
+    const resolveKey = `${activeGameId}:${turnNumber}`;
+    if (resolvedTurnRef.current === resolveKey) return;
+
+    resolvedTurnRef.current = resolveKey;
+
+    let cancelled = false;
+
+    const resolveExpiredTurn = async () => {
+      try {
+        const res = await fetch(`${API_URL}/games/${activeGameId}/resolve-expired-turn`, {
+          method: 'POST',
+        });
+
+        if (!res.ok && !cancelled) {
+          const json = await res.json().catch(() => null);
+          console.error('Failed to resolve expired turn:', json?.error?.message || res.statusText);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to resolve expired turn:', err);
+        }
+      }
+    };
+
+    resolveExpiredTurn();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeGameId, timeLeft, turnNumber, turnStatus]);
 
   const percentage = (timeLeft / 20) * 100;
   const isLowTime = timeLeft <= 5;

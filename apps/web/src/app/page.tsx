@@ -12,7 +12,7 @@ export default function Home() {
             Vote the piece. AI makes the move.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-[#f3dfbf]/70">
-            PawnPool is a live Web3 chess arena where spectators back White or Black, vote for the piece type with testnet ETH, and watch an AI resolve the best legal move in realtime.
+            ChessStake is a live Web3 chess arena where spectators back White or Black, vote for the piece type with testnet ETH, and watch an AI resolve the best legal move in realtime.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/arena/live" className="rounded-xl bg-[#d6a15f] px-6 py-3 text-center font-black text-[#120d0a] transition hover:bg-[#f0c178]">

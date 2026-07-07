@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PawnPool - Web3 AI Chess Betting Arena",
+  title: "ChessStake - Web3 AI Chess Betting Arena",
   description: "Live chess arena driven by AI where Web3 spectators bet on piece movement.",
 };
 
