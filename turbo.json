@@ -3,6 +3,14 @@
   "globalDependencies": [
     ".env"
   ],
+  "globalEnv": [
+    "NODE_ENV",
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_SOCKET_URL",
+    "NEXT_PUBLIC_CHECKMATE_BET_ADDRESS",
+    "NEXT_PUBLIC_CHAIN_ID",
+    "NEXT_PUBLIC_MOCK_CHAIN"
+  ],
   "tasks": {
     "build": {
       "dependsOn": [
