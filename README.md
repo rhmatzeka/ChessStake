@@ -1,4 +1,4 @@
-# PawnPool - Web3 AI Chess Betting Arena
+# PawnPool - Web3 AI Chess Betting Arena.
 
 PawnPool adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di mana penonton (spectators) dapat connect wallet, memilih tim (White/Black), dan memasang taruhan (bet) untuk mem-vote jenis bidak yang akan digerakkan. Gerakan bidak sesungguhnya tidak ditentukan oleh manusia, melainkan dihitung secara realtime oleh AI Agent menggunakan logic legal move.
 
