@@ -18,7 +18,7 @@ const PIECE_NAMES: Record<PieceType, string> = {
   QUEEN: 'Queen',
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_URL = '/api';
 const MOCK_CHAIN = process.env.NEXT_PUBLIC_MOCK_CHAIN === 'true';
 
 export const VotingPanel: React.FC = () => {

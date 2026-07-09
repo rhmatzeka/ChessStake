@@ -1,6 +1,6 @@
-# PawnPool - Web3 AI Chess Betting Arena.
+# ChessStake - Web3 AI Chess Betting Arena
 
-PawnPool adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di mana penonton (spectators) dapat connect wallet, memilih tim (White/Black), dan memasang taruhan (bet) untuk mem-vote jenis bidak yang akan digerakkan. Gerakan bidak sesungguhnya tidak ditentukan oleh manusia, melainkan dihitung secara realtime oleh AI Agent menggunakan logic legal move.
+ChessStake adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di mana penonton dapat connect wallet, memilih tim White/Black, dan memasang taruhan/vote untuk menentukan jenis bidak yang akan digerakkan. Untuk demo Vercel-only, vote berjalan dalam mock mode dan AI resolve dilakukan lewat Next.js API routes.
 
 ---
 
@@ -30,8 +30,9 @@ PawnPool adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di ma
 
 ## Tech Stack
 
-- **Frontend**: Next.js App Router (TypeScript, Tailwind CSS, Zustand, TanStack Query, ConnectKit + Wagmi v2 + Viem)
-- **Backend**: Express.js (TypeScript, Socket.IO, Prisma ORM + PostgreSQL)
+- **Frontend + API Demo**: Next.js App Router (TypeScript, Tailwind CSS, Zustand, polling API routes)
+- **Database**: Prisma ORM + PostgreSQL (Neon Free direkomendasikan untuk Vercel)
+- **Backend Legacy**: Express.js + Socket.IO masih ada di `apps/api`, tetapi tidak wajib untuk Vercel-only demo
 - **Smart Contract**: Solidity (Hardhat, OpenZeppelin v5, deployed on Ethereum Sepolia)
 - **AI Logic**: chess.js + Stockfish heuristik resolver
 
@@ -40,10 +41,10 @@ PawnPool adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di ma
 ## Struktur Folder Project
 
 ```text
-pawnpool/
+chessstake/
 ├── apps/
-│   ├── web/                          # Next.js Frontend Website
-│   └── api/                          # Express REST API & Socket.IO Server
+│   ├── web/                          # Next.js Frontend + API routes untuk Vercel-only demo
+│   └── api/                          # Legacy Express REST API & Socket.IO Server
 ├── packages/
 │   ├── contracts/                    # Hardhat Smart Contracts (Solidity)
 │   └── shared/                       # Global Constants & Type-safe ABI exports
@@ -59,7 +60,7 @@ pawnpool/
 ### 1. Prasyarat System
 - Node.js >= 20
 - pnpm >= 9
-- PostgreSQL & Redis (atau PostgreSQL local)
+- PostgreSQL (Neon Free direkomendasikan)
 
 ### 2. Setup Project Dependencies
 Jalankan di root folder:
@@ -70,15 +71,16 @@ pnpm install --no-frozen-lockfile --ignore-scripts
 ### 3. Setup Environment Variables
 Salin `.env.example` ke `.env` di root project dan sesuaikan nilainya:
 ```bash
-DATABASE_URL=postgresql://user:password@localhost:5432/pawnpool
+DATABASE_URL=postgresql://user:password@localhost:5432/chessstake
 RPC_ETHEREUM_SEPOLIA=https://ethereum-sepolia-rpc.publicnode.com
+NEXT_PUBLIC_MOCK_CHAIN=true
 PRIVATE_KEY=your_private_key
 ```
 
 ### 4. Setup Database & Prisma
-Masuk ke `apps/api` dan run generate client & migration:
+Untuk Vercel-only demo, generate Prisma client di `apps/web`:
 ```bash
-npx prisma generate
+pnpm --filter web prisma:generate
 ```
 
 ---
@@ -101,13 +103,37 @@ Build constants & ABI compiler:
 pnpm --filter shared build
 ```
 
-### 3. Run Dev Server (API & Frontend)
-Gunakan Turbo untuk menjalankan dev environment secara paralel dari root folder:
+### 3. Run Dev Server Vercel-Only
+Jalankan Next.js web app. API game tersedia di route `/api` pada server yang sama:
 ```bash
-pnpm dev
+pnpm --filter web dev
 ```
 - Frontend berjalan di: http://localhost:3000
-- Backend API berjalan di: http://localhost:4000
+- API route berjalan di: http://localhost:3000/api
+
+---
+
+## Deploy Vercel-Only
+
+Mode ini tidak membutuhkan Railway/Render/Koyeb. Next.js API routes menggantikan backend Express untuk demo.
+
+1. Buat database PostgreSQL gratis di Neon.
+2. Set Vercel environment variables:
+```text
+DATABASE_URL=postgresql://...
+NEXT_PUBLIC_MOCK_CHAIN=true
+```
+3. Install command:
+```bash
+pnpm install --no-frozen-lockfile --ignore-scripts
+```
+4. Build command:
+```bash
+pnpm --filter web build
+```
+5. Redeploy dari branch `main`.
+
+Catatan: mode Vercel-only memakai polling setiap 2 detik, bukan Socket.IO. Timer 0 memanggil `/api/games/:gameId/resolve-expired-turn` pada domain Vercel yang sama.
 
 ---
 

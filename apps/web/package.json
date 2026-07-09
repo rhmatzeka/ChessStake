@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "../../node_modules/.bin/prisma generate --schema prisma/schema.prisma && next build",
     "start": "next start",
     "lint": "eslint",
+    "prisma:generate": "../../node_modules/.bin/prisma generate --schema prisma/schema.prisma",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
     "lucide-react": "^0.359.0",
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.2.2",
+    "@prisma/client": "^5.14.0",
     "shared": "workspace:*",
     "wagmi": "^2.10.4",
     "viem": "^2.13.5",
@@ -45,6 +47,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "prisma": "^5.14.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

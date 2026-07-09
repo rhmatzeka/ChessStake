@@ -72,6 +72,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@prisma/client':
+        specifier: ^5.14.0
+        version: 5.14.0(prisma@5.14.0)
       '@tanstack/react-query':
         specifier: ^5.28.9
         version: 5.101.2(react@19.2.4)
@@ -136,6 +139,9 @@ importers:
       eslint-config-next:
         specifier: 16.2.10
         version: 16.2.10(@typescript-eslint/parser@8.62.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.0.2))(eslint@9.39.4(jiti@2.7.0))(typescript@5.0.2)
+      prisma:
+        specifier: ^5.14.0
+        version: 5.14.0
       tailwindcss:
         specifier: ^4
         version: 4.3.2
