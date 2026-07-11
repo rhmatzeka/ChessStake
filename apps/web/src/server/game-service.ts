@@ -342,6 +342,33 @@ export class VercelGameService {
     };
   }
 
+  public static async getGameBettors(gameId: string) {
+    const bets = await prisma.bet.findMany({
+      where: { gameId, status: 'CONFIRMED_VALID' },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const byAddress = new Map<string, { address: string; team: string; totalWei: bigint; betCount: number }>();
+
+    for (const bet of bets) {
+      const current = byAddress.get(bet.address) || {
+        address: bet.address,
+        team: bet.team,
+        totalWei: BigInt(0),
+        betCount: 0,
+      };
+
+      current.totalWei += BigInt(bet.amountWei);
+      current.betCount += 1;
+      byAddress.set(bet.address, current);
+    }
+
+    return jsonSafe([...byAddress.values()].map((bettor) => ({
+      ...bettor,
+      totalWei: bettor.totalWei.toString(),
+    })));
+  }
+
   public static async resolveExpiredTurn(gameId: string, skipStateRefresh = false) {
     const game = await prisma.game.findUnique({
       where: { id: gameId },

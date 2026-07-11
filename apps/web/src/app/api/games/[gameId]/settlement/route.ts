@@ -11,7 +11,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ game
     const address = searchParams.get('address');
 
     if (!address) {
-      return NextResponse.json({ ok: false, data: null, error: { code: 'VALIDATION_ERROR', message: 'address query is required' } }, { status: 400 });
+      const bettors = await VercelGameService.getGameBettors(gameId);
+      return NextResponse.json({ ok: true, data: { gameId, bettors }, error: null });
     }
 
     const settlement = await VercelGameService.getSettlement(gameId, address);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 type Settlement = {
@@ -19,6 +19,13 @@ type Settlement = {
   claimedAt?: string;
 };
 
+type Bettor = {
+  address: string;
+  team: string;
+  totalWei: string;
+  betCount: number;
+};
+
 function formatEth(wei: string) {
   const value = Number(wei) / 1e18;
   return `${value.toFixed(6)} ETH`;
@@ -29,10 +36,43 @@ export default function ClaimPage() {
   const [gameId, setGameId] = useState('');
   const [claimAddress, setClaimAddress] = useState('');
   const [settlement, setSettlement] = useState<Settlement | null>(null);
+  const [bettors, setBettors] = useState<Bettor[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const resolvedAddress = claimAddress || address || '';
+
+  useEffect(() => {
+    const hydrate = async () => {
+      try {
+        const res = await fetch('/api/games/active', { cache: 'no-store' });
+        const json = await res.json();
+        if (json.ok && json.data?.gameId) {
+          setGameId(json.data.gameId);
+          await loadBettors(json.data.gameId);
+        }
+
+        const mockAddress = localStorage.getItem('pawn_pool_mock_address');
+        if (!address && mockAddress) {
+          setClaimAddress(mockAddress);
+        }
+      } catch (err) {
+        console.error('Failed to hydrate claim page:', err);
+      }
+    };
+
+    hydrate();
+  }, [address]);
+
+  const loadBettors = async (targetGameId = gameId) => {
+    if (!targetGameId) return;
+
+    const res = await fetch(`/api/games/${targetGameId}/settlement`, { cache: 'no-store' });
+    const json = await res.json();
+    if (json.ok && Array.isArray(json.data?.bettors)) {
+      setBettors(json.data.bettors);
+    }
+  };
 
   const loadSettlement = async () => {
     if (!gameId || !resolvedAddress) {
@@ -47,6 +87,7 @@ export default function ClaimPage() {
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json.error?.message || 'Failed to load settlement');
       setSettlement(json.data);
+      await loadBettors();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load settlement');
     } finally {
@@ -68,6 +109,7 @@ export default function ClaimPage() {
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json.error?.message || 'Failed to claim settlement');
       setSettlement(json.data);
+      await loadBettors();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to claim settlement');
     } finally {
@@ -83,6 +125,10 @@ export default function ClaimPage() {
         <p className="mt-3 text-sm leading-6 text-[#f3dfbf]/65">
           Vercel-only mode uses demo accounting in PostgreSQL. This marks rewards or refunds as claimed in the database; it does not transfer on-chain ETH.
         </p>
+
+        <div className="mt-5 rounded-xl border border-[#b58863]/20 bg-[#120d0a] p-4 text-xs text-[#f3dfbf]/60">
+          Active game and demo address are auto-filled when possible. If eligibility says no bets found, pick one of the bettor addresses below.
+        </div>
 
         <div className="mt-8 grid gap-4">
           <label className="grid gap-2 text-sm font-bold uppercase tracking-wider text-[#f3dfbf]/70">
@@ -104,6 +150,25 @@ export default function ClaimPage() {
               className="rounded-xl border border-[#b58863]/25 bg-[#120d0a] px-4 py-3 font-mono text-sm text-[#f3dfbf] outline-none focus:border-[#d6a15f]"
             />
           </label>
+
+          {bettors.length > 0 && (
+            <div className="rounded-xl border border-[#b58863]/20 bg-[#120d0a] p-4">
+              <div className="mb-3 text-xs font-black uppercase tracking-wider text-[#b58863]">Bettors in this game</div>
+              <div className="grid gap-2">
+                {bettors.map((bettor) => (
+                  <button
+                    key={bettor.address}
+                    type="button"
+                    onClick={() => setClaimAddress(bettor.address)}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[#b58863]/10 bg-[#211713] px-3 py-2 text-left text-xs hover:border-[#d6a15f]/60"
+                  >
+                    <span className="font-mono text-[#f3dfbf]">{bettor.address}</span>
+                    <span className="text-[#f3dfbf]/60">{bettor.team} | {bettor.betCount} bet | {formatEth(bettor.totalWei)}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <button
