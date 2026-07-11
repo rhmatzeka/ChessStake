@@ -86,6 +86,8 @@ async function resolveBestMoveForPiece(fen: string, team: 'WHITE' | 'BLACK', win
 }
 
 export class VercelGameService {
+  private static resolvingGames = new Set<string>();
+
   public static async createGame() {
     const now = Date.now();
     const gameId = `game_${now}`;
@@ -127,6 +129,8 @@ export class VercelGameService {
   }
 
   public static async getGameState(gameId: string) {
+    await this.resolveExpiredTurnIfNeeded(gameId);
+
     const game = await prisma.game.findUnique({
       where: { id: gameId },
       include: {
@@ -176,6 +180,29 @@ export class VercelGameService {
       blackPoolWei: game.blackPoolWei,
       votes,
     });
+  }
+
+  private static async resolveExpiredTurnIfNeeded(gameId: string) {
+    if (this.resolvingGames.has(gameId)) return;
+
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: { turns: { orderBy: { turnNumber: 'desc' }, take: 1 } },
+    });
+
+    const currentTurn = game?.turns[0];
+    if (!game || game.status !== 'ACTIVE' || game.turnStatus !== 'OPEN' || !currentTurn?.endsAt || new Date() < currentTurn.endsAt) {
+      return;
+    }
+
+    this.resolvingGames.add(gameId);
+    try {
+      await this.resolveExpiredTurn(gameId, true);
+    } catch (err) {
+      console.error('Auto resolve expired turn failed:', err);
+    } finally {
+      this.resolvingGames.delete(gameId);
+    }
   }
 
   public static async placeBetMock(gameId: string, address: string, team: 'WHITE' | 'BLACK', piece: string, amountWei: string) {
@@ -233,7 +260,7 @@ export class VercelGameService {
     return jsonSafe(bet);
   }
 
-  public static async resolveExpiredTurn(gameId: string) {
+  public static async resolveExpiredTurn(gameId: string, skipStateRefresh = false) {
     const game = await prisma.game.findUnique({
       where: { id: gameId },
       include: { turns: { orderBy: { turnNumber: 'desc' }, take: 1 } },
@@ -250,7 +277,7 @@ export class VercelGameService {
 
     await prisma.game.update({ where: { id: gameId }, data: { turnStatus: 'LOCKED' } });
 
-    const state = await this.getGameState(gameId);
+    const state = skipStateRefresh ? await this.getGameStateSnapshot(gameId) : await this.getGameState(gameId);
     const validVotes = state?.votes.filter((vote) => BigInt(vote.totalAmountWei) > BigInt(0)) || [];
     let winningPiece = '';
     let fallbackPieces: string[] = [];
@@ -344,5 +371,35 @@ export class VercelGameService {
       await prisma.game.update({ where: { id: gameId }, data: { turnStatus: 'OPEN' } });
       throw err;
     }
+  }
+
+  private static async getGameStateSnapshot(gameId: string) {
+    const game = await prisma.game.findUnique({
+      where: { id: gameId },
+      include: { turns: { orderBy: { turnNumber: 'desc' }, take: 1 } },
+    });
+
+    if (!game) return null;
+
+    const bets = await prisma.bet.findMany({
+      where: { gameId, turnNumber: game.turnNumber, status: 'CONFIRMED_VALID' },
+    });
+
+    return {
+      votes: ['PAWN', 'KNIGHT', 'BISHOP', 'ROOK', 'QUEEN', 'KING'].map((piece) => {
+        const pieceBets = bets.filter((bet: { piece: string }) => bet.piece === piece);
+        const firstBetAt = pieceBets.reduce((earliest: string | null, bet: { createdAt: Date }) => {
+          const createdAt = bet.createdAt.toISOString();
+          return !earliest || createdAt < earliest ? createdAt : earliest;
+        }, null);
+
+        return {
+          piece,
+          totalAmountWei: pieceBets.reduce((sum: bigint, bet: { amountWei: string }) => sum + BigInt(bet.amountWei), BigInt(0)).toString(),
+          bettorCount: pieceBets.length,
+          firstBetAt,
+        };
+      }),
+    };
   }
 }
