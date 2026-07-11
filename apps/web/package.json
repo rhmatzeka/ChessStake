@@ -2,12 +2,17 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": "20.x",
+    "pnpm": "9.x"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "../../node_modules/.bin/prisma generate --schema prisma/schema.prisma && next build",
+    "build": "(node_modules/.bin/prisma generate --schema prisma/schema.prisma || ../../node_modules/.bin/prisma generate --schema prisma/schema.prisma) && next build",
     "start": "next start",
     "lint": "eslint",
-    "prisma:generate": "../../node_modules/.bin/prisma generate --schema prisma/schema.prisma",
+    "prisma:generate": "node_modules/.bin/prisma generate --schema prisma/schema.prisma || ../../node_modules/.bin/prisma generate --schema prisma/schema.prisma",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
