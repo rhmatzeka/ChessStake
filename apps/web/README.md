@@ -47,6 +47,9 @@ API route tersedia di domain Vercel yang sama:
 /api/games/:gameId/state
 /api/games/:gameId/votes/mock-bet
 /api/games/:gameId/resolve-expired-turn
+/api/games/:gameId/settlement
 ```
 
 Karena mode ini memakai polling, `NEXT_PUBLIC_API_URL` dan `NEXT_PUBLIC_SOCKET_URL` tidak diperlukan untuk demo Vercel-only. Build menjalankan `prisma db push` untuk membuat tabel demo otomatis di database `DATABASE_URL`.
+
+Demo settlement bisa dicek lewat `/claim` atau endpoint `GET /api/games/:gameId/settlement?address=0x...`. Claim demo hanya menandai record database sebagai claimed/refunded dan tidak mengirim ETH on-chain.

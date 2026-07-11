@@ -136,6 +136,8 @@ pnpm --filter web build
 
 Catatan: mode Vercel-only memakai polling setiap 2 detik, bukan Socket.IO. Timer 0 memanggil `/api/games/:gameId/resolve-expired-turn` pada domain Vercel yang sama. Build web menjalankan `prisma db push` untuk membuat tabel demo di database yang ditunjuk `DATABASE_URL`.
 
+Demo reward/refund tersedia di halaman `/claim` dan endpoint `/api/games/:gameId/settlement?address=0x...`. Mode ini hanya menandai settlement di database demo, bukan transfer ETH on-chain.
+
 ---
 
 ## Security & Invariants

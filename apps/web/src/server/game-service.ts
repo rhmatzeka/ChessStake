@@ -260,6 +260,88 @@ export class VercelGameService {
     return jsonSafe(bet);
   }
 
+  public static async getSettlement(gameId: string, address: string) {
+    const game = await prisma.game.findUnique({ where: { id: gameId } });
+    if (!game) throw new Error('GAME_NOT_FOUND');
+
+    const bets = await prisma.bet.findMany({
+      where: { gameId, address, status: 'CONFIRMED_VALID' },
+    });
+
+    const whiteAmount = bets
+      .filter((bet) => bet.team === 'WHITE')
+      .reduce((sum, bet) => sum + BigInt(bet.amountWei), BigInt(0));
+    const blackAmount = bets
+      .filter((bet) => bet.team === 'BLACK')
+      .reduce((sum, bet) => sum + BigInt(bet.amountWei), BigInt(0));
+    const totalUserBet = whiteAmount + blackAmount;
+    const totalPool = BigInt(game.whitePoolWei) + BigInt(game.blackPoolWei);
+    const rewardPool = totalPool > BigInt(0) ? (totalPool * BigInt(9000)) / BigInt(10000) : BigInt(0);
+
+    let type: 'REWARD' | 'REFUND' | 'NONE' = 'NONE';
+    let claimableWei = BigInt(0);
+    let reason = 'Game is not settled yet.';
+
+    if (game.status === 'CANCELLED') {
+      type = totalUserBet > BigInt(0) ? 'REFUND' : 'NONE';
+      claimableWei = totalUserBet;
+      reason = type === 'REFUND' ? 'Game cancelled. Full demo refund is available.' : 'No bets found for this address.';
+    } else if (game.status === 'FINISHED' && game.result === 'DRAW') {
+      type = totalUserBet > BigInt(0) ? 'REFUND' : 'NONE';
+      claimableWei = totalPool > BigInt(0) ? (totalUserBet * rewardPool) / totalPool : BigInt(0);
+      reason = type === 'REFUND' ? 'Game draw. 90% demo pool refund is available.' : 'No bets found for this address.';
+    } else if (game.status === 'FINISHED' && (game.winner === 'WHITE' || game.winner === 'BLACK')) {
+      const winningAmount = game.winner === 'WHITE' ? whiteAmount : blackAmount;
+      const winningPool = BigInt(game.winner === 'WHITE' ? game.whitePoolWei : game.blackPoolWei);
+      type = winningAmount > BigInt(0) ? 'REWARD' : 'NONE';
+      claimableWei = winningPool > BigInt(0) ? (winningAmount * rewardPool) / winningPool : BigInt(0);
+      reason = type === 'REWARD' ? `Team ${game.winner} won. Demo reward is available.` : `Team ${game.winner} won. This address has no winning bets.`;
+    }
+
+    const alreadyClaimed = bets.some((bet) => bet.claimedAt || bet.refundedAt);
+    if (alreadyClaimed) {
+      claimableWei = BigInt(0);
+      reason = 'This demo settlement was already claimed.';
+    }
+
+    return jsonSafe({
+      gameId,
+      address,
+      gameStatus: game.status,
+      result: game.result,
+      winner: game.winner,
+      type,
+      claimableWei: claimableWei.toString(),
+      totalUserBetWei: totalUserBet.toString(),
+      whiteAmountWei: whiteAmount.toString(),
+      blackAmountWei: blackAmount.toString(),
+      totalPoolWei: totalPool.toString(),
+      rewardPoolWei: rewardPool.toString(),
+      alreadyClaimed,
+      reason,
+    });
+  }
+
+  public static async claimSettlement(gameId: string, address: string) {
+    const settlement = await this.getSettlement(gameId, address);
+    if (BigInt(settlement.claimableWei) <= BigInt(0)) {
+      return settlement;
+    }
+
+    const now = new Date();
+    await prisma.bet.updateMany({
+      where: { gameId, address, status: 'CONFIRMED_VALID' },
+      data: settlement.type === 'REWARD' ? { claimedAt: now } : { refundedAt: now },
+    });
+
+    return {
+      ...settlement,
+      alreadyClaimed: true,
+      claimedAt: now.toISOString(),
+      reason: `${settlement.type === 'REWARD' ? 'Reward' : 'Refund'} marked as claimed in demo mode.`,
+    };
+  }
+
   public static async resolveExpiredTurn(gameId: string, skipStateRefresh = false) {
     const game = await prisma.game.findUnique({
       where: { id: gameId },
