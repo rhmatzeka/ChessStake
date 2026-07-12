@@ -2,40 +2,43 @@
 
 import React from 'react';
 import { useArenaStore } from '../../stores/arena-store';
-import ChessSquare from './ChessSquare';
 import ChessPieceSprite from './ChessPieceSprite';
-import { coordsToSquare } from '../../lib/chess-board';
+import { squareToCoords } from '../../lib/chess-board';
+
+const PLAYABLE_AREA = {
+  left: 10.9,
+  top: 10.7,
+  width: 78.2,
+  height: 78.0,
+};
 
 export const LiveChessBoard: React.FC = () => {
   const { board } = useArenaStore();
 
-  const renderSquares = () => {
-    const squares = [];
-    
-    // Board standard: White perspective
-    // Row 0 = rank 8, Row 7 = rank 1
-    // Col 0 = file a, Col 7 = file h
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        const square = coordsToSquare(r, c);
-        const piece = board[square];
-        const isLight = (r + c) % 2 === 0;
+  const renderPieces = () => {
+    return Object.entries(board).flatMap(([square, piece]) => {
+      if (!piece) return [];
 
-        squares.push(
-          <ChessSquare key={square} square={square} isLight={isLight}>
-            {piece && (
-              <ChessPieceSprite 
-                piece={piece} 
-                size={50} 
-                className="drop-shadow-[0_3px_2px_rgba(0,0,0,0.45)] hover:scale-110 active:scale-95 duration-100" 
-              />
-            )}
-          </ChessSquare>
-        );
-      }
-    }
-    
-    return squares;
+      const { row, col } = squareToCoords(square);
+      const squareWidth = PLAYABLE_AREA.width / 8;
+      const squareHeight = PLAYABLE_AREA.height / 8;
+      const left = PLAYABLE_AREA.left + (col + 0.5) * squareWidth;
+      const top = PLAYABLE_AREA.top + (row + 0.52) * squareHeight;
+
+      return (
+        <div
+          key={square}
+          className="absolute z-10 aspect-square w-[8.4%] -translate-x-1/2 -translate-y-1/2"
+          style={{ left: `${left}%`, top: `${top}%` }}
+        >
+          <ChessPieceSprite
+            piece={piece}
+            size="100%"
+            className="drop-shadow-[0_3px_2px_rgba(0,0,0,0.45)] hover:scale-110 active:scale-95 duration-100"
+          />
+        </div>
+      );
+    });
   };
 
   return (
@@ -46,9 +49,7 @@ export const LiveChessBoard: React.FC = () => {
         draggable={false}
         className="absolute inset-0 h-full w-full select-none [image-rendering:pixelated]"
       />
-      <div className="absolute left-[10.75%] right-[10.75%] top-[10.5%] bottom-[13.25%] grid grid-cols-8 grid-rows-8">
-        {renderSquares()}
-      </div>
+      {renderPieces()}
     </div>
   );
 };

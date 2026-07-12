@@ -3,7 +3,7 @@ import { ChessPiece } from '../../types/chess';
 
 interface ChessPieceSpriteProps {
   piece: ChessPiece;
-  size?: number;
+  size?: number | string;
   className?: string;
 }
 
