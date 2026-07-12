@@ -385,6 +385,28 @@ export class VercelGameService {
     })));
   }
 
+  public static async heartbeatSpectator(gameId: string, sessionId: string) {
+    const lastSeen = new Date();
+    await prisma.spectatorPresence.upsert({
+      where: { gameId_sessionId: { gameId, sessionId } },
+      create: { gameId, sessionId, lastSeen },
+      update: { lastSeen },
+    });
+
+    return this.getSpectatorCount(gameId);
+  }
+
+  public static async getSpectatorCount(gameId: string) {
+    const activeSince = new Date(Date.now() - 15_000);
+    await prisma.spectatorPresence.deleteMany({
+      where: { gameId, lastSeen: { lt: activeSince } },
+    });
+
+    return prisma.spectatorPresence.count({
+      where: { gameId, lastSeen: { gte: activeSince } },
+    });
+  }
+
   public static async resolveExpiredTurn(gameId: string, skipStateRefresh = false) {
     const game = await prisma.game.findUnique({
       where: { id: gameId },

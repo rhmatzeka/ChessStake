@@ -70,6 +70,11 @@ export const useArenaSocket = () => {
     if (!activeGameId) return;
 
     let cancelled = false;
+    let sessionId = localStorage.getItem('chessstake_spectator_session');
+    if (!sessionId) {
+      sessionId = `spectator_${crypto.randomUUID?.() || `${Date.now()}_${Math.random()}`}`;
+      localStorage.setItem('chessstake_spectator_session', sessionId);
+    }
 
     const poll = async () => {
       try {
@@ -84,12 +89,32 @@ export const useArenaSocket = () => {
       }
     };
 
+    const heartbeat = async () => {
+      try {
+        const res = await fetch(`${API_URL}/games/${activeGameId}/spectators`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        });
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!cancelled && json.ok && typeof json.data?.count === 'number') {
+          setGameState({ spectatorCount: Math.max(1, json.data.count) });
+        }
+      } catch (err) {
+        if (!cancelled) console.error('Error updating spectator heartbeat:', err);
+      }
+    };
+
     poll();
+    heartbeat();
     const interval = setInterval(poll, 2000);
+    const heartbeatInterval = setInterval(heartbeat, 5000);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
+      clearInterval(heartbeatInterval);
     };
   }, [activeGameId, setGameState]);
 

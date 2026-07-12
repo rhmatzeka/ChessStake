@@ -129,3 +129,13 @@ model IndexerState {
   lastIndexedBlock BigInt
   updatedAt        DateTime @updatedAt
 }
+
+model SpectatorPresence {
+  id        String   @id @default(cuid())
+  gameId    String
+  sessionId String
+  lastSeen  DateTime @default(now())
+
+  @@unique([gameId, sessionId])
+  @@index([gameId, lastSeen])
+}
