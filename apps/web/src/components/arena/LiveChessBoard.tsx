@@ -6,10 +6,10 @@ import ChessPieceSprite from './ChessPieceSprite';
 import { squareToCoords } from '../../lib/chess-board';
 
 const PLAYABLE_AREA = {
-  left: 10.9,
+  left: 10.7,
   top: 10.7,
-  width: 78.2,
-  height: 78.0,
+  width: 78.6,
+  height: 78.6,
 };
 
 export const LiveChessBoard: React.FC = () => {
@@ -22,18 +22,23 @@ export const LiveChessBoard: React.FC = () => {
       const { row, col } = squareToCoords(square);
       const squareWidth = PLAYABLE_AREA.width / 8;
       const squareHeight = PLAYABLE_AREA.height / 8;
-      const left = PLAYABLE_AREA.left + (col + 0.5) * squareWidth;
-      const top = PLAYABLE_AREA.top + (row + 0.52) * squareHeight;
+      const left = PLAYABLE_AREA.left + col * squareWidth;
+      const top = PLAYABLE_AREA.top + row * squareHeight;
 
       return (
         <div
           key={square}
-          className="absolute z-10 aspect-square w-[8.4%] -translate-x-1/2 -translate-y-1/2"
-          style={{ left: `${left}%`, top: `${top}%` }}
+          className="absolute z-10 flex items-end justify-center pb-[0.8%]"
+          style={{
+            left: `${left}%`,
+            top: `${top}%`,
+            width: `${squareWidth}%`,
+            height: `${squareHeight}%`,
+          }}
         >
           <ChessPieceSprite
             piece={piece}
-            size="100%"
+            size="86%"
             className="drop-shadow-[0_3px_2px_rgba(0,0,0,0.45)] hover:scale-110 active:scale-95 duration-100"
           />
         </div>
