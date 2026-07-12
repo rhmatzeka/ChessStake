@@ -180,24 +180,13 @@ export const VotingPanel: React.FC = () => {
             <h3 className="text-sm font-bold text-[#eedcbf] uppercase tracking-wider">
               Place Your Bet
             </h3>
-            <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${
-              MOCK_CHAIN
-                ? 'bg-amber-500/10 text-amber-300 border border-amber-400/30'
-                : 'bg-emerald-500/10 text-emerald-300 border border-emerald-400/30'
-            }`}>
-              {MOCK_CHAIN ? 'Demo Mode' : 'Web3 Mode'}
-            </span>
           </div>
           <p className="text-xs text-[#eedcbf]/60">
-            {MOCK_CHAIN
-              ? 'Demo mode uses backend mock votes. Set NEXT_PUBLIC_MOCK_CHAIN=false for wallet transactions.'
-              : !isConnected
-                ? 'Connect your wallet on Ethereum Sepolia to place an on-chain bet.'
-                : !myLockedTeam 
-                  ? 'Select your team above to unlock betting.'
-                  : myLockedTeam !== currentTurn
-                    ? `Waiting for your team's turn (${myLockedTeam}). Currently it's ${currentTurn}'s turn.`
-                    : `Place an on-chain bet for Team ${myLockedTeam}.`}
+            {!myLockedTeam 
+              ? 'Select your team above to unlock betting.'
+              : myLockedTeam !== currentTurn
+                ? `Waiting for your team's turn (${myLockedTeam}). Currently it's ${currentTurn}'s turn.`
+                : `Choose a legal piece for Team ${myLockedTeam}. Highest pool wins the move.`}
           </p>
         </div>
 
@@ -236,7 +225,7 @@ export const VotingPanel: React.FC = () => {
                 <div className="w-full text-center">
                   <div className="text-xs font-bold text-[#eedcbf]">{name}</div>
                   <div className="text-[10px] text-[#b58863] font-semibold">
-                    {!hasLegalMove ? 'No legal move' : MOCK_CHAIN ? 'Demo vote' : isWrongChain ? 'Switch to Ethereum Sepolia' : isBusy ? 'Submitting...' : `${price} ETH`}
+                    {!hasLegalMove ? 'No legal move' : isWrongChain ? 'Switch to Ethereum Sepolia' : isBusy ? 'Submitting...' : `${price} ETH`}
                   </div>
                 </div>
 
