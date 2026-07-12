@@ -6,10 +6,10 @@ import ChessPieceSprite from './ChessPieceSprite';
 import { squareToCoords } from '../../lib/chess-board';
 
 const PLAYABLE_AREA = {
-  left: 11.111,
-  top: 11.111,
-  width: 77.778,
-  height: 77.778,
+  left: 5.9,
+  top: 5.9,
+  width: 88.9,
+  height: 88.9,
 };
 
 export const LiveChessBoard: React.FC = () => {
@@ -38,7 +38,7 @@ export const LiveChessBoard: React.FC = () => {
         >
           <ChessPieceSprite
             piece={piece}
-            size="82%"
+            size="100%"
             className="drop-shadow-[0_3px_2px_rgba(0,0,0,0.45)] hover:scale-110 active:scale-95 duration-100"
           />
         </div>
