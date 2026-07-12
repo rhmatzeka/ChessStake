@@ -14,17 +14,12 @@ export const ChessSquare: React.FC<ChessSquareProps> = ({
   children,
   onClick,
 }) => {
-  const bgClass = isLight 
-    ? 'bg-[#eedcbf] text-[#b58863]' // warna kayu terang
-    : 'bg-[#b58863] text-[#eedcbf]'; // warna kayu gelap
-
   return (
     <div 
-      className={`relative w-full aspect-square flex items-center justify-center select-none ${bgClass} transition-colors duration-200 cursor-default`}
+      className="relative flex aspect-square w-full items-center justify-center select-none transition-colors duration-200 cursor-default"
       onClick={onClick}
     >
-      {/* Label coordinate di pojok-pojok board */}
-      <span className="absolute bottom-0.5 right-1 text-[9px] font-semibold opacity-30 select-none">
+      <span className={`absolute bottom-0.5 right-1 select-none font-mono text-[8px] font-black opacity-35 ${isLight ? 'text-[#8a5f35]' : 'text-[#f3dfbf]'}`}>
         {square}
       </span>
       {children}

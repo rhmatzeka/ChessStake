@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import { ChessPiece } from '../../types/chess';
 
 interface ChessPieceSpriteProps {
@@ -40,13 +39,13 @@ export const ChessPieceSprite: React.FC<ChessPieceSpriteProps> = ({
       className={`relative select-none pointer-events-none transition-transform duration-300 ${className}`}
       style={{ width: size, height: size }}
     >
-      <Image
+      <img
         src={src}
         alt={`${piece.team} ${piece.type}`}
         width={size}
         height={size}
-        className="object-contain"
-        priority
+        draggable={false}
+        className="h-full w-full object-contain [image-rendering:pixelated]"
       />
     </div>
   );

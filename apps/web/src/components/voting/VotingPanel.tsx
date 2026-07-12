@@ -221,7 +221,7 @@ export const VotingPanel: React.FC = () => {
                     src={imgUrl}
                     alt={name}
                     fill
-                    className="object-contain"
+                    className="object-contain [image-rendering:pixelated]"
                     priority
                   />
                 </div>

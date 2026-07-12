@@ -26,8 +26,8 @@ export const LiveChessBoard: React.FC = () => {
             {piece && (
               <ChessPieceSprite 
                 piece={piece} 
-                size={52} 
-                className="hover:scale-105 active:scale-95 duration-100" 
+                size={40} 
+                className="drop-shadow-[0_3px_2px_rgba(0,0,0,0.45)] hover:scale-110 active:scale-95 duration-100" 
               />
             )}
           </ChessSquare>
@@ -39,8 +39,14 @@ export const LiveChessBoard: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full max-w-[500px] aspect-square rounded-lg overflow-hidden shadow-2xl border-4 border-[#8b5a2b] bg-[#8b5a2b]">
-      <div className="grid grid-cols-8 grid-rows-8 w-full h-full">
+    <div className="relative aspect-square w-full max-w-[576px] overflow-hidden rounded-xl border-4 border-[#7a4c25] bg-[#2b1b12] shadow-2xl shadow-black/40">
+      <img
+        src="/assets/chess/Board.png"
+        alt="Chess board"
+        draggable={false}
+        className="absolute inset-0 h-full w-full select-none [image-rendering:pixelated]"
+      />
+      <div className="absolute inset-0 grid grid-cols-8 grid-rows-8">
         {renderSquares()}
       </div>
     </div>
