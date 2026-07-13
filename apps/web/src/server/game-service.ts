@@ -78,7 +78,15 @@ async function resolveBestMoveForPiece(fen: string, team: 'WHITE' | 'BLACK', win
 export class VercelGameService {
   private static resolvingGames = new Set<string>();
 
-  public static async createGame() {
+  public static async createGame(input: {
+    title?: string;
+    description?: string;
+    creatorName?: string;
+    creatorAddress?: string;
+    creatorSlug?: string;
+    creatorFeeBps?: number;
+    scheduledAt?: Date | null;
+  } = {}) {
     const now = Date.now();
     const gameId = `game_${now}`;
     const chainGameId = String(now);
@@ -87,6 +95,14 @@ export class VercelGameService {
       data: {
         id: gameId,
         chainGameId,
+        title: input.title || 'AI Boss Battle',
+        description: input.description || 'A live AI chess arena where the crowd backs teams and votes strategy.',
+        creatorName: input.creatorName || 'ChessStake',
+        creatorAddress: input.creatorAddress || null,
+        creatorSlug: input.creatorSlug || 'chessstake',
+        creatorFeeBps: input.creatorFeeBps ?? 0,
+        scheduledAt: input.scheduledAt || null,
+        startedAt: new Date(),
         status: 'ACTIVE',
         currentFen: INITIAL_FEN,
         currentTurn: 'WHITE',
@@ -166,6 +182,12 @@ export class VercelGameService {
     return jsonSafe({
       gameId: game.id,
       chainGameId: game.chainGameId,
+      title: game.title,
+      description: game.description,
+      creatorName: game.creatorName,
+      creatorAddress: game.creatorAddress,
+      creatorSlug: game.creatorSlug,
+      creatorFeeBps: game.creatorFeeBps,
       status: game.status,
       result: game.result,
       fen: game.currentFen,
@@ -383,6 +405,18 @@ export class VercelGameService {
       ...bettor,
       totalWei: bettor.totalWei.toString(),
     })));
+  }
+
+  public static async trackEvent(input: { name: string; gameId?: string | null; address?: string | null; sessionId?: string | null; payload?: unknown }) {
+    await prisma.analyticsEvent.create({
+      data: {
+        name: input.name,
+        gameId: input.gameId || null,
+        address: input.address || null,
+        sessionId: input.sessionId || null,
+        payload: input.payload === undefined ? undefined : JSON.parse(JSON.stringify(input.payload)),
+      },
+    });
   }
 
   public static async heartbeatSpectator(gameId: string, sessionId: string) {

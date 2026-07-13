@@ -17,6 +17,12 @@ export const useArenaSocket = () => {
 
     setGameState({
       activeGameId: game.gameId,
+      title: game.title || null,
+      description: game.description || null,
+      creatorName: game.creatorName || null,
+      creatorAddress: game.creatorAddress || null,
+      creatorSlug: game.creatorSlug || null,
+      creatorFeeBps: game.creatorFeeBps || 0,
       status: game.status,
       result: game.result,
       fen: game.fen,

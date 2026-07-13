@@ -12,6 +12,13 @@ export const RewardPoolPanel: React.FC = () => {
   };
 
   const totalPoolWei = (BigInt(whitePoolWei) + BigInt(blackPoolWei)).toString();
+  const totalPool = BigInt(totalPoolWei);
+  const whitePool = BigInt(whitePoolWei);
+  const blackPool = BigInt(blackPoolWei);
+  const rewardAfterFeeWei = totalPool > BigInt(0) ? ((totalPool * BigInt(9500)) / BigInt(10000)).toString() : '0';
+  const whitePercent = totalPool > BigInt(0) ? Number((whitePool * BigInt(10000)) / totalPool) / 100 : 50;
+  const blackPercent = totalPool > BigInt(0) ? 100 - whitePercent : 50;
+  const leader = whitePool === blackPool ? 'Even momentum' : whitePool > blackPool ? 'White leads' : 'Black leads';
 
   return (
     <div className="w-full bg-[#2d241e] p-5 rounded-xl border border-[#b58863]/30 shadow-md">
@@ -22,6 +29,19 @@ export const RewardPoolPanel: React.FC = () => {
         <h2 className="text-2xl font-extrabold font-mono text-[#eedcbf] mt-1">
           {formatEth(totalPoolWei)}
         </h2>
+        <p className="mt-1 text-xs font-semibold text-[#b58863]">
+          Projected rewards after fee: {formatEth(rewardAfterFeeWei)}
+        </p>
+      </div>
+
+      <div className="mb-4 rounded-lg border border-[#b58863]/15 bg-[#1e1713] p-3">
+        <div className="mb-2 flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-[#eedcbf]/55">
+          <span>{leader}</span>
+          <span>{whitePercent.toFixed(1)}% / {blackPercent.toFixed(1)}%</span>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-[#120d0a]">
+          <div className="h-full bg-[#eedcbf]" style={{ width: `${whitePercent}%` }} />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 border-t border-[#b58863]/10 pt-4">

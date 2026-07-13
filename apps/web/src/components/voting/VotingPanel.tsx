@@ -21,6 +21,12 @@ const PIECE_NAMES: Record<PieceType, string> = {
 const API_URL = '/api';
 const MOCK_CHAIN = process.env.NEXT_PUBLIC_ENABLE_ONCHAIN_BETS !== 'true';
 
+function formatEthFromWei(wei: string) {
+  const eth = Number(BigInt(wei)) / 1e18;
+  if (eth === 0) return '0 ETH';
+  return `${eth.toFixed(4)} ETH`;
+}
+
 export const VotingPanel: React.FC = () => {
   const {
     activeGameId,
@@ -36,6 +42,11 @@ export const VotingPanel: React.FC = () => {
   const { address, chainId, isConnected } = useAccount();
   const { placeBet, isPending, isConfirming } = usePlaceBet();
   const [isVotingLoading, setIsVotingLoading] = useState(false);
+  const [myPickedPiece, setMyPickedPiece] = useState<PieceType | null>(null);
+  const maxVoteWei = votes.reduce((max, vote) => {
+    const amount = BigInt(vote.totalAmountWei);
+    return amount > max ? amount : max;
+  }, BigInt(0));
 
   const handleVote = async (piece: PieceType) => {
     if (turnStatus !== 'OPEN' || !activeGameId) return;
@@ -107,6 +118,7 @@ export const VotingPanel: React.FC = () => {
         });
 
         setGameState({ votes: updatedVotes });
+        setMyPickedPiece(piece);
       } catch (err) {
         console.error('Mock bet submission failed:', err);
         alert(err instanceof Error ? err.message : 'Failed to submit bet');
@@ -125,6 +137,11 @@ export const VotingPanel: React.FC = () => {
   const handleSelectTeam = (team: Team) => {
     setGameState({ myLockedTeam: team });
     localStorage.setItem(`chessstake_locked_team_${activeGameId}`, team);
+    fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'team_selected', gameId: activeGameId, payload: { team } }),
+    }).catch(() => undefined);
   };
 
   // Efek samping untuk me-restore team dari localStorage jika ada
@@ -186,7 +203,7 @@ export const VotingPanel: React.FC = () => {
               ? 'Select your team above to unlock betting.'
               : myLockedTeam !== currentTurn
                 ? `Waiting for your team's turn (${myLockedTeam}). Currently it's ${currentTurn}'s turn.`
-                : `Choose a legal piece for Team ${myLockedTeam}. Highest pool wins the move.`}
+                : 'Back the piece you believe should move next. The highest-backed legal piece controls this turn.'}
           </p>
         </div>
 
@@ -200,6 +217,10 @@ export const VotingPanel: React.FC = () => {
             const isWrongChain = !MOCK_CHAIN && isConnected && chainId !== CHAIN_ID;
             const hasLegalMove = legalPieces.includes(piece);
             const isDisabled = !myLockedTeam || turnStatus !== 'OPEN' || isBusy || myLockedTeam !== currentTurn || !hasLegalMove || isWrongChain || (!MOCK_CHAIN && !isConnected);
+            const voteWei = BigInt(voteData.totalAmountWei);
+            const progress = maxVoteWei > BigInt(0) ? Number((voteWei * BigInt(100)) / maxVoteWei) : 0;
+            const isLeading = maxVoteWei > BigInt(0) && voteWei === maxVoteWei;
+            const isMyPick = myPickedPiece === piece;
 
             return (
               <button
@@ -210,8 +231,12 @@ export const VotingPanel: React.FC = () => {
                   isDisabled 
                     ? 'opacity-30 cursor-not-allowed border-[#b58863]/10'
                     : 'hover:bg-[#251d18] border-[#b58863]/30 hover:border-[#b58863]/60 cursor-pointer active:scale-95'
-                }`}
+                  }`}
               >
+                <div className="absolute left-2 top-2 flex gap-1">
+                  {isLeading && <span className="rounded bg-[#d6a15f] px-1.5 py-0.5 text-[9px] font-black uppercase text-[#1e1713]">Leading</span>}
+                  {isMyPick && <span className="rounded border border-[#d6a15f]/40 px-1.5 py-0.5 text-[9px] font-black uppercase text-[#d6a15f]">Your Pick</span>}
+                </div>
                 <div className="relative w-12 h-12 mb-2 select-none pointer-events-none">
                   <Image
                     src={imgUrl}
@@ -230,8 +255,11 @@ export const VotingPanel: React.FC = () => {
                 </div>
 
                 <div className="w-full border-t border-[#b58863]/10 mt-2 pt-1 flex justify-between text-[9px] text-[#eedcbf]/50 font-mono">
-                  <span>Wei: {voteData.totalAmountWei}</span>
-                  <span>Qty: {voteData.bettorCount}</span>
+                  <span>{formatEthFromWei(voteData.totalAmountWei)}</span>
+                  <span>{voteData.bettorCount} backers</span>
+                </div>
+                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#120d0a]">
+                  <div className="h-full bg-[#d6a15f]" style={{ width: `${progress}%` }} />
                 </div>
               </button>
             );

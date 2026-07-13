@@ -18,6 +18,18 @@ model User {
 model Game {
   id             String   @id
   chainGameId    String   @unique
+  title          String?
+  description    String?
+  creatorName    String?
+  creatorAddress String?
+  creatorSlug    String?
+  creatorFeeBps  Int      @default(0)
+  isPublic       Boolean  @default(true)
+  scheduledAt    DateTime?
+  startedAt      DateTime?
+  endedAt        DateTime?
+  sponsorName    String?
+  sponsorUrl     String?
   status         String
   result         String?
   currentFen     String
@@ -138,4 +150,17 @@ model SpectatorPresence {
 
   @@unique([gameId, sessionId])
   @@index([gameId, lastSeen])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  name      String
+  gameId    String?
+  address   String?
+  sessionId String?
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  @@index([name, createdAt])
+  @@index([gameId, createdAt])
 }

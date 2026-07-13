@@ -20,6 +20,12 @@ export interface VoteTally {
 
 interface ArenaState {
   activeGameId: string | null;
+  title: string | null;
+  description: string | null;
+  creatorName: string | null;
+  creatorAddress: string | null;
+  creatorSlug: string | null;
+  creatorFeeBps: number;
   status: 'WAITING' | 'ACTIVE' | 'FINISHED' | 'CANCELLED';
   result: string | null;
   fen: string;
@@ -47,6 +53,12 @@ interface ArenaState {
 
 export const useArenaStore = create<ArenaState>((set) => ({
   activeGameId: null,
+  title: null,
+  description: null,
+  creatorName: null,
+  creatorAddress: null,
+  creatorSlug: null,
+  creatorFeeBps: 0,
   status: 'ACTIVE',
   result: null,
   fen: INITIAL_FEN,

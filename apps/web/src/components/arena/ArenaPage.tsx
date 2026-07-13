@@ -10,9 +10,12 @@ import VotingTimer from '../voting/VotingTimer';
 import VotingPanel from '../voting/VotingPanel';
 import WalletConnectButton from '../layout/WalletConnectButton';
 import { useArenaSocket } from '../../hooks/useArenaSocket';
+import ShareArenaButton from '../share/ShareArenaButton';
+import { useArenaStore } from '../../stores/arena-store';
 
 export const ArenaPage: React.FC = () => {
   useArenaSocket();
+  const { spectatorCount, activeGameId, title, description, creatorName, creatorFeeBps } = useArenaStore();
 
   return (
     <div className="min-h-screen bg-[#1e1713] text-[#eedcbf] flex flex-col">
@@ -23,13 +26,13 @@ export const ArenaPage: React.FC = () => {
             ChessStake
           </div>
           <span className="text-xs uppercase tracking-wider font-bold opacity-40 ml-2 hidden sm:inline">
-            Web3 AI Chess Betting
+            Interactive AI Chess Arena
           </span>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="text-xs bg-[#b58863]/10 border border-[#b58863]/30 px-3 py-1.5 rounded-lg font-bold text-[#b58863] hidden md:inline-block">
-            Testnet Mode (Ethereum Sepolia)
+            {spectatorCount} watching
           </div>
           <WalletConnectButton />
         </div>
@@ -39,6 +42,21 @@ export const ArenaPage: React.FC = () => {
       <main className="flex-1 w-full max-w-[1200px] mx-auto p-4 md:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Board + Status (7 cols on lg) */}
         <div className="lg:col-span-7 flex flex-col items-center gap-4 w-full">
+          <section className="w-full rounded-xl border border-[#b58863]/25 bg-[#2d241e] p-5 shadow-md">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#b58863]">Live Creator Arena</p>
+                <h1 className="mt-1 text-2xl font-black text-[#eedcbf]">{title || 'AI Boss Battle'}</h1>
+                <p className="mt-1 text-sm text-[#eedcbf]/60">
+                  Hosted by {creatorName || 'ChessStake'}. {description || 'Back a side, vote strategy, and follow every AI-resolved move.'}
+                </p>
+                {creatorFeeBps > 0 && (
+                  <p className="mt-2 text-xs font-bold text-[#d6a15f]">Creator share target: {(creatorFeeBps / 100).toFixed(1)}%</p>
+                )}
+              </div>
+              <ShareArenaButton gameId={activeGameId} />
+            </div>
+          </section>
           <GameStatusPanel />
 
           <div className="relative w-full flex justify-center">
@@ -61,7 +79,7 @@ export const ArenaPage: React.FC = () => {
       
       {/* Footer */}
       <footer className="w-full bg-[#110d0a] border-t border-[#b58863]/10 py-4 px-6 text-center text-xs text-[#eedcbf]/40">
-        ChessStake &copy; {new Date().getFullYear()} - Play responsibly. Ethereum Sepolia testnet only.
+        ChessStake &copy; {new Date().getFullYear()} - Interactive AI chess arenas for creators and communities.
       </footer>
     </div>
   );
