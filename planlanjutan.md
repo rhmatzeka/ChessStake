@@ -1231,6 +1231,145 @@ menjadi:
 The highest-backed legal piece controls the turn
 ```
 
+## Arah Baru: Player-Owned AI Agents
+
+Fitur AI agent milik player bisa membuat ChessStake jauh lebih unik dibanding sekadar voting chess arena.
+
+Konsep baru:
+
+```text
+Crowd-controlled chess with player-owned AI agents.
+```
+
+Artinya:
+
+- Player tetap bisa vote manual.
+- Player bisa membuat AI agent sendiri.
+- Agent punya personality dan strategi.
+- Agent bisa memberi rekomendasi bidak/move.
+- Agent bisa mewakili player untuk voting jika auto-vote diaktifkan.
+- Agent punya statistik, leaderboard, dan reputasi sendiri.
+
+Contoh agent:
+
+- Aggressive Attacker: suka capture dan tekanan ke king.
+- Defensive Wall: fokus aman dan posisi solid.
+- Gambit Hunter: mau ambil risiko.
+- Endgame Grinder: fokus material dan simplifikasi.
+- Meme Agent: chaotic tapi tetap legal.
+
+Kenapa ini penting secara bisnis:
+
+- Membuat retention lebih kuat karena user punya aset/persona sendiri.
+- Membuka monetization baru seperti premium agent slot, skin/persona, agent league, dan creator-branded agents.
+- Membuat AI terasa nyata di produk, bukan hanya label marketing.
+- Membuat leaderboard lebih menarik karena bukan hanya player, tapi juga agent.
+
+## Integrasi AI Yang Direkomendasikan
+
+Saat ini project belum benar-benar memakai Grok/xAI. AI yang ada masih heuristic lokal.
+
+Arsitektur ideal:
+
+```text
+chess.js = aturan legal catur dan FEN
+Stockfish/local evaluator = tactical move scoring
+Grok/xAI = reasoning, commentary, personality, recap
+Player Agent = strategi personal player untuk vote/rekomendasi
+```
+
+Aturan penting:
+
+```text
+LLM tidak boleh menjadi sumber validasi move. Semua move harus tetap divalidasi oleh chess.js.
+```
+
+Tahap implementasi terbaik:
+
+1. Local deterministic agent scoring dulu.
+2. Agent recommendation di arena.
+3. Agent decision history.
+4. Agent leaderboard.
+5. AI commentary.
+6. Baru integrasi Grok/xAI untuk reasoning dan personality.
+7. Auto-vote hanya setelah ada limit dan legal/compliance review.
+
+## Model Bisnis Tambahan Dari AI Agent
+
+Revenue tambahan:
+
+- Free user dapat 1 basic agent.
+- Pro user dapat multiple agents.
+- Paid strategy presets.
+- Creator-branded community agent.
+- Agent league seasonal pass.
+- Sponsored agents.
+- Marketplace fee jika template agent bisa dijual nanti.
+
+Pricing awal yang masuk akal:
+
+```text
+Free: 1 basic agent
+Agent Pro: $5-$9/month
+Creator Agent: included in Creator Pro
+Agent League: seasonal pass or event entry fee
+```
+
+## Gameplay Dengan AI Agent
+
+Mode baru yang bisa dibuat:
+
+```text
+Manual Crowd Mode
+```
+
+Player vote manual seperti sekarang.
+
+```text
+Agent Assist Mode
+```
+
+Agent memberi rekomendasi, player klik confirm.
+
+```text
+Agent Auto-Vote Mode
+```
+
+Agent voting otomatis sesuai limit dan aturan player.
+
+```text
+Agent League
+```
+
+Agent bersaing di leaderboard berdasarkan performa.
+
+```text
+Creator Agent Battle
+```
+
+Creator/community punya agent sendiri untuk melawan agent komunitas lain.
+
+```text
+Human Crowd vs AI Agent
+```
+
+Satu sisi dikontrol crowd, satu sisi dikontrol agent AI.
+
+## Roadmap AI Agent
+
+Paling aman dieksekusi begini:
+
+```text
+AI-0: Jelaskan AI resolver yang sekarang
+AI-1: Tambah AI commentary sederhana
+AI-2: Buat Player Agent Builder MVP
+AI-3: Agent recommendation di voting panel
+AI-4: Agent decision history dan leaderboard
+AI-5: Auto-vote dengan strict limits
+AI-6: Grok/xAI untuk reasoning dan commentary
+AI-7: Agent League dan creator/community agents
+```
+
 ## Metrics Yang Harus Dipantau
 
 Untuk tahu project ini benar-benar bisa ramai, pantau metrics berikut:

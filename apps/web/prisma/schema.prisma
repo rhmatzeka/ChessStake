@@ -164,3 +164,43 @@ model AnalyticsEvent {
   @@index([name, createdAt])
   @@index([gameId, createdAt])
 }
+
+model PlayerAgent {
+  id              String   @id @default(cuid())
+  ownerAddress    String
+  name            String
+  description     String?
+  personality     String
+  riskLevel       String   @default("BALANCED")
+  preferredTeam   String?
+  isPublic        Boolean  @default(false)
+  autoVoteEnabled Boolean  @default(false)
+  maxVoteWei      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  decisions       AgentDecision[]
+
+  @@index([ownerAddress, createdAt])
+}
+
+model AgentDecision {
+  id                String   @id @default(cuid())
+  agentId           String
+  gameId            String
+  turnNumber        Int
+  fen               String
+  legalPieces       Json?
+  recommendedPiece  String
+  recommendedMove   String?
+  confidence        Int
+  reasoning         String?
+  scoringBreakdown  Json?
+  provider          String   @default("local")
+  fallbackUsed      Boolean  @default(false)
+  wasSubmitted      Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  agent             PlayerAgent @relation(fields: [agentId], references: [id])
+
+  @@index([agentId, createdAt])
+  @@index([gameId, turnNumber])
+}

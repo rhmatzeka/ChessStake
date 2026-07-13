@@ -43,6 +43,10 @@ export const VotingPanel: React.FC = () => {
   const { placeBet, isPending, isConfirming } = usePlaceBet();
   const [isVotingLoading, setIsVotingLoading] = useState(false);
   const [myPickedPiece, setMyPickedPiece] = useState<PieceType | null>(null);
+  const [agents, setAgents] = useState<Array<{ id: string; name: string; riskLevel: string }>>([]);
+  const [selectedAgentId, setSelectedAgentId] = useState('');
+  const [agentDecision, setAgentDecision] = useState<{ recommendedPiece: PieceType; confidence: number; reasoning?: string } | null>(null);
+  const [isAgentLoading, setIsAgentLoading] = useState(false);
   const maxVoteWei = votes.reduce((max, vote) => {
     const amount = BigInt(vote.totalAmountWei);
     return amount > max ? amount : max;
@@ -128,6 +132,40 @@ export const VotingPanel: React.FC = () => {
     }
   };
 
+  const loadAgents = React.useCallback(async () => {
+    if (!address) return;
+    try {
+      const res = await fetch(`/api/agents?ownerAddress=${encodeURIComponent(address)}`, { cache: 'no-store' });
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        setAgents(json.data || []);
+        if (!selectedAgentId && json.data?.[0]?.id) setSelectedAgentId(json.data[0].id);
+      }
+    } catch (err) {
+      console.error('Failed to load agents:', err);
+    }
+  }, [address, selectedAgentId]);
+
+  const requestAgentRecommendation = async () => {
+    if (!activeGameId || !selectedAgentId) return;
+    setIsAgentLoading(true);
+    setAgentDecision(null);
+    try {
+      const res = await fetch(`/api/agents/${selectedAgentId}/recommend`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameId: activeGameId }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error?.message || 'Agent recommendation failed');
+      setAgentDecision(json.data);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Agent recommendation failed');
+    } finally {
+      setIsAgentLoading(false);
+    }
+  };
+
   const getAssetPath = (piece: PieceType, team: Team) => {
     const formattedPiece = piece[0] + piece.slice(1).toLowerCase();
     const formattedTeam = team[0] + team.slice(1).toLowerCase();
@@ -153,6 +191,10 @@ export const VotingPanel: React.FC = () => {
       }
     }
   }, [activeGameId, setGameState]);
+
+  React.useEffect(() => {
+    loadAgents();
+  }, [loadAgents]);
 
   return (
     <div className="w-full bg-[#2d241e] p-3 rounded-xl border border-[#b58863]/30 shadow-md flex flex-col gap-3 md:p-4">
@@ -205,6 +247,42 @@ export const VotingPanel: React.FC = () => {
                 ? `Waiting for your team's turn (${myLockedTeam}). Currently it's ${currentTurn}'s turn.`
                 : 'Back the piece you believe should move next. The highest-backed legal piece controls this turn.'}
           </p>
+        </div>
+
+        <div className="mb-3 rounded-lg border border-[#b58863]/20 bg-[#1e1713] p-3">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-wider text-[#eedcbf]">Use My Agent</h4>
+              <p className="text-[11px] text-[#eedcbf]/50">Recommendation only. You still confirm the vote.</p>
+            </div>
+            <a href="/agents/create" className="text-[11px] font-bold text-[#d6a15f] hover:underline">Create</a>
+          </div>
+
+          {agents.length > 0 ? (
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+              <select value={selectedAgentId} onChange={(event) => setSelectedAgentId(event.target.value)} className="rounded-lg border border-[#b58863]/20 bg-[#120d0a] px-3 py-2 text-xs text-[#eedcbf] outline-none">
+                {agents.map((agent) => <option key={agent.id} value={agent.id}>{agent.name} ({agent.riskLevel})</option>)}
+              </select>
+              <button type="button" onClick={requestAgentRecommendation} disabled={isAgentLoading || !activeGameId} className="rounded-lg border border-[#d6a15f]/40 px-3 py-2 text-xs font-black text-[#d6a15f] disabled:opacity-40">
+                {isAgentLoading ? 'Thinking...' : 'Recommend'}
+              </button>
+            </div>
+          ) : (
+            <p className="text-xs text-[#eedcbf]/45">No connected wallet agent found yet.</p>
+          )}
+
+          {agentDecision && (
+            <div className="mt-3 rounded-lg bg-[#120d0a] p-3 text-xs text-[#eedcbf]/70">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span>Agent pick: <strong className="text-[#d6a15f]">{agentDecision.recommendedPiece}</strong></span>
+                <span>{agentDecision.confidence}% confidence</span>
+              </div>
+              {agentDecision.reasoning && <p className="mt-2 text-[#eedcbf]/50">{agentDecision.reasoning}</p>}
+              <button type="button" onClick={() => handleVote(agentDecision.recommendedPiece)} className="mt-3 rounded-lg bg-[#d6a15f] px-3 py-2 text-xs font-black text-[#120d0a]">
+                Back Agent Pick
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-3 gap-2">

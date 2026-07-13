@@ -419,6 +419,89 @@ export class VercelGameService {
     });
   }
 
+  public static async createAgent(input: {
+    ownerAddress: string;
+    name: string;
+    description?: string;
+    personality: string;
+    riskLevel: string;
+    preferredTeam?: string | null;
+  }) {
+    const agent = await prisma.playerAgent.create({
+      data: {
+        ownerAddress: input.ownerAddress.toLowerCase(),
+        name: input.name,
+        description: input.description || null,
+        personality: input.personality,
+        riskLevel: input.riskLevel,
+        preferredTeam: input.preferredTeam || null,
+      },
+    });
+
+    return jsonSafe(agent);
+  }
+
+  public static async getAgents(ownerAddress?: string | null) {
+    const agents = await prisma.playerAgent.findMany({
+      where: ownerAddress ? { ownerAddress: ownerAddress.toLowerCase() } : { isPublic: true },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+
+    return jsonSafe(agents);
+  }
+
+  public static async recommendWithAgent(agentId: string, gameId: string) {
+    const [agent, game] = await Promise.all([
+      prisma.playerAgent.findUnique({ where: { id: agentId } }),
+      prisma.game.findUnique({ where: { id: gameId } }),
+    ]);
+
+    if (!agent) throw new Error('AGENT_NOT_FOUND');
+    if (!game || game.status !== 'ACTIVE') throw new Error('GAME_NOT_ACTIVE');
+
+    const legalPieces = this.getLegalPiecesForTurn(game.currentFen, game.currentTurn as 'WHITE' | 'BLACK');
+    if (legalPieces.length === 0) throw new Error('NO_LEGAL_PIECES');
+
+    const scores = legalPieces.map((piece) => {
+      const legalMoves = ChessStateService.getLegalMovesForPiece(game.currentFen, piece, game.currentTurn as 'WHITE' | 'BLACK');
+      const captureScore = legalMoves.reduce((best, move) => {
+        const chess = new Chess(game.currentFen);
+        const targetPiece = chess.get(move.slice(2, 4) as any);
+        const values: Record<string, number> = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
+        return Math.max(best, targetPiece ? values[targetPiece.type] || 0 : 0);
+      }, 0);
+      const mobilityScore = legalMoves.length * 3;
+      const piecePreference = agent.personality.toLowerCase().includes(piece.toLowerCase()) ? 20 : 0;
+      const riskBonus = agent.riskLevel === 'AGGRESSIVE' ? captureScore : agent.riskLevel === 'DEFENSIVE' ? Math.min(mobilityScore, 20) : Math.floor((captureScore + mobilityScore) / 2);
+      const total = captureScore + mobilityScore + piecePreference + riskBonus;
+
+      return { piece, legalMoves, captureScore, mobilityScore, piecePreference, riskBonus, total };
+    }).sort((a, b) => b.total - a.total);
+
+    const best = scores[0];
+    const recommendedMove = best.legalMoves[0] || null;
+    const confidence = Math.max(35, Math.min(95, 50 + best.total));
+    const reasoning = `${agent.name} prefers ${best.piece} because it has ${best.legalMoves.length} legal move${best.legalMoves.length === 1 ? '' : 's'} with a local strategy score of ${best.total}.`;
+
+    const decision = await prisma.agentDecision.create({
+      data: {
+        agentId,
+        gameId,
+        turnNumber: game.turnNumber,
+        fen: game.currentFen,
+        legalPieces,
+        recommendedPiece: best.piece,
+        recommendedMove,
+        confidence,
+        reasoning,
+        scoringBreakdown: scores.map(({ piece, captureScore, mobilityScore, piecePreference, riskBonus, total }) => ({ piece, captureScore, mobilityScore, piecePreference, riskBonus, total })),
+      },
+    });
+
+    return jsonSafe(decision);
+  }
+
   public static async heartbeatSpectator(gameId: string, sessionId: string) {
     const lastSeen = new Date();
     await prisma.spectatorPresence.upsert({

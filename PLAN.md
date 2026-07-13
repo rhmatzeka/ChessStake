@@ -16,6 +16,698 @@ Core product narrative:
 ChessStake lets creators host live AI chess matches where fans back teams, vote strategy, and share rewards from the outcome.
 ```
 
+## Game Concept
+
+ChessStake is not only a normal chess match. The strongest concept is:
+
+```text
+Crowd-controlled chess with optional player-owned AI agents.
+```
+
+Core loop:
+
+```text
+1. A creator or community hosts a chess arena.
+2. Players join White or Black.
+3. Each turn, players back a strategy or piece.
+4. The highest-backed legal option wins the crowd decision.
+5. An AI resolver chooses the best legal move for that winning option.
+6. The board updates and the next side takes the turn.
+7. The match ends by checkmate, draw, max move limit, or cancellation.
+8. Rewards, reputation, leaderboard points, and creator stats update.
+```
+
+Current MVP behavior:
+
+```text
+Players vote for a piece type. The system uses chess.js for legal moves and a simple heuristic resolver to choose the move.
+```
+
+Target behavior:
+
+```text
+Players can either vote manually or delegate their decision to their own AI agent. The arena can also include creator/community agents, public agents, and AI commentary.
+```
+
+## AI Integration Direction
+
+The project currently uses a local heuristic move picker, not a real AI provider.
+
+Current files:
+
+```text
+apps/web/src/server/game-service.ts
+apps/web/src/server/chess-state.ts
+```
+
+Current AI logic:
+
+- `chess.js` generates legal moves.
+- The resolver prefers moves that capture higher-value pieces.
+- No Grok/xAI/OpenAI/Stockfish API is currently used in the Vercel flow.
+
+Target AI architecture:
+
+```text
+Chess rules engine: chess.js
+Tactical engine: Stockfish or lightweight local evaluator
+LLM strategy/commentary: Grok/xAI or OpenAI-compatible provider
+Player-owned agents: user-created strategy profiles that vote or recommend moves
+```
+
+Important principle:
+
+```text
+LLMs should not be trusted to validate chess legality. chess.js must remain the source of truth for legal moves.
+```
+
+Recommended AI responsibilities:
+
+- `chess.js`: legal moves, FEN updates, checkmate/draw validation.
+- Stockfish: best tactical move from legal candidates.
+- Grok/xAI or LLM: explanation, personality, strategy summary, trash talk, social recap, agent reasoning.
+- Player agent: preference model that chooses what piece/strategy to back.
+
+## Player-Owned AI Agents
+
+This is the next major feature that can make the game unique.
+
+Concept:
+
+```text
+Each player can create an AI agent that represents their chess style. The agent can recommend or auto-submit votes during live matches.
+```
+
+Player agent examples:
+
+- Aggressive Attacker: prefers captures, queen pressure, king-side attacks.
+- Defensive Wall: prefers safe moves, king safety, pawn structure.
+- Gambit Hunter: accepts risk for initiative.
+- Endgame Grinder: prefers simplification and material advantage.
+- Meme Agent: plays chaotic but legal strategies.
+
+Player agent loop:
+
+```text
+1. Player creates an agent.
+2. Player chooses personality and strategy weights.
+3. Agent can inspect current FEN, legal pieces, vote tally, and match context.
+4. Agent recommends a piece or move.
+5. Player can manually approve the agent recommendation.
+6. Later, player can enable auto-vote within limits.
+7. Agent performance is tracked on leaderboard.
+```
+
+MVP version:
+
+```text
+Agent recommends a piece. Player still clicks to confirm.
+```
+
+Advanced version:
+
+```text
+Agent auto-votes for the player using a configured budget, risk profile, and allowed match types.
+```
+
+## Agent Game Modes
+
+Recommended modes:
+
+```text
+Manual Crowd Mode
+Players vote manually. Current MVP.
+```
+
+```text
+Agent Assist Mode
+Players create agents that recommend votes, but user confirms.
+```
+
+```text
+Agent Auto-Vote Mode
+Player agents auto-submit votes within user-defined rules.
+```
+
+```text
+Agent League
+Agents compete across matches and climb rankings.
+```
+
+```text
+Creator Agent Battle
+Creator deploys a community agent against another creator/community agent.
+```
+
+```text
+Human Crowd vs AI Agent
+Crowd controls one side, a named AI agent controls the other side.
+```
+
+## Player Agent Monetization
+
+AI agents can create a stronger business model than reward-pool fee alone.
+
+Potential revenue streams:
+
+- Paid premium agent slots.
+- Agent customization skins/personas.
+- Advanced strategy presets.
+- Creator-branded agents.
+- Agent league entry fee.
+- Sponsored agents.
+- Marketplace fee if agents/templates are tradable later.
+
+Suggested pricing:
+
+```text
+Free: 1 basic agent
+Pro: $5/month to $9/month for multiple agents and advanced settings
+Creator Pro: custom community agent and analytics
+Agent League: entry fee or seasonal pass
+```
+
+Important: do not launch paid auto-vote with real-money reward pools before legal review.
+
+## Agent Data Model Direction
+
+Potential Prisma models:
+
+```prisma
+model PlayerAgent {
+  id              String   @id @default(cuid())
+  ownerAddress    String
+  name            String
+  description     String?
+  personality     String
+  riskLevel       String   @default("BALANCED")
+  preferredTeam   String?
+  isPublic        Boolean  @default(false)
+  autoVoteEnabled Boolean  @default(false)
+  maxVoteWei      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model AgentStrategyProfile {
+  id             String @id @default(cuid())
+  agentId        String @unique
+  aggression     Int    @default(50)
+  defense        Int    @default(50)
+  material       Int    @default(50)
+  kingSafety     Int    @default(50)
+  centerControl  Int    @default(50)
+  randomness     Int    @default(10)
+}
+
+model AgentDecision {
+  id              String   @id @default(cuid())
+  agentId         String
+  gameId          String
+  turnNumber      Int
+  fen             String
+  recommendedPiece String
+  recommendedMove  String?
+  confidence      Int
+  reasoning       String?
+  wasSubmitted    Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+```
+
+MVP can start simpler with only `PlayerAgent` and `AgentDecision`.
+
+## Agent API Direction
+
+Recommended routes:
+
+```text
+GET  /api/agents
+POST /api/agents
+GET  /api/agents/:agentId
+PATCH /api/agents/:agentId
+POST /api/agents/:agentId/recommend
+POST /api/agents/:agentId/auto-vote
+GET  /api/agents/:agentId/history
+GET  /api/agent-leaderboard
+```
+
+Responsibilities:
+
+- `/api/agents`: list agents owned by wallet/session.
+- `POST /api/agents`: create player agent.
+- `/recommend`: agent inspects match state and recommends a piece/move.
+- `/auto-vote`: submits vote only if user enabled auto mode and constraints pass.
+- `/history`: shows past agent decisions and performance.
+- `/agent-leaderboard`: ranks agents by wins, accuracy, ROI, and activity.
+
+## Agent UI Direction
+
+Recommended pages/components:
+
+```text
+/agents
+/agents/create
+/agents/[agentId]
+components/agents/AgentCard.tsx
+components/agents/AgentBuilderForm.tsx
+components/agents/AgentRecommendationPanel.tsx
+components/agents/AgentLeaderboard.tsx
+```
+
+Arena integration:
+
+- Show `Use My Agent` button in voting panel.
+- Show agent recommendation beside manual piece choices.
+- Show confidence and short reasoning.
+- Let user click `Back Agent Pick`.
+- Later add `Enable Auto-Vote` with clear risk/budget limits.
+
+Agent builder fields:
+
+- Agent name.
+- Personality.
+- Risk level.
+- Preferred strategy.
+- Favorite pieces.
+- Manual approval or auto-vote.
+- Max vote amount.
+- Public/private visibility.
+
+## AI Provider Plan
+
+Recommended abstraction:
+
+```text
+apps/web/src/server/ai/ai-provider.ts
+apps/web/src/server/ai/agent-decision-service.ts
+apps/web/src/server/ai/commentary-service.ts
+apps/web/src/server/ai/stockfish-service.ts
+```
+
+Provider interface:
+
+```ts
+type AgentDecisionInput = {
+  fen: string;
+  team: 'WHITE' | 'BLACK';
+  legalPieces: string[];
+  legalMovesByPiece: Record<string, string[]>;
+  votes: Array<{ piece: string; totalAmountWei: string; bettorCount: number }>;
+  agentProfile: {
+    personality: string;
+    riskLevel: string;
+    aggression: number;
+    defense: number;
+    material: number;
+  };
+};
+
+type AgentDecisionOutput = {
+  piece: string;
+  move?: string;
+  confidence: number;
+  reasoning: string;
+};
+```
+
+Provider priority:
+
+```text
+1. Deterministic local agent scoring for MVP
+2. Stockfish for tactical scoring
+3. Grok/xAI for reasoning/commentary/personality
+4. Optional OpenAI-compatible fallback
+```
+
+Environment variables:
+
+```env
+XAI_API_KEY=...
+AI_PROVIDER=xai
+AI_AGENT_MODE=assist
+AI_COMMENTARY_ENABLED=true
+```
+
+Security rules:
+
+- Never expose API keys to client.
+- AI calls must happen server-side.
+- Always validate returned piece/move with `chess.js`.
+- If AI returns illegal move, fall back to legal local scorer.
+
+## Agent Scoring MVP
+
+Before using Grok/xAI, implement local scoring so the feature works reliably.
+
+Agent scoring can use:
+
+- Capture value.
+- Legal move count.
+- Piece preference.
+- Risk profile.
+- Existing vote momentum.
+- King safety heuristic.
+- Randomness weight.
+
+Example:
+
+```text
+Aggressive agent: capture value + queen/rook preference + attack squares
+Defensive agent: king safety + avoids hanging pieces
+Balanced agent: material + mobility + low randomness
+```
+
+This keeps the product functional even without paid AI API usage.
+
+## Updated AI/Agent Execution Phases
+
+### Phase AI-0: Clarify AI In Product
+
+Tasks:
+
+- Rename current resolver from generic AI to `Strategy Resolver` or `AI Resolver` with clear explanation.
+- Add UI text explaining that chess legality is enforced by `chess.js`.
+- Add move explanation placeholder.
+
+### Phase AI-1: AI Commentary
+
+Tasks:
+
+- Add commentary after every move.
+- Use local template first.
+- Later connect Grok/xAI for richer commentary.
+
+### Phase AI-2: Player Agent Builder MVP
+
+Tasks:
+
+- Add `/agents` and `/agents/create`.
+- Add `PlayerAgent` model.
+- Let player create one basic agent.
+- Store personality and risk profile.
+
+### Phase AI-3: Agent Recommendation In Arena
+
+Tasks:
+
+- Add `Use My Agent` panel inside voting UI.
+- Agent recommends piece for current turn.
+- Player manually confirms vote.
+- Store `AgentDecision`.
+
+### Phase AI-4: Agent Leaderboard
+
+Tasks:
+
+- Track agent recommendations.
+- Track submitted agent votes.
+- Rank agents by win rate, activity, and accuracy.
+
+### Phase AI-5: Auto-Vote With Limits
+
+Tasks:
+
+- Add opt-in auto-vote.
+- Add max vote amount.
+- Add match type allowlist.
+- Add emergency disable.
+- Do not enable for real-money mainnet without legal review.
+
+### Phase AI-6: Grok/xAI Integration
+
+Tasks:
+
+- Add server-side xAI provider.
+- Use it for commentary and agent reasoning first.
+- Use deterministic local scoring as fallback.
+- Do not let LLM bypass legal move validation.
+
+### Phase AI-7: Agent League
+
+Tasks:
+
+- Public agent profiles.
+- Agent rankings.
+- Creator/community agents.
+- Seasonal competitions.
+- Optional paid agent slots or league passes.
+
+## Remaining Gaps Before AI Agent Execution
+
+The AI agent plan is directionally strong, but these gaps must be resolved before implementation starts.
+
+## 1. Agent Ownership And Authentication
+
+Problem:
+
+```text
+If agents are owned by wallet addresses, the app needs a reliable way to prove that the current user controls the wallet before editing or using an agent.
+```
+
+Required decisions:
+
+- Use wallet signature login or continue with lightweight wallet/session identity.
+- Decide whether guest users can create temporary agents.
+- Decide whether agents are tied to wallet address, user account, or creator account.
+- Decide what happens if a player changes wallet.
+
+Recommended MVP:
+
+```text
+Agents are tied to wallet address. Editing or auto-vote requires wallet connection. Recommendation-only can work in demo mode with local/session identity.
+```
+
+Implementation notes:
+
+- Add signature-based ownership verification before destructive actions.
+- Do not allow editing another wallet's agent.
+- Store `ownerAddress` normalized lowercase.
+
+## 2. Agent Safety And Abuse Prevention
+
+Problem:
+
+Player-owned agents can be abused for spam, automation, sybil voting, or griefing.
+
+Risks:
+
+- Unlimited agent creation.
+- Vote spam.
+- Bot-created agents.
+- Agent names/descriptions containing offensive content.
+- Auto-vote draining user funds if misconfigured.
+- Prompt injection if public descriptions are passed into LLM prompts.
+
+Required safeguards:
+
+- Limit free agents per wallet.
+- Rate-limit agent recommendation requests.
+- Moderate agent names/descriptions.
+- Escape/sanitize all user-generated text.
+- Add max auto-vote amount.
+- Add daily/weekly auto-vote cap.
+- Add emergency disable for auto-vote.
+- Never pass untrusted text directly into critical LLM instructions.
+
+Recommended MVP:
+
+```text
+1 free agent per wallet. Recommendation only. No auto-vote until abuse controls are implemented.
+```
+
+## 3. AI Cost Control
+
+Problem:
+
+If every player agent calls Grok/xAI on every turn, costs can explode quickly.
+
+Cost risks:
+
+- Many players request recommendations at once.
+- Same FEN/state produces repeated AI calls.
+- Agent league simulations can create heavy background usage.
+- Commentary per move adds additional AI calls.
+
+Cost controls:
+
+- Start with local deterministic scoring.
+- Cache recommendations by `agentProfileHash + fen + team + legalPieces`.
+- Use Grok/xAI only for reasoning text, not every scoring decision.
+- Add per-wallet rate limits.
+- Add per-match AI budget.
+- Add fallback when AI provider fails.
+
+Recommended MVP:
+
+```text
+No paid AI provider required for agent recommendation. Use local scorer first, then add Grok/xAI for commentary/personality once engagement is proven.
+```
+
+## 4. Agent Performance Metrics
+
+Problem:
+
+Agent leaderboard needs clear scoring rules, otherwise users will not trust it.
+
+Metrics to track:
+
+- Recommendation count.
+- Submitted vote count.
+- Winning-piece accuracy.
+- Match win rate.
+- Average reward influence.
+- Manual approval rate.
+- Auto-vote success rate.
+- Illegal recommendation rate.
+- Confidence calibration.
+
+Suggested agent score:
+
+```text
+Agent Score = win contribution + recommendation accuracy + activity streak - illegal/fallback penalties
+```
+
+MVP leaderboard:
+
+- Most used agents.
+- Highest recommendation accuracy.
+- Most winning picks.
+- Best match win rate.
+
+## 5. Agent UX Onboarding
+
+Problem:
+
+If users do not understand what an agent does, the feature will feel confusing or fake.
+
+Required UX explanations:
+
+- What the agent can see.
+- What the agent cannot do.
+- Difference between recommendation and auto-vote.
+- Why a recommendation was made.
+- Whether the user still needs to confirm.
+- Whether any funds are used.
+
+Recommended UI copy:
+
+```text
+Your agent recommends a strategy based on the current board, legal moves, and your selected playstyle. You stay in control and confirm before anything is submitted.
+```
+
+MVP UX:
+
+- Add `Use My Agent` button.
+- Show recommendation card.
+- Show confidence.
+- Show short reasoning.
+- Show `Back Agent Pick` button.
+- Show fallback if no agent exists: `Create your first agent`.
+
+## 6. Agent Decision Transparency
+
+Problem:
+
+Users need to trust why an agent recommended a move or piece.
+
+Required fields in `AgentDecision`:
+
+- `inputFen`
+- `legalPieces`
+- `recommendedPiece`
+- `recommendedMove`
+- `confidence`
+- `reasoning`
+- `scoringBreakdown`
+- `provider`
+- `fallbackUsed`
+
+Recommended addition:
+
+```prisma
+scoringBreakdown Json?
+provider         String @default("local")
+fallbackUsed     Boolean @default(false)
+```
+
+## 7. Real AI vs Marketing AI
+
+Problem:
+
+Current app says AI, but actual move resolver is simple heuristic. If the product adds agents, the marketing must not overclaim.
+
+Required copy discipline:
+
+- Say `AI-assisted strategy` only where AI actually exists.
+- Say `local strategy resolver` for heuristic logic.
+- Say `Grok-powered commentary` only after Grok is actually integrated.
+
+Recommended product wording before Grok integration:
+
+```text
+AI-assisted arena with deterministic chess validation and strategy scoring.
+```
+
+After Grok integration:
+
+```text
+Grok-powered agent reasoning and live commentary.
+```
+
+## 8. Legal And Compliance For Auto-Vote
+
+Problem:
+
+Auto-vote plus real-money pools may create additional regulatory risk because the agent acts on behalf of a user.
+
+Required constraints before auto-vote:
+
+- Explicit opt-in.
+- Clear max spend.
+- Clear match allowlist.
+- Clear stop button.
+- Audit trail for every auto-vote.
+- Legal review before mainnet.
+
+Recommended rollout:
+
+```text
+Recommendation-only -> demo auto-vote -> testnet auto-vote -> legal review -> limited mainnet pilot
+```
+
+## 9. Technical Reliability
+
+Problem:
+
+AI requests and auto-votes can fail, timeout, or race with turn close.
+
+Required system behavior:
+
+- Agent recommendation timeout under 2 seconds for MVP.
+- If AI fails, local scorer fallback.
+- If turn closes before recommendation, do not submit.
+- If auto-vote fails, log failure and notify user.
+- Do not block turn resolution on agent commentary.
+
+Recommended architecture later:
+
+- Queue background commentary.
+- Keep voting path synchronous and fast.
+- Store decision attempts even when failed.
+
+## 10. Agent Rollout Acceptance Criteria
+
+Do not move to auto-vote or paid agents until these are true:
+
+- Users create agents without confusion.
+- At least 30% of active voters try recommendation.
+- At least 50% of recommendations are manually accepted.
+- Agent recommendation endpoint has stable latency.
+- Illegal recommendation rate is near zero after validation/fallback.
+- No major abuse/spam issue appears in test events.
+- Users understand agent decisions from reasoning text.
+
 ## Current State
 
 The project already has the technical foundation:
