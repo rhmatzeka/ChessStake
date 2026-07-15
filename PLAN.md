@@ -734,6 +734,220 @@ Acceptance criteria:
 - User creating an agent can choose a template instead of writing strategy from scratch.
 - User can understand recommendation-only vs demo auto-vote.
 
+## New Player Tutorial Plan
+
+Problem:
+
+```text
+New users can see the board and controls, but they do not immediately understand what to do first, why pieces are disabled, what the AI does, or how agents fit into the game.
+```
+
+Tutorial goal:
+
+```text
+A first-time user should understand and submit their first valid action within 60 seconds without external explanation.
+```
+
+Required tutorial layers:
+
+- First-time modal.
+- Persistent `How to Play` button.
+- Contextual hints inside voting UI.
+- Mobile-first onboarding layout.
+- Standalone `/how-to-play` page.
+- Analytics for tutorial completion and drop-off.
+
+## Tutorial Modal MVP
+
+Create:
+
+```text
+apps/web/src/components/tutorial/HowToPlayModal.tsx
+```
+
+Behavior:
+
+- Show automatically on first arena visit.
+- Store completion in `localStorage.chessstake_tutorial_seen`.
+- Let users skip.
+- Let users reopen from `How to Play` button.
+- Track opened, skipped, completed.
+
+Recommended steps:
+
+```text
+1. Welcome to ChessStake
+2. Choose White or Black
+3. Back a legal piece
+4. AI resolves the move
+5. Optional: use your AI agent
+```
+
+Modal copy should be short. Avoid long paragraphs.
+
+## Guided UI Highlights
+
+The tutorial should eventually highlight real UI areas, not only show text.
+
+Target highlights:
+
+- Board.
+- Team selector.
+- Piece voting grid.
+- Timer.
+- AI agent panel.
+- Reward pool.
+
+MVP can use text-only modal. Next iteration should use highlight anchors.
+
+Potential component API:
+
+```ts
+type TutorialStep = {
+  title: string;
+  body: string;
+  target?: 'board' | 'team' | 'pieces' | 'timer' | 'agent' | 'pool';
+};
+```
+
+## Contextual Hints
+
+Update:
+
+```text
+apps/web/src/components/voting/VotingPanel.tsx
+apps/web/src/components/voting/VotingTimer.tsx
+apps/web/src/components/arena/RewardPoolPanel.tsx
+```
+
+Required hints:
+
+- If no team selected: `Start here: choose White or Black.`
+- If wrong turn: `Your team is waiting. You can vote when it is your team's turn.`
+- If piece disabled: `This piece has no legal move right now.`
+- If agent missing: `Create an agent later, or play manually now.`
+- Timer: `When time reaches 0, the highest-backed legal piece is resolved by AI.`
+- Pool: `MVP mode may use demo accounting unless on-chain mode is enabled.`
+
+## First-Action Checklist
+
+Add a tiny checklist for new users until they submit a first vote.
+
+Checklist:
+
+```text
+[ ] Choose a team
+[ ] Pick a legal piece
+[ ] Wait for AI move
+```
+
+Behavior:
+
+- Hide checklist after first successful vote.
+- Store in localStorage.
+- Keep it compact on mobile.
+
+## Mobile Tutorial Requirements
+
+Mobile is the highest-risk UX because users scroll between board and controls.
+
+Requirements:
+
+- Tutorial button must be visible near board/voting.
+- Modal must fit small screens.
+- Step text must be short.
+- CTA buttons must be thumb-friendly.
+- Tutorial should not cover the whole board permanently.
+- `Start Playing` should scroll user to voting panel after the modal closes.
+
+## Standalone How-To-Play Page
+
+Create:
+
+```text
+apps/web/src/app/how-to-play/page.tsx
+```
+
+Sections:
+
+- What is ChessStake?
+- How turns work.
+- How voting works.
+- What AI does.
+- What agents do.
+- Why some pieces are disabled.
+- Demo vs on-chain mode.
+- FAQ.
+
+CTAs:
+
+- `Enter Live Arena`
+- `Create Agent`
+- `View Matches`
+
+## Tutorial Analytics
+
+Use existing endpoint:
+
+```text
+POST /api/analytics
+```
+
+Track:
+
+- `tutorial_opened`
+- `tutorial_step_viewed`
+- `tutorial_completed`
+- `tutorial_skipped`
+- `how_to_play_clicked`
+- `first_team_selected_after_tutorial`
+- `first_vote_after_tutorial`
+
+Success metrics:
+
+- At least 70% of first-time users complete or skip after reading at least 2 steps.
+- At least 50% of first-time users select a team after tutorial.
+- At least 25% submit a vote in first session.
+- Reduced user questions about “what do I do?” during live tests.
+
+## Tutorial Accessibility
+
+Requirements:
+
+- Modal has proper `role="dialog"`.
+- Escape closes modal.
+- Buttons are keyboard accessible.
+- Focus is trapped inside modal while open.
+- Text contrast is readable.
+- No instruction relies only on color.
+
+## Tutorial Reset And Persistence
+
+Add:
+
+- `How to Play` button in arena.
+- Optional `Reset tutorial` link in `/how-to-play`.
+- Store tutorial state per browser using localStorage.
+
+Keys:
+
+```text
+chessstake_tutorial_seen
+chessstake_first_vote_done
+```
+
+## Tutorial Acceptance Criteria
+
+- First-time arena visit shows tutorial.
+- Tutorial can be skipped.
+- Tutorial can be reopened.
+- User understands team selection.
+- User understands piece voting.
+- User understands AI move resolution.
+- User understands agents are optional.
+- Mobile user sees voting guidance without excessive scrolling.
+- Analytics events are emitted.
+
 ## Current State
 
 The project already has the technical foundation:

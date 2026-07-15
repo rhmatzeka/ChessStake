@@ -20,6 +20,7 @@ const PIECE_NAMES: Record<PieceType, string> = {
 
 const API_URL = '/api';
 const MOCK_CHAIN = process.env.NEXT_PUBLIC_ENABLE_ONCHAIN_BETS !== 'true';
+const FIRST_VOTE_DONE_KEY = 'chessstake_first_vote_done';
 
 function formatEthFromWei(wei: string) {
   const eth = Number(BigInt(wei)) / 1e18;
@@ -47,6 +48,7 @@ export const VotingPanel: React.FC = () => {
   const [selectedAgentId, setSelectedAgentId] = useState('');
   const [agentDecision, setAgentDecision] = useState<{ recommendedPiece: PieceType; confidence: number; reasoning?: string } | null>(null);
   const [isAgentLoading, setIsAgentLoading] = useState(false);
+  const [firstVoteDone, setFirstVoteDone] = useState(false);
   const maxVoteWei = votes.reduce((max, vote) => {
     const amount = BigInt(vote.totalAmountWei);
     return amount > max ? amount : max;
@@ -123,6 +125,13 @@ export const VotingPanel: React.FC = () => {
 
         setGameState({ votes: updatedVotes });
         setMyPickedPiece(piece);
+        localStorage.setItem(FIRST_VOTE_DONE_KEY, 'true');
+        setFirstVoteDone(true);
+        fetch('/api/analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: 'first_vote_after_tutorial', gameId: activeGameId, payload: { piece } }),
+        }).catch(() => undefined);
       } catch (err) {
         console.error('Mock bet submission failed:', err);
         alert(err instanceof Error ? err.message : 'Failed to submit bet');
@@ -213,6 +222,10 @@ export const VotingPanel: React.FC = () => {
   }, [activeGameId, setGameState]);
 
   React.useEffect(() => {
+    setFirstVoteDone(localStorage.getItem(FIRST_VOTE_DONE_KEY) === 'true');
+  }, []);
+
+  React.useEffect(() => {
     loadAgents();
   }, [loadAgents]);
 
@@ -254,6 +267,17 @@ export const VotingPanel: React.FC = () => {
       </div>
 
       <div>
+        {!firstVoteDone && (
+          <div className="mb-3 rounded-lg border border-[#d6a15f]/25 bg-[#120d0a] p-3 text-xs text-[#eedcbf]/70">
+            <div className="mb-2 font-black uppercase tracking-wider text-[#d6a15f]">First Turn Checklist</div>
+            <div className="grid gap-1">
+              <span>{myLockedTeam ? '[x]' : '[ ]'} Choose a team</span>
+              <span>{myLockedTeam === currentTurn ? '[ ]' : '[ ]'} Pick a legal piece when it is your turn</span>
+              <span>[ ] Wait for the AI move</span>
+            </div>
+          </div>
+        )}
+
         <div className="mb-4">
           <div className="mb-0.5 flex items-center justify-between gap-3">
             <h3 className="text-[11px] font-bold text-[#eedcbf] uppercase tracking-wider">
@@ -262,9 +286,9 @@ export const VotingPanel: React.FC = () => {
           </div>
           <p className="text-[11px] text-[#eedcbf]/60">
             {!myLockedTeam 
-              ? 'Select your team above to unlock betting.'
+              ? 'Step 1: choose White or Black to unlock piece voting.'
               : myLockedTeam !== currentTurn
-                ? `Waiting for your team's turn (${myLockedTeam}). Currently it's ${currentTurn}'s turn.`
+                ? `Your team is waiting. You joined ${myLockedTeam}; you can vote when it is ${myLockedTeam}'s turn.`
                 : 'Back the piece you believe should move next. The highest-backed legal piece controls this turn.'}
           </p>
         </div>

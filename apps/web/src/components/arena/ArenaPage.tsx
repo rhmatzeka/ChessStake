@@ -12,10 +12,16 @@ import WalletConnectButton from '../layout/WalletConnectButton';
 import { useArenaSocket } from '../../hooks/useArenaSocket';
 import ShareArenaButton from '../share/ShareArenaButton';
 import { useArenaStore } from '../../stores/arena-store';
+import HowToPlayModal, { shouldShowTutorial } from '../tutorial/HowToPlayModal';
 
 export const ArenaPage: React.FC = () => {
   useArenaSocket();
   const { spectatorCount, activeGameId, title, creatorName, creatorFeeBps } = useArenaStore();
+  const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (shouldShowTutorial()) setIsTutorialOpen(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#1e1713] text-[#eedcbf] flex flex-col">
@@ -30,7 +36,10 @@ export const ArenaPage: React.FC = () => {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
+          <button type="button" onClick={() => setIsTutorialOpen(true)} className="rounded-lg border border-[#b58863]/30 px-3 py-1.5 text-xs font-black text-[#b58863] transition hover:bg-[#b58863]/10">
+            How to Play
+          </button>
           <div className="text-xs bg-[#b58863]/10 border border-[#b58863]/30 px-3 py-1.5 rounded-lg font-bold text-[#b58863] hidden md:inline-block">
             {spectatorCount} watching
           </div>
@@ -62,6 +71,7 @@ export const ArenaPage: React.FC = () => {
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <a href="/agents" className="rounded-xl border border-[#d6a15f]/40 px-3 py-2 text-xs font-black text-[#f3dfbf] transition hover:bg-[#d6a15f]/10">My Agents</a>
+                <button type="button" onClick={() => setIsTutorialOpen(true)} className="rounded-xl border border-[#d6a15f]/40 px-3 py-2 text-xs font-black text-[#f3dfbf] transition hover:bg-[#d6a15f]/10">Help</button>
                 <ShareArenaButton gameId={activeGameId} />
               </div>
             </div>
@@ -86,6 +96,7 @@ export const ArenaPage: React.FC = () => {
       <footer className="w-full bg-[#110d0a] border-t border-[#b58863]/10 py-4 px-6 text-center text-xs text-[#eedcbf]/40">
         ChessStake &copy; {new Date().getFullYear()} - Interactive AI chess arenas for creators and communities.
       </footer>
+      <HowToPlayModal open={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
     </div>
   );
 };

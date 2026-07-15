@@ -63,6 +63,7 @@ export const RewardPoolPanel: React.FC = () => {
           </div>
         </div>
       </div>
+      <p className="mt-3 text-center text-[10px] text-[#eedcbf]/35">MVP mode may use demo accounting unless on-chain mode is enabled.</p>
     </div>
   );
 };

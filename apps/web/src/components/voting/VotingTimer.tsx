@@ -136,6 +136,7 @@ export const VotingTimer: React.FC = () => {
           {timeLeft}s
         </span>
       </div>
+      <p className="mt-2 text-[10px] text-[#eedcbf]/45">When time reaches 0, the highest-backed legal piece is resolved by AI.</p>
     </div>
   );
 };
