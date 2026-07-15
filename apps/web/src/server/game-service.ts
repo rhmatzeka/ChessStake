@@ -13,6 +13,26 @@ function jsonSafe<T>(data: T): T {
   return JSON.parse(JSON.stringify(data, (_key, value) => (typeof value === 'bigint' ? value.toString() : value)));
 }
 
+function scoreMove(fen: string, move: string) {
+  const chess = new Chess(fen);
+  const from = move.slice(0, 2);
+  const to = move.slice(2, 4);
+  const targetPiece = chess.get(to as any);
+  const movingPiece = chess.get(from as any);
+  const values: Record<string, number> = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
+  const file = to.charCodeAt(0) - 97;
+  const rank = Number(to[1]);
+  const centerDistance = Math.abs(file - 3.5) + Math.abs(rank - 4.5);
+  const centerScore = Math.max(0, 18 - centerDistance * 4);
+  const captureScore = targetPiece ? (values[targetPiece.type] || 0) * 10 : 0;
+  const developmentScore = movingPiece?.type === 'n' || movingPiece?.type === 'b' ? 8 : 0;
+  const pawnCenterBonus = movingPiece?.type === 'p' && ['c', 'd', 'e', 'f'].includes(to[0]) ? 14 : 0;
+  const pawnAdvanceBonus = movingPiece?.type === 'p' ? Math.max(0, movingPiece.color === 'w' ? rank - 2 : 7 - rank) * 2 : 0;
+  const edgePenalty = file === 0 || file === 7 ? -10 : 0;
+
+  return captureScore + centerScore + developmentScore + pawnCenterBonus + pawnAdvanceBonus + edgePenalty;
+}
+
 async function getXaiReasoning(input: { agentName: string; personality: string; piece: string; confidence: number; fen: string }) {
   if (!process.env.XAI_API_KEY || process.env.AI_PROVIDER !== 'xai') return null;
 
@@ -47,11 +67,7 @@ async function getBestMove(fen: string, legalMoves: string[]) {
   let bestScore = -Infinity;
 
   for (const move of legalMoves) {
-    const chess = new Chess(fen);
-    const to = move.slice(2, 4);
-    const targetPiece = chess.get(to as any);
-    const values: Record<string, number> = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
-    const score = targetPiece ? values[targetPiece.type] || 0 : 0;
+    const score = scoreMove(fen, move);
 
     if (score > bestScore) {
       bestScore = score;
@@ -490,22 +506,18 @@ export class VercelGameService {
 
     const scores = legalPieces.map((piece) => {
       const legalMoves = ChessStateService.getLegalMovesForPiece(game.currentFen, piece, game.currentTurn as 'WHITE' | 'BLACK');
-      const captureScore = legalMoves.reduce((best, move) => {
-        const chess = new Chess(game.currentFen);
-        const targetPiece = chess.get(move.slice(2, 4) as any);
-        const values: Record<string, number> = { p: 10, n: 30, b: 30, r: 50, q: 90, k: 900 };
-        return Math.max(best, targetPiece ? values[targetPiece.type] || 0 : 0);
-      }, 0);
+      const moveScores = legalMoves.map((move) => ({ move, score: scoreMove(game.currentFen, move) })).sort((a, b) => b.score - a.score);
+      const captureScore = moveScores[0]?.score || 0;
       const mobilityScore = legalMoves.length * 3;
       const piecePreference = agent.personality.toLowerCase().includes(piece.toLowerCase()) ? 20 : 0;
       const riskBonus = agent.riskLevel === 'AGGRESSIVE' ? captureScore : agent.riskLevel === 'DEFENSIVE' ? Math.min(mobilityScore, 20) : Math.floor((captureScore + mobilityScore) / 2);
       const total = captureScore + mobilityScore + piecePreference + riskBonus;
 
-      return { piece, legalMoves, captureScore, mobilityScore, piecePreference, riskBonus, total };
+      return { piece, legalMoves, bestMove: moveScores[0]?.move || legalMoves[0], captureScore, mobilityScore, piecePreference, riskBonus, total };
     }).sort((a, b) => b.total - a.total);
 
     const best = scores[0];
-    const recommendedMove = best.legalMoves[0] || null;
+    const recommendedMove = best.bestMove || null;
     const confidence = Math.max(35, Math.min(95, 50 + best.total));
     const localReasoning = `${agent.name} prefers ${best.piece} because it has ${best.legalMoves.length} legal move${best.legalMoves.length === 1 ? '' : 's'} with a local strategy score of ${best.total}.`;
     const xaiReasoning = await getXaiReasoning({ agentName: agent.name, personality: agent.personality, piece: best.piece, confidence, fen: game.currentFen }).catch(() => null);
