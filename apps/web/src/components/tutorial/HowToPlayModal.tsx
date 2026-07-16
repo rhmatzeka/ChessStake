@@ -80,6 +80,43 @@ type Rect = {
   height: number;
 };
 
+const TOOLTIP_WIDTH = 390;
+const TOOLTIP_HEIGHT = 360;
+const GAP = 18;
+const EDGE = 16;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getVisibleTutorialTarget(targetName: string) {
+  const targets = Array.from(document.querySelectorAll<HTMLElement>(`[data-tutorial="${targetName}"]`));
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  return targets
+    .map((target) => {
+      const rect = target.getBoundingClientRect();
+      const style = window.getComputedStyle(target);
+      const visibleWidth = Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0);
+      const visibleHeight = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
+      const visibleArea = Math.max(0, visibleWidth) * Math.max(0, visibleHeight);
+
+      return { target, rect, visibleArea, style };
+    })
+    .filter(({ rect, visibleArea, style }) => {
+      return (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        visibleArea > 0 &&
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        Number(style.opacity) !== 0
+      );
+    })
+    .sort((a, b) => b.visibleArea - a.visibleArea)[0]?.target ?? null;
+}
+
 function trackTutorial(name: string, payload?: unknown) {
   fetch('/api/analytics', {
     method: 'POST',
@@ -102,7 +139,7 @@ export default function HowToPlayModal({ open, onClose }: HowToPlayModalProps) {
   const isLast = step === STEPS.length - 1;
 
   const updateTargetRect = () => {
-    const target = document.querySelector(`[data-tutorial="${current.target}"]`);
+    const target = getVisibleTutorialTarget(current.target);
     if (!target) {
       setTargetRect(null);
       return;
@@ -120,11 +157,11 @@ export default function HowToPlayModal({ open, onClose }: HowToPlayModalProps) {
 
   useEffect(() => {
     if (!open) return;
-    const target = document.querySelector(`[data-tutorial="${current.target}"]`);
+    const target = getVisibleTutorialTarget(current.target);
     target?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-    const timer = window.setTimeout(updateTargetRect, 350);
+    const timers = [80, 300, 650].map((delay) => window.setTimeout(updateTargetRect, delay));
     trackTutorial('guided_tutorial_step_viewed', { step: step + 1, target: current.target, title: current.title });
-    return () => window.clearTimeout(timer);
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
   }, [open, step, current.target, current.title]);
 
   useEffect(() => {
@@ -162,21 +199,68 @@ export default function HowToPlayModal({ open, onClose }: HowToPlayModalProps) {
 
   const highlightStyle = targetRect
     ? {
-        top: Math.max(8, targetRect.top - 8),
-        left: Math.max(8, targetRect.left - 8),
-        width: targetRect.width + 16,
-        height: targetRect.height + 16,
+        top: Math.max(EDGE, targetRect.top - 8),
+        left: Math.max(EDGE, targetRect.left - 8),
+        width: Math.min(window.innerWidth - EDGE * 2, targetRect.width + 16),
+        height: Math.min(window.innerHeight - EDGE * 2, targetRect.height + 16),
       }
     : undefined;
 
-  const tooltipStyle = !isMobile && targetRect
-    ? {
-        top: Math.min(window.innerHeight - 260, Math.max(16, targetRect.top + targetRect.height / 2 - 120)),
-        left: targetRect.left + targetRect.width / 2 < window.innerWidth / 2
-          ? Math.min(window.innerWidth - 420, targetRect.left + targetRect.width + 24)
-          : Math.max(16, targetRect.left - 420),
-      }
-    : undefined;
+  const getTooltipStyle = () => {
+    if (!targetRect) return undefined;
+
+    const maxLeft = window.innerWidth - TOOLTIP_WIDTH - EDGE;
+    const maxTop = window.innerHeight - TOOLTIP_HEIGHT - EDGE;
+    const rightSpace = window.innerWidth - targetRect.left - targetRect.width;
+    const leftSpace = targetRect.left;
+    const bottomSpace = window.innerHeight - targetRect.top - targetRect.height;
+    const topSpace = targetRect.top;
+    const centeredLeft = clamp(targetRect.left + targetRect.width / 2 - TOOLTIP_WIDTH / 2, EDGE, maxLeft);
+
+    if (isMobile) {
+      const preferBottom = targetRect.top + targetRect.height / 2 < window.innerHeight / 2;
+      const maxMobileTop = Math.max(EDGE, window.innerHeight - 300);
+      return preferBottom
+        ? {
+            top: clamp(targetRect.top + targetRect.height + GAP, EDGE, maxMobileTop),
+            left: EDGE,
+            right: EDGE,
+          }
+        : {
+            bottom: clamp(window.innerHeight - targetRect.top + GAP, EDGE, maxMobileTop),
+            left: EDGE,
+            right: EDGE,
+          };
+    }
+
+    if (rightSpace >= TOOLTIP_WIDTH + GAP) {
+      return {
+        top: clamp(targetRect.top + targetRect.height / 2 - TOOLTIP_HEIGHT / 2, EDGE, maxTop),
+        left: targetRect.left + targetRect.width + GAP,
+      };
+    }
+
+    if (leftSpace >= TOOLTIP_WIDTH + GAP) {
+      return {
+        top: clamp(targetRect.top + targetRect.height / 2 - TOOLTIP_HEIGHT / 2, EDGE, maxTop),
+        left: targetRect.left - TOOLTIP_WIDTH - GAP,
+      };
+    }
+
+    if (bottomSpace >= 260 || bottomSpace >= topSpace) {
+      return {
+        top: clamp(targetRect.top + targetRect.height + GAP, EDGE, maxTop),
+        left: centeredLeft,
+      };
+    }
+
+    return {
+      top: clamp(targetRect.top - TOOLTIP_HEIGHT - GAP, EDGE, maxTop),
+      left: centeredLeft,
+    };
+  };
+
+  const tooltipStyle = getTooltipStyle();
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Guided tutorial">
@@ -190,7 +274,7 @@ export default function HowToPlayModal({ open, onClose }: HowToPlayModalProps) {
       )}
 
       <div
-        className={`fixed z-[70] rounded-2xl border border-[#b58863]/30 bg-[#211713] p-4 text-[#f3dfbf] shadow-2xl ${isMobile ? 'bottom-4 left-4 right-4' : 'w-[390px]'}`}
+        className={`fixed z-[70] max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-[#b58863]/30 bg-[#211713] p-4 text-[#f3dfbf] shadow-2xl ${isMobile ? '' : 'w-[390px]'}`}
         style={tooltipStyle}
       >
         <div className="flex items-start justify-between gap-3">
