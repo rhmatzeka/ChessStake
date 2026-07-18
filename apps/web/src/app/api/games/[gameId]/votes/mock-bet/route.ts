@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const schema = z.object({
-  address: z.string(),
+  address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Connect a valid wallet before placing a bet.'),
   team: z.enum(['WHITE', 'BLACK']),
   piece: z.enum(['PAWN', 'KNIGHT', 'BISHOP', 'ROOK', 'QUEEN', 'KING']),
   amountWei: z.string(),

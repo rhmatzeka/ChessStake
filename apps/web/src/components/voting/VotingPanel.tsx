@@ -53,19 +53,28 @@ export const VotingPanel: React.FC = () => {
     const amount = BigInt(vote.totalAmountWei);
     return amount > max ? amount : max;
   }, BigInt(0));
-  const checklistTitle = !myLockedTeam
-    ? 'Start here'
-    : myLockedTeam !== currentTurn
-      ? `You joined ${myLockedTeam}`
-      : 'Your team is moving';
-  const checklistBody = !myLockedTeam
-    ? 'Choose WHITE or BLACK first. After that, you can vote when your team is moving.'
-    : myLockedTeam !== currentTurn
-      ? `Current turn: ${currentTurn}. Wait for ${myLockedTeam}'s turn before voting.`
-      : 'Pick one legal piece below. The highest-backed piece controls this turn.';
+  const checklistTitle = !isConnected || !address
+    ? 'Connect wallet first'
+    : !myLockedTeam
+      ? 'Start here'
+      : myLockedTeam !== currentTurn
+        ? `You joined ${myLockedTeam}`
+        : 'Your team is moving';
+  const checklistBody = !isConnected || !address
+    ? 'Connect your wallet before choosing a team or backing a piece.'
+    : !myLockedTeam
+      ? 'Choose WHITE or BLACK first. After that, you can vote when your team is moving.'
+      : myLockedTeam !== currentTurn
+        ? `Current turn: ${currentTurn}. Wait for ${myLockedTeam}'s turn before voting.`
+        : 'Pick one legal piece below. The highest-backed piece controls this turn.';
 
   const handleVote = async (piece: PieceType) => {
     if (turnStatus !== 'OPEN' || !activeGameId) return;
+
+    if (!isConnected || !address) {
+      alert('Connect your wallet before backing a piece.');
+      return;
+    }
     
     // User wajib memilih tim terlebih dahulu sebelum bet
     if (!myLockedTeam) {
@@ -92,13 +101,6 @@ export const VotingPanel: React.FC = () => {
       // OFF-CHAIN MOCK VOTE (FALLBACK)
       setIsVotingLoading(true);
       try {
-        // Use the connected wallet for demo-mode identity when available.
-        let mockAddress = address || localStorage.getItem('pawn_pool_mock_address');
-        if (!mockAddress) {
-          mockAddress = `0xmock_user_${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}`;
-          localStorage.setItem('pawn_pool_mock_address', mockAddress);
-        }
-
         const priceEth = PIECE_PRICES[piece];
         const amountWei = parseEther(priceEth).toString();
 
@@ -108,7 +110,7 @@ export const VotingPanel: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            address: mockAddress,
+            address,
             team: currentTurn,
             piece,
             amountWei,
@@ -212,6 +214,11 @@ export const VotingPanel: React.FC = () => {
   };
 
   const handleSelectTeam = (team: Team) => {
+    if (!isConnected || !address) {
+      alert('Connect your wallet before choosing a team.');
+      return;
+    }
+
     setGameState({ myLockedTeam: team });
     localStorage.setItem(`chessstake_locked_team_${activeGameId}`, team);
     fetch('/api/analytics', {
@@ -223,13 +230,18 @@ export const VotingPanel: React.FC = () => {
 
   // Efek samping untuk me-restore team dari localStorage jika ada
   React.useEffect(() => {
+    if (!isConnected || !address) {
+      setGameState({ myLockedTeam: null });
+      return;
+    }
+
     if (activeGameId) {
       const storedTeam = localStorage.getItem(`chessstake_locked_team_${activeGameId}`);
       if (storedTeam === 'WHITE' || storedTeam === 'BLACK') {
         setGameState({ myLockedTeam: storedTeam as Team });
       }
     }
-  }, [activeGameId, setGameState]);
+  }, [activeGameId, address, isConnected, setGameState]);
 
   React.useEffect(() => {
     setFirstVoteDone(localStorage.getItem(FIRST_VOTE_DONE_KEY) === 'true');
@@ -251,13 +263,15 @@ export const VotingPanel: React.FC = () => {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => handleSelectTeam('WHITE')}
-              className="py-1.5 px-3 rounded-lg text-xs font-bold text-center border transition-all duration-150 cursor-pointer text-[#1e1713] bg-[#eedcbf] border-[#eedcbf] hover:bg-[#eedcbf]/90 active:scale-95"
+              disabled={!isConnected || !address}
+              className="py-1.5 px-3 rounded-lg text-xs font-bold text-center border transition-all duration-150 cursor-pointer text-[#1e1713] bg-[#eedcbf] border-[#eedcbf] hover:bg-[#eedcbf]/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
             >
               WHITE Team
             </button>
             <button
               onClick={() => handleSelectTeam('BLACK')}
-              className="py-1.5 px-3 rounded-lg text-xs font-bold text-center border transition-all duration-150 cursor-pointer text-[#eedcbf] bg-[#1e1713] border-[#eedcbf]/30 hover:bg-[#1e1713]/80 active:scale-95"
+              disabled={!isConnected || !address}
+              className="py-1.5 px-3 rounded-lg text-xs font-bold text-center border transition-all duration-150 cursor-pointer text-[#eedcbf] bg-[#1e1713] border-[#eedcbf]/30 hover:bg-[#1e1713]/80 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
             >
               BLACK Team
             </button>
@@ -291,8 +305,10 @@ export const VotingPanel: React.FC = () => {
             </h3>
           </div>
           <p className="text-[11px] text-[#eedcbf]/60">
-            {!myLockedTeam 
-              ? 'Step 1: choose White or Black to unlock piece voting.'
+              {!isConnected || !address
+              ? 'Connect your wallet first to choose a team and unlock piece voting.'
+              : !myLockedTeam 
+                ? 'Step 1: choose White or Black to unlock piece voting.'
               : myLockedTeam !== currentTurn
                 ? `Your team is waiting. You joined ${myLockedTeam}; you can vote when it is ${myLockedTeam}'s turn.`
                 : 'Back the piece you believe should move next. The highest-backed legal piece controls this turn.'}
@@ -317,7 +333,7 @@ export const VotingPanel: React.FC = () => {
                 <button type="button" onClick={requestAgentRecommendation} disabled={isAgentLoading || !activeGameId} className="rounded-lg border border-[#d6a15f]/40 px-3 py-2 text-xs font-black text-[#d6a15f] disabled:opacity-40">
                   {isAgentLoading ? 'Thinking...' : 'Recommend'}
                 </button>
-                <button type="button" onClick={submitAgentAutoVote} disabled={isAgentLoading || !activeGameId || !agents.find((agent) => agent.id === selectedAgentId)?.autoVoteEnabled} className="rounded-lg bg-[#d6a15f] px-3 py-2 text-xs font-black text-[#120d0a] disabled:opacity-40">
+                <button type="button" onClick={submitAgentAutoVote} disabled={!isConnected || !address || isAgentLoading || !activeGameId || !agents.find((agent) => agent.id === selectedAgentId)?.autoVoteEnabled} className="rounded-lg bg-[#d6a15f] px-3 py-2 text-xs font-black text-[#120d0a] disabled:cursor-not-allowed disabled:opacity-40">
                   Auto Demo
                 </button>
               </div>
@@ -337,7 +353,7 @@ export const VotingPanel: React.FC = () => {
               </div>
               <p className="mt-1 text-[10px] uppercase tracking-wider text-[#eedcbf]/35">Local scorer by default. Grok reasoning when xAI env is configured.</p>
               {agentDecision.reasoning && <p className="mt-2 text-[#eedcbf]/50">{agentDecision.reasoning}</p>}
-              <button type="button" onClick={() => handleVote(agentDecision.recommendedPiece)} className="mt-3 rounded-lg bg-[#d6a15f] px-3 py-2 text-xs font-black text-[#120d0a]">
+              <button type="button" onClick={() => handleVote(agentDecision.recommendedPiece)} disabled={!isConnected || !address} className="mt-3 rounded-lg bg-[#d6a15f] px-3 py-2 text-xs font-black text-[#120d0a] disabled:cursor-not-allowed disabled:opacity-40">
                 Back Agent Pick
               </button>
             </div>
@@ -353,7 +369,7 @@ export const VotingPanel: React.FC = () => {
             const isBusy = isPending || isConfirming || isVotingLoading;
             const isWrongChain = !MOCK_CHAIN && isConnected && chainId !== CHAIN_ID;
             const hasLegalMove = legalPieces.includes(piece);
-            const isDisabled = !myLockedTeam || turnStatus !== 'OPEN' || isBusy || myLockedTeam !== currentTurn || !hasLegalMove || isWrongChain || (!MOCK_CHAIN && !isConnected);
+            const isDisabled = !isConnected || !address || !myLockedTeam || turnStatus !== 'OPEN' || isBusy || myLockedTeam !== currentTurn || !hasLegalMove || isWrongChain || (!MOCK_CHAIN && !isConnected);
             const voteWei = BigInt(voteData.totalAmountWei);
             const progress = maxVoteWei > BigInt(0) ? Number((voteWei * BigInt(100)) / maxVoteWei) : 0;
             const isLeading = maxVoteWei > BigInt(0) && voteWei === maxVoteWei;
