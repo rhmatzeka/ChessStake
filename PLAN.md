@@ -1,8 +1,8 @@
-# ChessStake Execution Plan
+# PawnPool Execution Plan
 
 ## Objective
 
-Turn ChessStake from a hackathon demo into a more mature creator-led interactive AI chess arena.
+Turn PawnPool from a hackathon demo into a more mature creator-led interactive AI chess arena.
 
 The project should move away from being positioned as a generic Web3 betting demo and become:
 
@@ -13,12 +13,12 @@ Interactive AI Chess Arena for Creators and Communities
 Core product narrative:
 
 ```text
-ChessStake lets creators host live AI chess matches where fans back teams, vote strategy, and share rewards from the outcome.
+PawnPool lets creators host live AI chess matches where fans back teams, vote strategy, and share rewards from the outcome.
 ```
 
 ## Game Concept
 
-ChessStake is not only a normal chess match. The strongest concept is:
+PawnPool is not only a normal chess match. The strongest concept is:
 
 ```text
 Crowd-controlled chess with optional player-owned AI agents.
@@ -768,7 +768,7 @@ apps/web/src/components/tutorial/HowToPlayModal.tsx
 Behavior:
 
 - Show automatically on first arena visit.
-- Store completion in `localStorage.chessstake_tutorial_seen`.
+- Store completion in `localStorage.pawnpool_tutorial_seen`.
 - Let users skip.
 - Let users reopen from `How to Play` button.
 - Track opened, skipped, completed.
@@ -776,7 +776,7 @@ Behavior:
 Recommended steps:
 
 ```text
-1. Welcome to ChessStake
+1. Welcome to PawnPool
 2. Choose White or Black
 3. Back a legal piece
 4. AI resolves the move
@@ -870,7 +870,7 @@ apps/web/src/app/how-to-play/page.tsx
 
 Sections:
 
-- What is ChessStake?
+- What is PawnPool?
 - How turns work.
 - How voting works.
 - What AI does.
@@ -932,8 +932,8 @@ Add:
 Keys:
 
 ```text
-chessstake_tutorial_seen
-chessstake_first_vote_done
+pawnpool_tutorial_seen
+pawnpool_first_vote_done
 ```
 
 ## Tutorial Acceptance Criteria
@@ -1192,8 +1192,8 @@ Add reset mechanism:
 - Optional localStorage reset:
 
 ```ts
-localStorage.removeItem('chessstake_tutorial_seen')
-localStorage.removeItem('chessstake_first_vote_done')
+localStorage.removeItem('pawnpool_tutorial_seen')
+localStorage.removeItem('pawnpool_first_vote_done')
 ```
 
 ## Tutorial QA Script
@@ -1628,7 +1628,7 @@ Twitch Plays Chess with Real Stakes
 Suggested subheadline:
 
 ```text
-ChessStake lets creators host live AI chess arenas where fans back a team, vote strategy, and share the upside.
+PawnPool lets creators host live AI chess arenas where fans back a team, vote strategy, and share the upside.
 ```
 
 Acceptance criteria:
@@ -1710,7 +1710,7 @@ Acceptance criteria:
 
 ## Phase 3: Match Lobby
 
-Goal: make ChessStake feel like a platform with multiple events.
+Goal: make PawnPool feel like a platform with multiple events.
 
 New files:
 
@@ -1918,7 +1918,7 @@ Goal:
 Format:
 
 ```text
-ChessStake Friday AI Boss Battle
+PawnPool Friday AI Boss Battle
 ```
 
 Goal:
@@ -2009,7 +2009,7 @@ First users: small creators and Web3 guilds
 
 ## Product And Business Maturity Addendum
 
-The existing plan explains what to build, but several assumptions are still unproven. This section defines the missing decisions, experiments, controls, and go/no-go gates needed before ChessStake can become a sustainable product.
+The existing plan explains what to build, but several assumptions are still unproven. This section defines the missing decisions, experiments, controls, and go/no-go gates needed before PawnPool can become a sustainable product.
 
 ## 1. Problem Validation Before Feature Expansion
 
@@ -2068,7 +2068,7 @@ After three pilots, compare a second wedge of chess streamers using the same act
 
 Changing words from `bet` to `back` does not change the legal substance. A pooled contribution with an uncertain payout may still be regulated as gambling, wagering, a contest, or a financial product depending on jurisdiction.
 
-ChessStake should be designed as separate product modes rather than one ambiguous mode:
+PawnPool should be designed as separate product modes rather than one ambiguous mode:
 
 | Mode | User payment | Reward | Recommended use |
 |---|---|---|---|
@@ -2565,7 +2565,7 @@ These decisions must be recorded with owner, deadline, evidence, and chosen outc
 | Primary buyer | Creator/community organizer first, sponsor second | Before pricing test |
 | Vote influence | Equal or capped weight for non-cash MVP | Before next game-design build |
 | Guest identity | Anonymous session with optional account/wallet upgrade | Before onboarding work |
-| Brand name | Choose ChessStake or PawnPool consistently | Before public outreach |
+| Brand name | Choose PawnPool or PawnPool consistently | Before public outreach |
 | Fee model | Fixed event fee first; pool fee only where permitted | Before billing work |
 | Creator payout | Manual invoiced payout during pilots | Before first paid event |
 | AI claim | `Strategy resolver` until real model capabilities are live | Immediately |
@@ -2589,7 +2589,7 @@ These decisions must be recorded with owner, deadline, evidence, and chosen outc
 
 ## Strategic Blind Spots Addendum
 
-The maturity addendum defines validation and operating gates. The following areas still need explicit strategy before ChessStake can support an investment case, long-term roadmap, or scalable commercial launch.
+The maturity addendum defines validation and operating gates. The following areas still need explicit strategy before PawnPool can support an investment case, long-term roadmap, or scalable commercial launch.
 
 ## 21. Entertainment Thesis And Core Fun
 
@@ -2704,7 +2704,7 @@ Research deliverables:
 - Interview at least five users of each major alternative.
 - Document why they would switch and why they would not.
 - Record competitor pricing and platform dependencies quarterly.
-- Identify whether ChessStake is replacing a poll, a tournament, a giveaway, or an entire event workflow.
+- Identify whether PawnPool is replacing a poll, a tournament, a giveaway, or an entire event workflow.
 
 ## 23. Defensibility And Moat
 
@@ -2732,7 +2732,7 @@ Avoid premature marketplace claims. Network effects only exist if each additiona
 
 ## 24. Cold-Start And Supply Strategy
 
-ChessStake can become a multi-sided marketplace involving creators, audiences, sponsors, and possibly agents. Launching an empty self-serve lobby would expose the cold-start problem rather than solve it.
+PawnPool can become a multi-sided marketplace involving creators, audiences, sponsors, and possibly agents. Launching an empty self-serve lobby would expose the cold-start problem rather than solve it.
 
 Initial managed supply strategy:
 
@@ -2811,7 +2811,7 @@ Sponsor validation target: secure one paid pilot and one renewal before building
 
 ## 26. Reward And Token Strategy
 
-ChessStake does not need a native token for product validation. Introducing one early adds speculation, liquidity, securities, treasury, and governance complexity without proving entertainment value.
+PawnPool does not need a native token for product validation. Introducing one early adds speculation, liquidity, securities, treasury, and governance complexity without proving entertainment value.
 
 Default strategy:
 
@@ -2990,7 +2990,7 @@ Required IP register:
 
 Business requirements:
 
-- Run a trademark/name search before committing to `ChessStake` or `PawnPool`.
+- Run a trademark/name search before committing to `PawnPool` or `PawnPool`.
 - Define whether creators grant the platform rights to clip and redistribute event content.
 - Define whether players grant rights to public match actions and display names.
 - Prohibit agents that impersonate real people or infringe brands.

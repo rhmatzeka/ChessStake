@@ -79,10 +79,10 @@ export const useArenaSocket = (requestedGameId?: string) => {
     if (!activeGameId) return;
 
     let cancelled = false;
-    let sessionId = localStorage.getItem('chessstake_spectator_session');
+    let sessionId = localStorage.getItem('pawnpool_spectator_session');
     if (!sessionId) {
       sessionId = `spectator_${crypto.randomUUID?.() || `${Date.now()}_${Math.random()}`}`;
-      localStorage.setItem('chessstake_spectator_session', sessionId);
+      localStorage.setItem('pawnpool_spectator_session', sessionId);
     }
 
     const poll = async () => {

@@ -1,6 +1,6 @@
-# ChessStake Web
+# PawnPool Web
 
-Next.js app untuk ChessStake. Mode deployment utama sekarang adalah **Vercel-only demo**: frontend, API game, AI move resolver, dan Prisma client berjalan di project Vercel yang sama.
+Next.js app untuk PawnPool. Mode deployment utama sekarang adalah **Vercel-only demo**: frontend, API game, AI move resolver, dan Prisma client berjalan di project Vercel yang sama.
 
 ## Local Development
 

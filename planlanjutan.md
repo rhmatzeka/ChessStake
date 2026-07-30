@@ -1,8 +1,8 @@
-# Plan Lanjutan ChessStake
+# Plan Lanjutan PawnPool
 
 ## Tujuan
 
-Dokumen ini merangkum kekurangan project ChessStake dari sisi bisnis, produk, marketing, growth, dan monetization. Tujuannya adalah mengubah project dari sekadar demo hackathon menjadi produk yang lebih matang, lebih mudah dipahami, lebih mudah dipasarkan, dan punya peluang menghasilkan uang.
+Dokumen ini merangkum kekurangan project PawnPool dari sisi bisnis, produk, marketing, growth, dan monetization. Tujuannya adalah mengubah project dari sekadar demo hackathon menjadi produk yang lebih matang, lebih mudah dipahami, lebih mudah dipasarkan, dan punya peluang menghasilkan uang.
 
 ## Kesimpulan Utama
 
@@ -30,7 +30,7 @@ Namun dari sisi bisnis, project masih kurang matang karena:
 - Monetization masih terlihat seperti platform mengambil fee, bukan membantu creator menghasilkan uang.
 - Kata "betting" terlalu riskan untuk marketing dan regulasi.
 
-Direction terbaik adalah mengubah ChessStake dari:
+Direction terbaik adalah mengubah PawnPool dari:
 
 ```text
 Web3 AI Chess Betting Arena
@@ -53,7 +53,7 @@ Twitch Plays Chess with Real Stakes
 ### Positioning Lama
 
 ```text
-ChessStake is a live Web3 chess arena where spectators back White or Black, vote for the piece type with testnet ETH, and watch an AI resolve the best legal move in realtime.
+PawnPool is a live Web3 chess arena where spectators back White or Black, vote for the piece type with testnet ETH, and watch an AI resolve the best legal move in realtime.
 ```
 
 Masalah:
@@ -66,7 +66,7 @@ Masalah:
 ### Positioning Baru
 
 ```text
-ChessStake is an interactive AI chess arena where creators host live matches, fans back teams, vote strategy, and share rewards from the outcome.
+PawnPool is an interactive AI chess arena where creators host live matches, fans back teams, vote strategy, and share rewards from the outcome.
 ```
 
 Value utama:
@@ -146,7 +146,7 @@ Twitch Plays Chess with Real Stakes
 Contoh subheadline:
 
 ```text
-ChessStake lets creators host live AI chess arenas where fans back a team, vote strategy, and share the upside.
+PawnPool lets creators host live AI chess arenas where fans back a team, vote strategy, and share the upside.
 ```
 
 ## 2. Arena Page Masih Terasa Seperti Demo
@@ -171,7 +171,7 @@ Yang kurang:
 Yang perlu ditambahkan:
 
 - Match title, misalnya "AI Boss Battle #12".
-- Host info, misalnya "Hosted by ChessStake" atau creator name.
+- Host info, misalnya "Hosted by PawnPool" atau creator name.
 - Spectator count di header.
 - Share arena button.
 - Creator revenue badge.
@@ -365,7 +365,7 @@ Team White is controlling the board. Join before the next vote closes.
 ```
 
 ```text
-I backed the Queen move that won the match on ChessStake.
+I backed the Queen move that won the match on PawnPool.
 ```
 
 ```text
@@ -809,7 +809,7 @@ Tujuan:
 Format:
 
 ```text
-ChessStake Friday AI Boss Battle
+PawnPool Friday AI Boss Battle
 ```
 
 Tujuan:
@@ -1233,7 +1233,7 @@ The highest-backed legal piece controls the turn
 
 ## Arah Baru: Player-Owned AI Agents
 
-Fitur AI agent milik player bisa membuat ChessStake jauh lebih unik dibanding sekadar voting chess arena.
+Fitur AI agent milik player bisa membuat PawnPool jauh lebih unik dibanding sekadar voting chess arena.
 
 Konsep baru:
 
@@ -1407,13 +1407,13 @@ Jika semua ini ada, project akan terasa seperti produk, bukan hanya prototype.
 Narasi akhir yang disarankan:
 
 ```text
-ChessStake is a live strategy arena where creators host AI-powered chess battles and audiences back teams, vote strategy, and share rewards.
+PawnPool is a live strategy arena where creators host AI-powered chess battles and audiences back teams, vote strategy, and share rewards.
 ```
 
 Pitch pendek:
 
 ```text
-Live gaming audiences are passive, and creators need better monetization than ads and donations. ChessStake turns spectators into active participants through AI-powered chess arenas where fans back teams, vote strategy, and compete for reward pools. We monetize through platform fees, creator revenue share, sponsored tournaments, and premium creator tools.
+Live gaming audiences are passive, and creators need better monetization than ads and donations. PawnPool turns spectators into active participants through AI-powered chess arenas where fans back teams, vote strategy, and compete for reward pools. We monetize through platform fees, creator revenue share, sponsored tournaments, and premium creator tools.
 ```
 
 ## Checklist Eksekusi

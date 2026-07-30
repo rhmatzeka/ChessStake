@@ -8,7 +8,7 @@ export default function HostPage() {
   const router = useRouter();
   const { address } = useAccount();
   const [title, setTitle] = useState('Friday AI Boss Battle');
-  const [creatorName, setCreatorName] = useState('ChessStake Creator');
+  const [creatorName, setCreatorName] = useState('PawnPool Creator');
   const [description, setDescription] = useState('A live AI chess arena for my community. Back a side, vote strategy, and follow every move together.');
   const [creatorFee, setCreatorFee] = useState('3');
   const [loading, setLoading] = useState(false);

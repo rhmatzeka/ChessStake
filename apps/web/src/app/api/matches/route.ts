@@ -9,9 +9,9 @@ export async function GET() {
     const games = await prisma.game.findMany({ orderBy: { createdAt: 'desc' }, take: 30 });
     const data = games.map((game) => ({
       gameId: game.id,
-      title: game.title || (game.status === 'ACTIVE' ? 'AI Boss Battle Live' : `ChessStake Match ${game.id.slice(-4)}`),
+      title: game.title || (game.status === 'ACTIVE' ? 'AI Boss Battle Live' : `PawnPool Match ${game.id.slice(-4)}`),
       description: game.description,
-      host: game.creatorName || 'ChessStake',
+      host: game.creatorName || 'PawnPool',
       creatorFeeBps: game.creatorFeeBps,
       status: game.status,
       currentTurn: game.currentTurn,

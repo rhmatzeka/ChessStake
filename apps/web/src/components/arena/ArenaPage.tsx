@@ -29,7 +29,7 @@ export const ArenaPage: React.FC<{ gameId?: string }> = ({ gameId }) => {
       <header className="w-full bg-[#110d0a] border-b border-[#b58863]/20 px-3 py-2 md:px-5 flex justify-between items-center shadow-lg">
         <div className="flex items-center gap-2">
           <div className="bg-[#b58863] text-[#110d0a] font-extrabold px-2.5 py-1 rounded-lg text-sm uppercase tracking-wider font-mono md:text-base">
-            ChessStake
+            PawnPool
           </div>
           <span className="text-[10px] uppercase tracking-wider font-bold opacity-40 ml-2 hidden sm:inline">
             Interactive AI Chess Arena
@@ -67,7 +67,7 @@ export const ArenaPage: React.FC<{ gameId?: string }> = ({ gameId }) => {
               <div className="min-w-0">
                 <p className="text-[8px] font-black uppercase tracking-[0.22em] text-[#b58863]">Live Creator Arena</p>
                 <h1 className="truncate text-base font-black leading-tight text-[#eedcbf] md:text-lg">{title || 'AI Boss Battle'}</h1>
-                <p className="truncate text-[11px] text-[#eedcbf]/60">Hosted by {creatorName || 'ChessStake'}{creatorFeeBps > 0 ? ` | Creator share ${(creatorFeeBps / 100).toFixed(1)}%` : ''}</p>
+                <p className="truncate text-[11px] text-[#eedcbf]/60">Hosted by {creatorName || 'PawnPool'}{creatorFeeBps > 0 ? ` | Creator share ${(creatorFeeBps / 100).toFixed(1)}%` : ''}</p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <a href="/agents" className="rounded-xl border border-[#d6a15f]/40 px-3 py-2 text-xs font-black text-[#f3dfbf] transition hover:bg-[#d6a15f]/10">My Agents</a>
@@ -94,7 +94,7 @@ export const ArenaPage: React.FC<{ gameId?: string }> = ({ gameId }) => {
       
       {/* Footer */}
       <footer className="w-full bg-[#110d0a] border-t border-[#b58863]/10 py-4 px-6 text-center text-xs text-[#eedcbf]/40">
-        ChessStake &copy; {new Date().getFullYear()} - Interactive AI chess arenas for creators and communities.
+        PawnPool &copy; {new Date().getFullYear()} - Interactive AI chess arenas for creators and communities.
       </footer>
       <HowToPlayModal open={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
     </div>

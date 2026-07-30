@@ -13,7 +13,7 @@ export default function ShareArenaButton({ gameId, label = 'Share Arena' }: Shar
   const handleShare = async () => {
     const path = gameId ? `/arena/${gameId}` : '/arena/live';
     const url = `${window.location.origin}${path}`;
-    const text = 'Join this ChessStake AI chess arena. Back a team, vote strategy, and help control the next move.';
+    const text = 'Join this PawnPool AI chess arena. Back a team, vote strategy, and help control the next move.';
 
     fetch('/api/analytics', {
       method: 'POST',
@@ -23,7 +23,7 @@ export default function ShareArenaButton({ gameId, label = 'Share Arena' }: Shar
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'ChessStake Live Arena', text, url });
+        await navigator.share({ title: 'PawnPool Live Arena', text, url });
         return;
       } catch (err) {
         if ((err as Error).name === 'AbortError') return;

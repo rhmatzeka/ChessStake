@@ -20,7 +20,7 @@ const PIECE_NAMES: Record<PieceType, string> = {
 
 const API_URL = '/api';
 const MOCK_CHAIN = process.env.NEXT_PUBLIC_ENABLE_ONCHAIN_BETS !== 'true';
-const FIRST_VOTE_DONE_KEY = 'chessstake_first_vote_done';
+const FIRST_VOTE_DONE_KEY = 'pawnpool_first_vote_done';
 
 function formatEthFromWei(wei: string) {
   const eth = Number(BigInt(wei)) / 1e18;
@@ -220,7 +220,7 @@ export const VotingPanel: React.FC = () => {
     }
 
     setGameState({ myLockedTeam: team });
-    localStorage.setItem(`chessstake_locked_team_${activeGameId}`, team);
+    localStorage.setItem(`pawnpool_locked_team_${activeGameId}`, team);
     fetch('/api/analytics', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -236,7 +236,7 @@ export const VotingPanel: React.FC = () => {
     }
 
     if (activeGameId) {
-      const storedTeam = localStorage.getItem(`chessstake_locked_team_${activeGameId}`);
+      const storedTeam = localStorage.getItem(`pawnpool_locked_team_${activeGameId}`);
       if (storedTeam === 'WHITE' || storedTeam === 'BLACK') {
         setGameState({ myLockedTeam: storedTeam as Team });
       }

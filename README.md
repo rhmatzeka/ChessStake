@@ -1,6 +1,6 @@
-# ChessStake - Web3 AI Chess Betting Arena
+# PawnPool - Interactive AI Chess Arena
 
-ChessStake adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di mana penonton dapat connect wallet, memilih tim White/Black, dan memasang taruhan/vote untuk menentukan jenis bidak yang akan digerakkan. Untuk demo Vercel-only, vote berjalan dalam mock mode dan AI resolve dilakukan lewat Next.js API routes
+PawnPool adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di mana penonton dapat connect wallet, memilih tim White/Black, dan memasang taruhan/vote untuk menentukan jenis bidak yang akan digerakkan. Untuk demo Vercel-only, vote berjalan dalam mock mode dan AI resolve dilakukan lewat Next.js API routes
 
 ---
 
@@ -41,7 +41,7 @@ ChessStake adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di 
 ## Struktur Folder Project
 
 ```text
-chessstake/
+pawnpool/
 ├── apps/
 │   ├── web/                          # Next.js Frontend + API routes untuk Vercel-only demo
 │   └── api/                          # Legacy Express REST API & Socket.IO Server
@@ -71,7 +71,7 @@ pnpm install --no-frozen-lockfile --ignore-scripts
 ### 3. Setup Environment Variables
 Salin `.env.example` ke `.env` di root project dan sesuaikan nilainya:
 ```bash
-DATABASE_URL=postgresql://user:password@localhost:5432/chessstake
+DATABASE_URL=postgresql://user:password@localhost:5432/pawnpool
 RPC_ETHEREUM_SEPOLIA=https://ethereum-sepolia-rpc.publicnode.com
 NEXT_PUBLIC_MOCK_CHAIN=true
 PRIVATE_KEY=your_private_key

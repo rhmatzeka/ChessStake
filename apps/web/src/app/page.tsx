@@ -12,7 +12,7 @@ export default function Home() {
             Twitch Plays Chess with real stakes.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-[#f3dfbf]/70">
-            ChessStake lets creators host live AI chess arenas where fans back a team, vote strategy, and share the upside from every match.
+            PawnPool lets creators host live AI chess arenas where fans back a team, vote strategy, and share the upside from every match.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/arena/live" className="rounded-xl bg-[#d6a15f] px-6 py-3 text-center font-black text-[#120d0a] transition hover:bg-[#f0c178]">

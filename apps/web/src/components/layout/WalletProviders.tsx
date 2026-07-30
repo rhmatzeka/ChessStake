@@ -9,7 +9,7 @@ import { baseSepolia, localhost } from 'wagmi/chains';
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your_project_id_placeholder';
 const config = createConfig(
   getDefaultConfig({
-    appName: 'ChessStake',
+    appName: 'PawnPool',
     walletConnectProjectId: projectId,
     chains: [baseSepolia, localhost],
     transports: {

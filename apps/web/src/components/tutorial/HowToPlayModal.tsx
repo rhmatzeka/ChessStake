@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const TUTORIAL_SEEN_KEY = 'chessstake_tutorial_seen';
+const TUTORIAL_SEEN_KEY = 'pawnpool_tutorial_seen';
 
 type TutorialStep = {
   target: string;

@@ -120,7 +120,7 @@ export default function ClaimPage() {
   return (
     <main className="min-h-screen bg-[#120d0a] px-6 py-16 text-[#f3dfbf]">
       <div className="mx-auto max-w-3xl rounded-2xl border border-[#b58863]/20 bg-[#211713] p-8">
-        <p className="text-xs font-black uppercase tracking-[0.3em] text-[#b58863]">ChessStake Demo Settlement</p>
+        <p className="text-xs font-black uppercase tracking-[0.3em] text-[#b58863]">PawnPool Demo Settlement</p>
         <h1 className="mt-3 text-3xl font-black">Claim Rewards / Refunds</h1>
         <p className="mt-3 text-sm leading-6 text-[#f3dfbf]/65">
           Vercel-only mode uses demo accounting in PostgreSQL. This marks rewards or refunds as claimed in the database; it does not transfer on-chain ETH.
