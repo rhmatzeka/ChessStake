@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const name = String(body.name || '').trim();
-    if (!name) {
+    if (!name || !/^[a-z][a-z0-9_]{1,63}$/.test(name)) {
       return NextResponse.json({ ok: false, data: null, error: { code: 'INVALID_EVENT', message: 'Event name is required.' } }, { status: 400 });
     }
 
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       gameId: body.gameId ? String(body.gameId) : null,
       address: body.address ? String(body.address) : null,
       sessionId: body.sessionId ? String(body.sessionId) : null,
-      payload: body.payload || null,
+      payload: body.payload && JSON.stringify(body.payload).length <= 4096 ? body.payload : null,
     });
 
     return NextResponse.json({ ok: true, data: { tracked: true }, error: null });

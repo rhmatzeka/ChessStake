@@ -1,46 +1,14 @@
 "use client";
 
 import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider, createConfig, http } from 'wagmi';
-import { sepolia, localhost } from 'wagmi/chains';
-import { ConnectKitProvider, getDefaultConfig } from 'connectkit';
+import dynamic from 'next/dynamic';
 
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'your_project_id_placeholder';
-
-const config = createConfig(
-  getDefaultConfig({
-    appName: 'ChessStake',
-    walletConnectProjectId: projectId,
-    chains: [sepolia, localhost],
-    transports: {
-      [sepolia.id]: http(),
-      [localhost.id]: http(),
-    },
-  })
-);
-
-const queryClient = new QueryClient();
+const WalletProviders = dynamic(() => import('./WalletProviders'), {
+  ssr: false,
+  loading: () => <div className="min-h-screen bg-[#1e1713]" />,
+});
 
 export const AppShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return <div className="min-h-screen bg-[#1e1713]"></div>; // loading placeholder static
-  }
-
-  return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider>
-          {children}
-        </ConnectKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-  );
+  return <WalletProviders>{children}</WalletProviders>;
 };
 export default AppShell;

@@ -12,7 +12,8 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "test": "turbo test"
+    "test": "turbo test",
+    "test:e2e:vercel": "node scripts/vercel-smoke.mjs"
   },
   "devDependencies": {
     "prettier": "^3.9.4",

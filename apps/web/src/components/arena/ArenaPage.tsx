@@ -14,8 +14,8 @@ import ShareArenaButton from '../share/ShareArenaButton';
 import { useArenaStore } from '../../stores/arena-store';
 import HowToPlayModal, { shouldShowTutorial } from '../tutorial/HowToPlayModal';
 
-export const ArenaPage: React.FC = () => {
-  useArenaSocket();
+export const ArenaPage: React.FC<{ gameId?: string }> = ({ gameId }) => {
+  useArenaSocket(gameId);
   const { spectatorCount, activeGameId, title, creatorName, creatorFeeBps } = useArenaStore();
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
 

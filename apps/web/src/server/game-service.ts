@@ -1,5 +1,5 @@
 import { Chess } from 'chess.js';
-import { INITIAL_FEN, MAX_HALF_MOVES, MAX_NO_VOTE_REOPEN, PIECE_PRIORITY, VOTING_DURATION_SECONDS } from 'shared';
+import { INITIAL_FEN, MAX_HALF_MOVES, MAX_NO_VOTE_REOPEN, PIECE_PRICES, PIECE_PRIORITY, VOTING_DURATION_SECONDS } from 'shared';
 import { prisma } from './prisma';
 import { ChessStateService } from './chess-state';
 
@@ -7,6 +7,11 @@ const TURN_DURATION_MS = VOTING_DURATION_SECONDS * 1000;
 
 function addWei(a: string, b: string) {
   return (BigInt(a) + BigInt(b)).toString();
+}
+
+function etherToWei(value: string) {
+  const [whole = '0', fraction = ''] = value.split('.');
+  return (BigInt(whole) * BigInt('1000000000000000000') + BigInt(fraction.padEnd(18, '0').slice(0, 18) || '0')).toString();
 }
 
 function jsonSafe<T>(data: T): T {
@@ -321,6 +326,8 @@ export class VercelGameService {
     if (!this.getLegalPiecesForTurn(game.currentFen, game.currentTurn as 'WHITE' | 'BLACK').includes(piece)) {
       throw new Error('PIECE_HAS_NO_LEGAL_MOVE');
     }
+    const configuredPrice = PIECE_PRICES[piece as keyof typeof PIECE_PRICES];
+    if (!configuredPrice || amountWei !== etherToWei(configuredPrice)) throw new Error('INVALID_PIECE_PRICE');
 
     const existingLock = await prisma.playerGameState.findUnique({
       where: { gameId_address: { gameId, address } },

@@ -2006,3 +2006,1111 @@ Match format: scheduled events first
 AI: explanation now, Stockfish/Grok later
 First users: small creators and Web3 guilds
 ```
+
+## Product And Business Maturity Addendum
+
+The existing plan explains what to build, but several assumptions are still unproven. This section defines the missing decisions, experiments, controls, and go/no-go gates needed before ChessStake can become a sustainable product.
+
+## 1. Problem Validation Before Feature Expansion
+
+The core assumption is that creators need a new interactive event format and that their audiences will repeatedly influence a chess match. This must be validated before building tournaments, marketplaces, or autonomous agents.
+
+Hypotheses to test:
+
+| Hypothesis | Cheapest test | Success signal |
+|---|---|---|
+| Creators want this format | Interview 15 chess/Web3 creators and show a clickable demo | At least 5 agree to run a test event |
+| Viewers understand the loop | Moderated test with 20 first-time users | At least 70% submit a valid first vote without verbal help |
+| Interaction is repeatable | Run 3 scheduled events | Median voter participates in at least 3 turns |
+| Creator distribution works | Give each host a unique invite link | At least 30% of invited visitors enter the arena |
+| Creators value monetization tools | Show fee-share and subscription offers | At least 3 creators prefer one offer strongly enough to pilot it |
+| The event remains entertaining without cash | Use points and sponsored prizes | Participation does not drop more than 30% versus testnet stake mode |
+
+Required discovery questions:
+
+- What does a creator use today: polls, donations, Discord bots, tournaments, or Twitch extensions?
+- Is the main value audience engagement, creator revenue, community rivalry, or prize distribution?
+- How long can a live match remain entertaining before viewers leave?
+- Does choosing a piece feel meaningful enough, or do users want strategy cards, move candidates, or team chat?
+- What prevents a creator from hosting again?
+- Does wallet connection reduce participation compared with guest play?
+
+Do not treat wallet connections, page views, or testnet pool volume as proof of willingness to pay.
+
+## 2. Choose One Initial Product Wedge
+
+The plan currently targets chess creators, Web3 communities, AI communities, sponsors, and tournament organizers. That is too broad for the first launch.
+
+Recommended first wedge:
+
+```text
+Small Web3 creators and communities that already run scheduled online events,
+using sponsored points or non-cash prizes and no mandatory wallet for first participation.
+```
+
+Why this wedge:
+
+- Existing distribution and community identity.
+- Familiarity with wallets, but guest onboarding can still reduce friction.
+- Easier access to protocol sponsors and prize boosts.
+- Scheduled events solve the empty-arena and liquidity problem.
+
+Explicit non-targets for the first three pilots:
+
+- General chess players acquired through paid ads.
+- Professional chess tournaments requiring federation-grade rules.
+- Real-money public betting users.
+- Fully autonomous trading-style agent users.
+
+After three pilots, compare a second wedge of chess streamers using the same activation and retention metrics.
+
+## 3. Product Mode And Legal Architecture
+
+Changing words from `bet` to `back` does not change the legal substance. A pooled contribution with an uncertain payout may still be regulated as gambling, wagering, a contest, or a financial product depending on jurisdiction.
+
+ChessStake should be designed as separate product modes rather than one ambiguous mode:
+
+| Mode | User payment | Reward | Recommended use |
+|---|---|---|---|
+| Free Play | None | Points, badges, rank | Public acquisition and onboarding |
+| Sponsored Event | None or free entry | Sponsor-funded fixed prizes | First commercial pilots |
+| Testnet Lab | Testnet token | Testnet reward | Technical and contract testing |
+| Paid Creator Tool | Creator pays SaaS/event fee | No pooled player payout required | Lower-risk B2B monetization |
+| Real-Money Pool | User funds | Variable pooled payout | Blocked pending jurisdiction-specific legal approval |
+
+Rules:
+
+- Every match must expose its mode, reward source, fee, eligibility, jurisdiction restrictions, and settlement rules before participation.
+- Free and sponsored modes must not silently reuse real-money language or accounting assumptions.
+- Sponsored prizes should be fixed and funded before an event, not dependent on participant losses.
+- Mainnet mode requires legal opinions for launch jurisdictions, age gating, geofencing, sanctions screening, responsible-play controls, tax analysis, and written incident/complaint procedures.
+- Terms of Service, Privacy Policy, Contest Rules, Responsible Play, and creator/sponsor agreements need named owners and versions.
+- Marketing copy must be reviewed for substance, not only terminology.
+
+Recommended commercial sequence:
+
+```text
+Free engagement -> sponsored fixed-prize events -> paid creator tooling ->
+jurisdiction-limited real-money pilot only if legally approved
+```
+
+## 4. Value Proposition By Stakeholder
+
+### Creator
+
+Job to be done: turn a passive stream or community call into a repeatable interactive event without operating game infrastructure.
+
+Minimum creator value:
+
+- Create and schedule a match in under 5 minutes.
+- Share one guest-friendly link.
+- Use an OBS/browser overlay.
+- Moderate, pause, cancel, and communicate incidents.
+- See live engagement and post-event analytics.
+- Export a recap and understand revenue owed.
+
+### Participant
+
+Job to be done: influence a live team outcome, understand why it happened, and build status over time.
+
+Minimum participant value:
+
+- Join as spectator without wallet.
+- Understand the first action in under 60 seconds.
+- See exactly how their action affected the turn.
+- Trust rules, tally, move selection, and rewards.
+- Keep identity/reputation across events without exposing unnecessary wallet data.
+
+### Sponsor
+
+Job to be done: fund an interactive community event with measurable exposure and brand safety.
+
+Minimum sponsor value:
+
+- Clear inventory: naming rights, overlay, prize boost, recap, and CTA.
+- Verified reach, unique participants, interactions, watch time, and click-through.
+- Brand-safety and fraud report.
+- Post-event report delivered within 48 hours.
+
+## 5. Revenue Model Priorities
+
+Do not rely on reward-pool take rate as the only or first revenue source. It creates regulatory exposure and weak revenue when liquidity is low.
+
+Recommended priority:
+
+1. Sponsored event package.
+2. Fixed creator/event hosting fee.
+3. Creator Pro subscription after repeat usage is proven.
+4. Optional fee share in legally permitted modes.
+5. Agent subscriptions and cosmetics only after agent retention is proven.
+
+Proposed pilot offers:
+
+| Offer | Buyer | Initial price hypothesis | Included |
+|---|---|---:|---|
+| Community Pilot | Creator/community | Free for first event | Hosted setup, basic overlay, recap |
+| Hosted Event | Creator/community | $49-$149 per event | Scheduling, branding, moderation, analytics |
+| Sponsored Battle | Protocol/brand | $500-$2,500 per event | Prize funding separate, branded arena, report |
+| Creator Pro | Repeat creator | $19-$49 per month | Self-serve hosting, overlays, history, analytics |
+
+Prices are hypotheses, not final pricing. Test fixed fees before building billing automation. Use invoices or manual payment for pilots.
+
+Avoid double charging without clear value. If a creator pays a hosting fee, participant pool fees should be lower or absent. Display the complete fee split before users act.
+
+## 6. Complete Unit Economics
+
+Pool volume is not revenue, and gross platform fee is not contribution margin.
+
+Track per event:
+
+```text
+Gross revenue
+= event hosting fee
++ sponsor fee
++ platform share of permitted pool fee
++ subscription revenue allocated to the event
+
+Variable cost
+= chain gas subsidized by platform
++ RPC and indexing
++ database/realtime usage
++ AI inference
++ prize subsidy
++ creator payout
++ payment processing
++ support/moderation time
++ fraud losses and refunds
+
+Contribution margin = gross revenue - variable cost
+```
+
+Required unit metrics:
+
+- Revenue per hosted event.
+- Contribution margin per event.
+- Creator acquisition cost and payback period.
+- Creator activation rate: signed up to first completed event.
+- Creator repeat rate within 30 days.
+- Cost per active participant.
+- Sponsor renewal rate.
+- Refund, failed settlement, and support-ticket rate.
+- AI cost per completed match.
+- Infrastructure cost per concurrent spectator.
+
+Initial guardrails:
+
+- Positive contribution margin excluding intentional pilot subsidy by the tenth paid event.
+- Creator acquisition payback below three months for subscription customers.
+- AI and infrastructure cost below 10% of net event revenue.
+- Platform-funded prize subsidy has a fixed monthly cap and a measured acquisition purpose.
+
+## 7. Match Economics And Game Design Gaps
+
+The current piece prices create pay-to-control behavior: expensive piece votes carry more tally weight because price and influence are coupled. Wealthy users can repeatedly determine strategy, while cheaper pieces may be structurally disadvantaged. This can reduce fun and undermine the claim of crowd control.
+
+Decisions required:
+
+- Is each action one equal vote, or is influence proportional to money?
+- Why should Queen cost more, and does that produce better gameplay?
+- Can one wallet dominate every turn?
+- Can a participant join late after seeing which side is winning?
+- Does team lock create balanced teams or trap users in an inactive side?
+- Who funds rewards in free/sponsored modes?
+- What happens if only one team has participants?
+
+Recommended experiments:
+
+| Mechanic | Variant A | Variant B | Measure |
+|---|---|---|---|
+| Influence | One person, one vote | Quadratic/capped stake weight | Participation concentration and satisfaction |
+| Piece selection | Equal price | Price by tactical power | Piece diversity and perceived fairness |
+| Team assignment | User choice | Auto-balance parties | Team balance and completion |
+| Reward | Winner pool | Points plus fixed sponsor prizes | Repeat participation and legal complexity |
+| Turn length | 20 seconds | 30-45 seconds | Vote rate, latency failures, stream pacing |
+
+Recommended free/sponsored MVP:
+
+- Equal vote weight per verified session or account.
+- Optional points budget, not money, for strategic allocation.
+- Per-turn and per-match influence caps.
+- Fixed sponsor-funded rewards based on published contest rules.
+- Separate competitive ranking from financial ROI.
+
+## 8. Market Integrity And Abuse Controls
+
+Wallet-based identity alone does not prevent Sybil attacks. Public live tallies also enable last-second sniping, and creator-controlled games introduce conflict-of-interest risks.
+
+Threat model must cover:
+
+- Multi-wallet Sybil voting.
+- Creator or operator betting in their own match.
+- Insider knowledge of resolver, pause, or cancellation decisions.
+- Last-second vote sniping and chain confirmation races.
+- Collusion between accounts or teams.
+- Wash activity to inflate pools and leaderboards.
+- Referral fraud and fake spectators.
+- Malicious creator names, links, chat, or agent prompts.
+- DDoS during scheduled events.
+- Compromised operator, treasury, or creator wallet.
+
+Minimum controls before public reward events:
+
+- Published operator and creator participation policy.
+- Per-account, per-device, and per-IP velocity signals with privacy review.
+- Configurable stake/influence limits.
+- Commit/reveal or hidden tally experiment if sniping materially affects outcomes.
+- Immutable per-turn audit record: inputs, tally, legal candidates, resolver version, selected move, and timestamps.
+- Separation between creator controls and settlement authority.
+- Multisig for admin/treasury and key-rotation runbook.
+- Fraud review queue and documented disqualification/refund process.
+- Leaderboards exclude flagged, demo, operator, and test accounts.
+
+## 9. Trust, Fairness, And Verifiability
+
+The product must clearly disclose that the backend currently coordinates game state and move resolution. On-chain escrow does not make off-chain game outcomes trustless.
+
+Add a public fairness page containing:
+
+- Complete game and settlement rules.
+- Resolver name and version used by each match.
+- Legal move validation method.
+- Tie-break and fallback behavior.
+- Fee and prize calculation examples.
+- Operator powers and emergency conditions.
+- Contract address, deployment, audit status, and known limitations.
+- Downloadable match transcript or audit JSON.
+
+For every completed match, retain:
+
+```text
+initial FEN + all turn windows + aggregate votes + legal candidates +
+resolver input/output + move history + settlement calculation + admin actions
+```
+
+Never market the system as decentralized or trustless while an operator can resolve, cancel, mark late transactions, or choose game outcomes without an independently verifiable policy.
+
+## 10. Creator Operations And Marketplace Governance
+
+Creator mode is not only a form and fee split. It requires a supply-side operating system.
+
+Creator lifecycle:
+
+```text
+Lead -> qualified -> approved -> onboarded -> first event ->
+repeat host -> paid creator -> sponsor-ready creator
+```
+
+Required capabilities:
+
+- Creator application and approval for early pilots.
+- Identity, payout details, sanctions eligibility, and tax information where applicable.
+- Revenue statement and payout status.
+- Content and brand guidelines.
+- Event cancellation and no-show policy.
+- Moderation controls and escalation contact.
+- Sponsor conflict and category-exclusivity rules.
+- Service-level expectations for paid events.
+- Creator quality score based on completion, attendance, incidents, and repeat rate.
+
+Do not make creator hosting fully permissionless until abuse, settlement, and support procedures are proven.
+
+## 11. Distribution And Growth Measurement
+
+Each acquisition channel needs attribution and an owner. Generic sharing buttons are not a growth strategy.
+
+Channel experiments:
+
+| Channel | Experiment | Primary metric |
+|---|---|---|
+| Creator audience | Unique creator invite link and scheduled stream | Activated participants per creator |
+| Community Discord | Reminder bot plus event role | RSVP-to-participant conversion |
+| X/Twitter | Dynamic result card | Qualified arena visits per post |
+| Sponsor community | Co-branded event | New participant activation and sponsor leads |
+| Referral | Team invite link | Incremental activated users, excluding fraud |
+
+Define the funnel:
+
+```text
+Invitation seen -> landing visit -> arena entry -> first team choice ->
+first valid vote -> third vote -> match completion -> result share -> next event return
+```
+
+Core definitions:
+
+- Activated participant: submits at least one valid action.
+- Engaged participant: submits valid actions in at least three turns.
+- Retained participant: joins another match within 30 days.
+- Activated creator: completes a match with at least 10 activated participants.
+- Retained creator: hosts another match within 30 days.
+
+Avoid using total wallet count, gross pool, or spectator websocket connections as standalone success metrics.
+
+## 12. North Star And KPI Tree
+
+Replace `Weekly Creator-Hosted Reward Pool Volume` as the only North Star because it rewards money movement without proving user value and may incentivize wash activity.
+
+Recommended North Star for the validation stage:
+
+```text
+Weekly Engaged Participants in Completed Creator-Hosted Matches
+```
+
+Business companion metric:
+
+```text
+Monthly Retained Creators with Positive-Contribution Events
+```
+
+KPI tree:
+
+- Supply: approved creators, activated creators, retained creators, events per creator.
+- Demand: invited visitors, activated participants, engaged participants, 30-day retention.
+- Experience: first-action time, vote error rate, match completion, median turns participated, satisfaction.
+- Growth: invite conversion, share conversion, organic participant percentage.
+- Revenue: event revenue, sponsor revenue, MRR, platform fee revenue.
+- Economics: contribution margin, CAC, payback, prize subsidy, support cost.
+- Trust: disputed events, refunds, flagged activity, settlement time, incidents.
+
+## 13. Analytics, Privacy, And Experimentation
+
+The analytics plan needs event definitions and privacy rules, not only event names.
+
+Requirements:
+
+- Version every event schema.
+- Use server-side truth for votes, match completion, fees, and settlement.
+- Generate anonymous session IDs for guests.
+- Keep wallet address pseudonymous and avoid exposing raw addresses unnecessarily.
+- Define retention and deletion periods.
+- Support consent requirements by jurisdiction.
+- Exclude team/admin/test traffic from business dashboards.
+- Add experiment assignment fields so A/B tests are reproducible.
+- Never store private keys, signatures beyond operational need, or sensitive agent prompts in analytics payloads.
+
+Minimum dashboards:
+
+- Creator acquisition and activation funnel.
+- Participant first-action funnel.
+- Per-event engagement and completion.
+- Cohort retention by creator and acquisition channel.
+- Event unit economics.
+- Reliability, fraud, refund, and support incidents.
+
+## 14. Reliability And Event Operations
+
+A scheduled live product fails differently from a normal website: one outage can ruin a creator relationship and sponsor event.
+
+Service objectives for paid pilots:
+
+- Arena/API availability during event window: at least 99.9% measured per event.
+- Vote acknowledgement p95 under 1 second off-chain.
+- Board update p95 under 2 seconds after resolution.
+- No accepted vote lost during reconnect.
+- Settlement status visible within 5 minutes after match completion.
+
+Required runbooks:
+
+- Failed AI/resolver.
+- Database or realtime outage.
+- Chain/RPC degradation.
+- Stuck or late transaction spike.
+- Incorrect result or settlement dispute.
+- Creator no-show.
+- Abusive content or participant.
+- Key compromise.
+- Full event cancellation and participant communication.
+
+Every admin action must be authenticated, authorized, logged, attributable, and reviewable. Paid/sponsored events need a named on-call operator until automation is proven.
+
+## 15. Security And Contract Readiness Gates
+
+Existing unit tests are not equivalent to a production security review.
+
+Before any mainnet or valuable-prize launch:
+
+- Write explicit smart-contract invariants and add fuzz/property tests.
+- Test rounding dust, zero pools, one-sided pools, mixed late refunds, paused states, and malicious receiver contracts.
+- Review role escalation, operator compromise, treasury failure, and emergency recovery.
+- Use multisig and hardware-backed keys for admin and treasury.
+- Add deployment reproducibility and verified source code.
+- Obtain independent contract and backend security reviews.
+- Set a maximum value at risk per game and globally.
+- Add pause criteria and a public disclosure process.
+- Fund a bug bounty appropriate to value at risk.
+
+Product launch limits must be configurable without contract redeployment where safe:
+
+- Maximum pool per game.
+- Maximum user contribution.
+- Maximum concurrent games.
+- Approved creators and jurisdictions.
+- Approved token and chain.
+
+## 16. Ownership And Team Capacity
+
+The roadmap currently lists features but not accountable owners. Assign one directly responsible owner to each workstream:
+
+| Workstream | Required owner |
+|---|---|
+| Product and user research | Product lead |
+| Creator acquisition and event operations | Growth/operations lead |
+| Sponsorship sales | Business lead |
+| Game integrity and risk | Product/risk owner |
+| Legal and privacy | Qualified external counsel plus internal owner |
+| Smart contract and backend security | Engineering/security owner |
+| Reliability and incident response | Engineering owner |
+| Analytics and unit economics | Product/data owner |
+
+If the team is small, one person may own multiple workstreams, but no workstream should be implicitly owned by “the team.”
+
+## 17. Revised Validation Roadmap
+
+### Gate 0: Concept Validation, No New Platform Features
+
+Duration target: 2 weeks.
+
+- Interview 15 target creators.
+- Test the current arena with 20 first-time participants.
+- Select one wedge and one primary value proposition.
+- Choose Free Play and Sponsored Event as initial product modes.
+- Obtain preliminary legal issue-spotting before selling reward-based events.
+
+Exit criteria:
+
+- At least 5 creators agree to a pilot.
+- At least 70% of users understand and complete a first action.
+- One monetization offer receives credible buyer interest.
+
+### Gate 1: Concierge Creator Pilot
+
+Duration target: 3-4 weeks.
+
+- Run three manually operated scheduled events.
+- Add only essential creator metadata, share links, onboarding, analytics, and operator controls.
+- Use guest access, points, or pre-funded fixed prizes.
+- Measure the complete funnel and event cost.
+
+Exit criteria:
+
+- Three events complete without critical integrity failures.
+- At least 30% of attendees become activated participants.
+- Median activated participant acts in at least three turns.
+- At least two of three creators want to host again.
+- One creator, community, or sponsor is willing to pay for the next event.
+
+### Gate 2: Repeatable Hosted Product
+
+- Build self-serve scheduling only for validated creator needs.
+- Add OBS overlay, moderation, event recap, creator dashboard, and manual billing.
+- Package Hosted Event and Sponsored Battle offers.
+- Establish support and incident runbooks.
+
+Exit criteria:
+
+- Five paid or sponsor-funded events complete.
+- At least 40% creator 30-day repeat rate.
+- Positive contribution margin on at least three events excluding intentional subsidies.
+- No unresolved reward or integrity dispute.
+
+### Gate 3: Retention Features
+
+- Build leaderboard, season, agent recommendation, and richer commentary based on observed retention problems.
+- A/B test each feature against repeat participation, not novelty clicks.
+
+Exit criteria:
+
+- Participant 30-day retention improves meaningfully versus the pilot baseline.
+- Agent recommendation has at least 30% trial and 50% manual acceptance among eligible users before monetization.
+
+### Gate 4: Regulated Value Mode
+
+- Select launch jurisdiction and legal classification.
+- Implement required age, location, identity, sanctions, tax, responsible-play, and dispute controls.
+- Complete security review and cap value at risk.
+- Run a closed, jurisdiction-limited pilot.
+
+Exit criteria:
+
+- Written legal approval for the precise product flow and jurisdictions.
+- Independent security review findings resolved.
+- Operational, financial, and incident controls tested end to end.
+
+## 18. Stop Conditions
+
+Pause or pivot the concept if, after the first three pilots:
+
+- Fewer than 30% of attendees take one valid action.
+- Median participant acts in fewer than two turns.
+- Fewer than two creators want to host again.
+- No buyer shows willingness to pay for hosting, sponsorship, or creator tools.
+- Wallet or reward complexity is the dominant reason for abandonment and guest mode does not solve it.
+- Match duration consistently exceeds audience tolerance.
+- Fraud, legal, or support cost makes positive contribution margin implausible.
+
+Possible pivots:
+
+- B2B interactive stream tool with points and no pooled money.
+- Sponsored community tournament platform.
+- Crowd-vs-agent entertainment product.
+- White-label audience voting engine for games beyond chess.
+
+## 19. Open Decision Register
+
+These decisions must be recorded with owner, deadline, evidence, and chosen outcome:
+
+| Decision | Recommended default | Deadline |
+|---|---|---|
+| First customer segment | Small Web3 creators/communities | Before Gate 0 ends |
+| Initial product modes | Free Play and Sponsored Event | Before first pilot |
+| Primary buyer | Creator/community organizer first, sponsor second | Before pricing test |
+| Vote influence | Equal or capped weight for non-cash MVP | Before next game-design build |
+| Guest identity | Anonymous session with optional account/wallet upgrade | Before onboarding work |
+| Brand name | Choose ChessStake or PawnPool consistently | Before public outreach |
+| Fee model | Fixed event fee first; pool fee only where permitted | Before billing work |
+| Creator payout | Manual invoiced payout during pilots | Before first paid event |
+| AI claim | `Strategy resolver` until real model capabilities are live | Immediately |
+| Backend source of truth | Next.js/Vercel or dedicated realtime backend, not both | Before scaling events |
+| Launch geography | One counsel-approved jurisdiction | Before any value mode |
+
+## 20. Immediate Next Actions
+
+- [ ] Name an owner for product discovery, creator pilots, legal, and engineering reliability.
+- [ ] Choose one brand name and update future documentation accordingly.
+- [ ] Create a 15-creator interview list and interview script.
+- [ ] Recruit 20 first-time usability testers.
+- [ ] Define Free Play and Sponsored Event rules separately.
+- [ ] Decide equal versus money-weighted influence for the next pilot.
+- [ ] Instrument the full participant and creator funnels with event definitions.
+- [ ] Build a per-event unit economics spreadsheet before adding billing code.
+- [ ] Prepare creator, participant, and sponsor pilot offers.
+- [ ] Add an event operations and incident runbook.
+- [ ] Run three concierge events before building autonomous agents or tournament infrastructure.
+- [ ] Record results against Gate 1 criteria and make an explicit continue, pivot, or stop decision.
+
+## Strategic Blind Spots Addendum
+
+The maturity addendum defines validation and operating gates. The following areas still need explicit strategy before ChessStake can support an investment case, long-term roadmap, or scalable commercial launch.
+
+## 21. Entertainment Thesis And Core Fun
+
+The product currently explains mechanics better than it explains why a participant would enjoy the tenth match. Financial upside, AI branding, and creator presence can attract initial attention, but they are not a durable game loop by themselves.
+
+Core entertainment promise:
+
+```text
+Make a fast team decision, see visible consequences on the board,
+celebrate or blame the crowd, and return for the next decisive moment.
+```
+
+Each turn should deliver four beats:
+
+```text
+Understand the threat -> debate a choice -> reveal the crowd decision ->
+watch and understand the consequence
+```
+
+Concept gaps to validate:
+
+- Voting for a piece type may be too abstract for non-chess users.
+- A full chess match may be too long for a live audience.
+- Users on the inactive team may have long periods with nothing to do.
+- Strong players may dislike losing control to uninformed voters.
+- New players may not understand whether a resulting move was good or bad.
+- A dominant team or board position may remove suspense too early.
+- Repeated 20-second cycles may become monotonous without event pacing.
+
+Prototype these formats before expanding infrastructure:
+
+| Format | Description | Question answered |
+|---|---|---|
+| Piece Vote | Current mechanic | Is simple choice enough? |
+| Strategy Vote | Attack, defend, trade, develop, protect king | Is intent easier than chess notation? |
+| Candidate Move Vote | AI offers 2-3 legal moves with explanations | Does more control improve trust and fun? |
+| Power Turn | Community earns one special high-impact vote per match | Does scarcity create memorable moments? |
+| Crowd vs Boss | Crowd faces a named AI with phases/personality | Is a clear antagonist more entertaining? |
+| Blitz Scenario | Start from a tactical FEN and finish in 10-20 turns | Does a shorter format improve completion? |
+
+Recommended pilot format:
+
+```text
+15-25 minute scheduled scenario match, candidate or strategy voting,
+both teams receive a meaningful interaction every 30-60 seconds,
+and commentary explains every reveal.
+```
+
+Fun metrics:
+
+- Median active minutes per participant.
+- Turns participated per active minute.
+- Percentage staying through match end.
+- Percentage reacting, sharing, or inviting after a decisive turn.
+- Post-match `Would you play again?` score.
+- Percentage who can recall one memorable match moment.
+- Creator dead-air time and commentary burden.
+
+## 22. Market Map And Competitive Alternatives
+
+Market sizing should be bottom-up. A broad label such as Web3 gaming, online chess, or creator economy overstates the reachable market.
+
+Competitive alternatives include more than direct AI chess products:
+
+- Twitch/YouTube polls and chat commands.
+- Twitch Plays-style community bots.
+- Lichess and Chess.com tournaments.
+- Discord tournament and engagement bots.
+- Prediction markets and fantasy games.
+- Stream donations, channel points, raffles, and giveaways.
+- Jackbox-style audience participation tools.
+- Custom branded microsites built by agencies.
+- Doing nothing and running a normal stream.
+
+Build a competitor matrix using:
+
+| Dimension | Why it matters |
+|---|---|
+| Setup time | Creator switching friction |
+| Guest participation | Audience conversion |
+| Stream integration | Creator workflow fit |
+| Strategic depth | Repeat entertainment |
+| Monetization | Buyer ROI |
+| Moderation | Operational safety |
+| Verifiability | Reward trust |
+| Price | Willingness to switch |
+| Audience ownership/export | Creator control |
+
+Bottom-up market model:
+
+```text
+Serviceable creators
+x realistic hosted events per creator per year
+x net platform revenue per event
++ sponsor package revenue
++ creator subscription revenue
+= serviceable annual revenue opportunity
+```
+
+Use three cases:
+
+| Case | Creator count | Events/year | Net revenue/event | Annual revenue |
+|---|---:|---:|---:|---:|
+| Conservative | Research input | Research input | Pilot result | Calculated |
+| Base | Research input | Research input | Pilot result | Calculated |
+| Upside | Research input | Research input | Pilot result | Calculated |
+
+Do not publish TAM/SAM/SOM until creator counts, event frequency, and realized pricing have cited sources or pilot evidence.
+
+Research deliverables:
+
+- Interview at least five users of each major alternative.
+- Document why they would switch and why they would not.
+- Record competitor pricing and platform dependencies quarterly.
+- Identify whether ChessStake is replacing a poll, a tournament, a giveaway, or an entire event workflow.
+
+## 23. Defensibility And Moat
+
+Chess rendering, wallet connection, LLM commentary, and voting are replicable features. A token is not a moat. The defensibility thesis should be based on compounding assets.
+
+Potential moat stack:
+
+1. Creator workflow: fastest path from event idea to safe, measurable live event.
+2. Distribution network: repeat creators, communities, sponsors, and cross-community match supply.
+3. Proprietary format knowledge: data on pacing, scenarios, voting formats, and retention.
+4. Reputation graph: portable creator, participant, team, and agent history with anti-fraud quality.
+5. Sponsor measurement: credible engagement benchmarks and repeatable inventory.
+6. Operational trust: reliable settlement, moderation, integrity, and event execution.
+7. Content library: reusable licensed scenarios, AI bosses, overlays, and event templates.
+
+Moat milestones:
+
+- 20 retained creators with repeat event history.
+- A benchmark dataset linking formats to completion and retention.
+- Sponsor renewal and creator-to-creator referral become material acquisition channels.
+- More than half of events use templates, reputation, or network matching unavailable from a generic poll tool.
+- Creators would lose meaningful history, workflow, or distribution value by switching.
+
+Avoid premature marketplace claims. Network effects only exist if each additional creator, participant, or sponsor measurably improves value for others.
+
+## 24. Cold-Start And Supply Strategy
+
+ChessStake can become a multi-sided marketplace involving creators, audiences, sponsors, and possibly agents. Launching an empty self-serve lobby would expose the cold-start problem rather than solve it.
+
+Initial managed supply strategy:
+
+- Recruit a cohort of 5-10 creators instead of opening globally.
+- Offer two fixed weekly event slots to concentrate demand.
+- Platform produces scenarios, overlays, moderation, and recaps.
+- Cross-match participants are invited to the next scheduled event.
+- Match communities with similar audience size manually.
+- Sell sponsor inventory across a season rather than one isolated event.
+
+Liquidity hierarchy:
+
+```text
+One excellent scheduled event
+-> recurring weekly slate
+-> curated creator season
+-> invite-only self-serve hosting
+-> open marketplace only after demand density exists
+```
+
+Marketplace health metrics:
+
+- Fill rate of scheduled event slots.
+- Median activated participants per event.
+- Creator wait time to host.
+- Sponsor inventory sell-through.
+- Percentage of events meeting minimum audience threshold.
+- Cross-event participant migration.
+- Concentration of activity among top creators.
+
+Set minimum launch conditions for a public lobby: at least three upcoming events at any time and one predictable recurring event. Otherwise show one focused schedule, not an empty marketplace.
+
+## 25. Sponsor Product And ROI
+
+Sponsorship needs a defined media product, not only a logo and prize boost.
+
+Sellable inventory:
+
+- Event naming rights.
+- Pre-match card and countdown placement.
+- Board-side or overlay placement.
+- Sponsored AI boss/personality.
+- Branded strategy card or non-gameplay cosmetic.
+- Prize presentation.
+- Post-match recap and result card.
+- Creator mention with disclosure.
+- Opt-in sponsor CTA and landing-page click.
+- Season sponsorship across several events.
+
+Never sell influence over legal moves, outcomes, resolver behavior, or hidden user data.
+
+Sponsor report definitions:
+
+- Unique verified viewers, not socket connections.
+- Activated and engaged participants.
+- Median active time.
+- Sponsor impressions with a defined viewability rule.
+- CTA clicks and conversion where available.
+- Creator content reach reported separately from platform reach.
+- Fraud-filtered totals and methodology.
+- Brand-safety incidents.
+
+Commercial terms must define:
+
+- Inventory and deliverables.
+- Prize funding versus platform fee.
+- Payment schedule and currency risk.
+- Creator disclosure obligations.
+- Data available to sponsor.
+- Cancellation, underdelivery, and make-good policy.
+- Content approval deadline.
+- Category exclusivity.
+- IP usage period for clips, logos, and creator likeness.
+
+Sponsor validation target: secure one paid pilot and one renewal before building a sponsor dashboard.
+
+## 26. Reward And Token Strategy
+
+ChessStake does not need a native token for product validation. Introducing one early adds speculation, liquidity, securities, treasury, and governance complexity without proving entertainment value.
+
+Default strategy:
+
+```text
+No native token before repeat product usage and qualified legal analysis.
+```
+
+Reward hierarchy:
+
+1. Non-transferable points, badges, team reputation, and cosmetic unlocks.
+2. Sponsor-funded fixed prizes with published eligibility.
+3. Stable-value rewards where legally and operationally permitted.
+4. Native crypto pools only after security and legal gates.
+
+Points policy must define:
+
+- How points are earned and whether they expire.
+- Anti-farming and account rules.
+- No promise of future monetary conversion.
+- Season resets and historical badges.
+- Corrections after fraud or game cancellation.
+- Separation between engagement points and financial balances.
+
+If stablecoin mode is considered later, compare it with native ETH on:
+
+- User price clarity.
+- Volatility during long matches.
+- Chain liquidity and wallet support.
+- Gas sponsorship/account abstraction.
+- Contract risk and token allowlisting.
+- Accounting and sanctions requirements.
+
+Never fund rewards primarily through continuous token issuance. Every reward program needs a named budget source, cap, objective, and end date.
+
+## 27. Treasury, Cash Flow, Accounting, And Tax
+
+The business needs an operational ledger separate from game-state tables and blockchain events.
+
+Track distinct balances:
+
+- Customer/player funds held in escrow.
+- Sponsor prize funds restricted to an event.
+- Creator payable.
+- Refund liability.
+- Platform-earned revenue.
+- Platform-funded subsidy.
+- Gas and vendor expense.
+- Unclaimed rewards and treatment after expiry.
+
+Financial controls:
+
+- Never recognize escrowed pool value as platform revenue.
+- Reconcile contract, database, bank/payment account, and creator statements.
+- Use dual approval for treasury movement above a threshold.
+- Define creator payout schedule, minimum payout, currency, and network fees.
+- Define refund reserves and cash buffer.
+- Record exchange rates and timestamps for crypto-denominated transactions.
+- Produce a per-event settlement statement.
+- Separate production, prize, operating, and treasury wallets/accounts.
+- Retain evidence required for tax and sponsor invoices.
+
+Monthly finance close should answer:
+
+```text
+Opening liabilities + funds received - rewards paid - refunds paid -
+creator payables - recognized platform revenue = closing reconciled balances
+```
+
+Before paid operation, obtain accounting advice for revenue recognition, crypto valuation, creator reporting, prize taxation, VAT/GST/sales tax, and unclaimed property rules in applicable jurisdictions.
+
+## 28. Customer Support And Dispute Resolution
+
+Trust requires a user-facing process, not only internal runbooks.
+
+Support categories:
+
+- Cannot join, vote, or reconnect.
+- Wrong team or misunderstood team lock.
+- Vote accepted but not counted.
+- Late transaction or network fee complaint.
+- Reward/refund eligibility dispute.
+- Creator cancellation or sponsor prize issue.
+- Account restriction or fraud appeal.
+- Offensive content or harassment report.
+- Privacy or data deletion request.
+
+Minimum support system:
+
+- In-product event ID, turn ID, transaction ID, and `Report issue` action.
+- Searchable rules and status page.
+- Ticket intake with severity and evidence fields.
+- Response targets by event type.
+- Escalation from support to integrity, engineering, finance, or legal.
+- Written appeal and final-decision process.
+- Incident communication template and postmortem for material failures.
+
+Suggested service levels for pilots:
+
+| Severity | Example | Initial response |
+|---|---|---|
+| Critical | Wrong settlement, funds at risk, event-wide outage | 15 minutes during event |
+| High | Many users cannot vote | 30 minutes during event |
+| Normal | Individual vote/reward question | 1 business day |
+| Privacy/legal | Data or eligibility request | Per applicable legal deadline |
+
+Publish who has final authority over game results and what evidence can change a result. Do not improvise settlement decisions in private messages.
+
+## 29. Community Safety, Accessibility, And Localization
+
+The product includes rivalry, financial incentives, creator audiences, and AI-generated text. This creates harassment and unsafe-content risks even without chat.
+
+Community safety requirements:
+
+- Community code of conduct.
+- Creator and agent naming/content policy.
+- Reporting, blocking, suspension, and appeal process.
+- AI commentary filters and safe fallback templates.
+- No personalized financial pressure, loss chasing, or humiliating commentary.
+- Controls for creator links and sponsor content.
+- Minor protection and age-appropriate free mode.
+- Rate limits for usernames, referrals, and generated content.
+
+Accessibility extends beyond the tutorial:
+
+- Keyboard-operable board alternatives and controls.
+- Screen-reader labels for board state, turn, timer, and vote status.
+- Do not rely on color for White/Black, leading state, or profit/loss.
+- Reduced-motion option for board animations and countdown effects.
+- Captions/text equivalents for live commentary and sound cues.
+- Timer accommodations where rules permit.
+- WCAG 2.2 AA target for core participant and creator flows.
+
+Localization strategy:
+
+- Start with English plus the language of the first creator cohort, likely Indonesian.
+- Externalize product copy, rules, dates, numbers, and currencies.
+- Use human review for legal, reward, and safety copy.
+- Localize chess terminology with community testers.
+- Do not open a jurisdiction merely because the interface is translated.
+
+## 30. Identity And Reputation Portability
+
+Wallet-only identity creates fragmented profiles and poor recovery; account-only identity weakens Web3 portability. Use progressive identity.
+
+Recommended model:
+
+```text
+Guest session -> verified email/social or passkey account -> optional linked wallets
+```
+
+Principles:
+
+- One profile may link multiple wallets after proof of control.
+- Changing a wallet must not erase legitimate non-financial reputation.
+- Financial claims remain bound to the authorized wallet or an explicit secure migration flow.
+- Public profiles use display names and truncated addresses by default.
+- Reputation separates play, creator, sponsor, agent, and integrity dimensions.
+- Users can export account and match history where practical.
+- Account recovery must not allow support staff to redirect on-chain funds.
+
+Do not create tradable reputation or agent assets until impersonation, recovery, licensing, and marketplace fraud are addressed.
+
+## 31. IP, Licensing, And Content Rights
+
+Before commercial use, verify rights for every external asset and generated output.
+
+Required IP register:
+
+- Chess board and piece images from `maapcaturrr` with source and license evidence.
+- Fonts, icons, music, sound effects, and UI assets.
+- Stockfish and all open-source dependencies with license obligations.
+- Creator names, logos, clips, voice, and likeness permissions.
+- Sponsor marks and campaign usage windows.
+- AI model provider terms for generated commentary and training/data use.
+- User-created agent names, prompts, descriptions, and shared content.
+
+Business requirements:
+
+- Run a trademark/name search before committing to `ChessStake` or `PawnPool`.
+- Define whether creators grant the platform rights to clip and redistribute event content.
+- Define whether players grant rights to public match actions and display names.
+- Prohibit agents that impersonate real people or infringe brands.
+- Provide takedown and repeat-infringer procedures.
+- Avoid using a creator's likeness in sponsor materials without explicit approval.
+
+## 32. Platform And Vendor Dependency Risk
+
+Distribution may depend on Twitch, YouTube, Discord, X, wallet providers, Vercel, Neon, RPC providers, AI APIs, and app stores. Their policies can limit gambling-adjacent content, automated activity, crypto promotion, data use, or embedded transactions.
+
+Before integration or campaign launch:
+
+- Review platform terms for interactive extensions, crypto, contests, and promotions.
+- Confirm creator disclosure and sponsored-content requirements.
+- Avoid claiming an official partnership without written permission.
+- Maintain email/community channels not controlled by one platform.
+- Support export of creator schedule, participants, and event results.
+- Define fallback providers for RPC, AI commentary, email, and analytics.
+- Set vendor cost and outage alerts.
+- Keep chess legality, tally, and settlement independent of an LLM provider.
+
+Architecture decision records should identify exit cost and fallback for each critical vendor. Avoid building a Twitch-specific product until creator research proves Twitch is the dominant workflow.
+
+## 33. Partnerships Strategy
+
+Partnerships should close a specific gap rather than add logos.
+
+Priority partnership types:
+
+| Partner | Value received | Value offered |
+|---|---|---|
+| Creator networks/agencies | Creator supply | New interactive format and revenue |
+| Chess communities/coaches | Credibility and scenarios | Exposure and educational events |
+| Web3 protocols | Sponsor funding and distribution | Measurable community activation |
+| Streaming tool vendors | Workflow integration | New use case and users |
+| Wallet/onboarding providers | Lower conversion friction | Transaction volume and showcase |
+| Legal/security specialists | Launch assurance | Paid engagement and case study |
+
+For every partnership define owner, target outcome, integration cost, exclusivity, data sharing, commercial terms, and exit condition. Do not prioritize chain grants that force product choices unsupported by users.
+
+## 34. Portfolio And Expansion Logic
+
+Chess can be the initial content format without defining the eventual company boundary.
+
+Possible strategic paths:
+
+```text
+A. Best creator-led crowd chess product
+B. Interactive tournament operating system
+C. Audience decision engine for live strategy games
+D. White-label sponsored community event platform
+```
+
+Stay chess-focused until:
+
+- Creator repeatability is demonstrated.
+- The team knows which value comes specifically from chess and which comes from audience interaction.
+- At least 20 completed events produce comparable format data.
+- Expansion demand appears in interviews or paid requests.
+
+Expansion test:
+
+- Reuse the event, identity, voting, sponsor, and analytics layers for one non-chess pilot.
+- Do not generalize the codebase before a paid or strategically strong request exists.
+- Compare activation, completion, operating cost, and creator repeat intent against chess.
+
+Potential exit or strategic value comes from retained creator distribution, sponsor relationships, trusted event infrastructure, and interaction data, not merely the smart contract or chess UI.
+
+## 35. Scenario Planning And Capital Discipline
+
+Plan for three operating scenarios:
+
+| Scenario | Signal | Response |
+|---|---|---|
+| Engagement works, payments blocked | Users and creators return but legal/payment friction remains | Focus on B2B SaaS and sponsored free-entry events |
+| Creators engage, users do not retain | Hosts like novelty but audiences act once | Shorten formats, improve team identity, test other games |
+| Users retain, creators will not pay | Strong community play but weak B2B demand | Test sponsor-funded seasons or consumer subscription carefully |
+| Sponsors buy, operations are expensive | Revenue exists but concierge work dominates | Productize templates and automation before scaling sales |
+| Real-money mode approved | Legal path exists and pilots are healthy | Launch capped jurisdiction-specific trial, not global rollout |
+
+Capital allocation order:
+
+1. User research and concierge events.
+2. Reliability, analytics, integrity, and creator workflow.
+3. Repeatable distribution and paid pilots.
+4. Retention features proven by experiments.
+5. Automation for demonstrated operational bottlenecks.
+6. Mainnet, marketplace, native token, or broad game expansion last.
+
+Maintain a monthly kill list of features that are not connected to a current hypothesis, paid request, reliability need, or compliance gate.
+
+## 36. Additional Decision Register
+
+| Decision | Evidence required | Recommended default |
+|---|---|---|
+| Core voting format | Format tests and completion data | Candidate/strategy vote for short scenarios |
+| Target match duration | Audience retention curve | 15-25 minutes for pilots |
+| Direct competitor | Creator interviews | Current polls/bots/events, not another Web3 chess app |
+| Native token | Repeat usage plus legal and economic case | Do not launch |
+| Reward currency | User comprehension and legal/accounting review | Points or fixed sponsored prize |
+| Creator event supply | Fill and repeat data | Curated scheduled cohort |
+| Sponsor unit | Paid pilot feedback | Event/season package, not impressions alone |
+| User identity | Conversion, recovery, and fraud tests | Progressive account with optional wallets |
+| Product category | Twenty-event evidence | Remain chess-first until expansion demand exists |
+| Marketplace launch | Supply density and integrity controls | Invite-only until healthy |
+
+## 37. Additional Immediate Actions
+
+- [ ] Run three game-format prototypes before committing to piece-type voting as the permanent mechanic.
+- [ ] Set a 15-25 minute pilot match target and measure retention by minute.
+- [ ] Build the competitive-alternative matrix from creator interviews.
+- [ ] Produce a bottom-up market model using cited creator counts and pilot pricing.
+- [ ] Write the defensibility thesis and update it after every ten completed events.
+- [ ] Define a managed weekly event slate instead of launching an empty lobby.
+- [ ] Create a sponsor one-pager, inventory list, measurement methodology, and make-good policy.
+- [ ] Formally decide not to issue a native token during validation.
+- [ ] Create an event ledger and reconciliation template before accepting paid sponsor or player funds.
+- [ ] Publish support, result dispute, and escalation procedures before valuable-prize events.
+- [ ] Audit asset, dependency, creator, sponsor, and AI-provider licenses.
+- [ ] Review Twitch, YouTube, Discord, X, wallet, and hosting provider policies.
+- [ ] Add community safety, reduced-motion, screen-reader, and bilingual requirements to acceptance criteria.
+- [ ] Use progressive identity rather than treating one wallet as one permanent person.
+- [ ] Review the roadmap monthly and remove work not tied to validation, revenue, trust, or reliability.

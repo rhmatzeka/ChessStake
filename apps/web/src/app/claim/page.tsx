@@ -42,6 +42,16 @@ export default function ClaimPage() {
 
   const resolvedAddress = claimAddress || address || '';
 
+  const loadBettors = async (targetGameId = gameId) => {
+    if (!targetGameId) return;
+
+    const res = await fetch(`/api/games/${targetGameId}/settlement`, { cache: 'no-store' });
+    const json = await res.json();
+    if (json.ok && Array.isArray(json.data?.bettors)) {
+      setBettors(json.data.bettors);
+    }
+  };
+
   useEffect(() => {
     const hydrate = async () => {
       try {
@@ -63,16 +73,6 @@ export default function ClaimPage() {
 
     hydrate();
   }, [address]);
-
-  const loadBettors = async (targetGameId = gameId) => {
-    if (!targetGameId) return;
-
-    const res = await fetch(`/api/games/${targetGameId}/settlement`, { cache: 'no-store' });
-    const json = await res.json();
-    if (json.ok && Array.isArray(json.data?.bettors)) {
-      setBettors(json.data.bettors);
-    }
-  };
 
   const loadSettlement = async () => {
     if (!gameId || !resolvedAddress) {

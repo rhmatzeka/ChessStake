@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ChessStake - Web3 AI Chess Betting Arena",
-  description: "Live chess arena driven by AI where Web3 spectators bet on piece movement.",
+  title: "ChessStake - Interactive AI Chess Arena",
+  description: "Creator-hosted AI chess arenas where communities join teams, vote strategy, and follow every move live.",
 };
 
 export default function RootLayout({

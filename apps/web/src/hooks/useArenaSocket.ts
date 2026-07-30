@@ -6,7 +6,7 @@ import { PieceType, Team } from '../types/chess';
 
 const API_URL = '/api';
 
-export const useArenaSocket = () => {
+export const useArenaSocket = (requestedGameId?: string) => {
   const { activeGameId, setGameState } = useArenaStore();
 
   const applyGameState = (game: any) => {
@@ -57,7 +57,10 @@ export const useArenaSocket = () => {
   useEffect(() => {
     const fetchInitialState = async () => {
       try {
-        const res = await fetch(`${API_URL}/games/active`);
+        const endpoint = requestedGameId && requestedGameId !== 'live'
+          ? `${API_URL}/games/${encodeURIComponent(requestedGameId)}/state`
+          : `${API_URL}/games/active`;
+        const res = await fetch(endpoint, { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to fetch active game');
         const json = await res.json();
         
@@ -70,7 +73,7 @@ export const useArenaSocket = () => {
     };
 
     fetchInitialState();
-  }, [setGameState]);
+  }, [requestedGameId, setGameState]);
 
   useEffect(() => {
     if (!activeGameId) return;

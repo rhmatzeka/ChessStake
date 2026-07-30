@@ -1,5 +1,5 @@
-export const CHAIN_ID = 11155111;
-export const CHAIN_NAME = 'Ethereum Sepolia';
+export const CHAIN_ID = 84532;
+export const CHAIN_NAME = 'Base Sepolia';
 export const SUPPORTED_CHAINS = {
   ethereumSepolia: {
     id: 11155111,

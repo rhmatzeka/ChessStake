@@ -29,6 +29,12 @@ export async function POST(request: Request) {
     if (creatorName.length < 2) {
       return NextResponse.json({ ok: false, data: null, error: { code: 'INVALID_CREATOR', message: 'Creator name must be at least 2 characters.' } }, { status: 400 });
     }
+    if (title.length > 80 || creatorName.length > 50 || description.length > 500) {
+      return NextResponse.json({ ok: false, data: null, error: { code: 'INPUT_TOO_LONG', message: 'Match metadata exceeds the allowed length.' } }, { status: 400 });
+    }
+    if (creatorAddress && !/^0x[a-fA-F0-9]{40}$/.test(creatorAddress)) {
+      return NextResponse.json({ ok: false, data: null, error: { code: 'INVALID_ADDRESS', message: 'Creator wallet address is invalid.' } }, { status: 400 });
+    }
 
     if (!Number.isFinite(creatorFeeBps) || creatorFeeBps < 0 || creatorFeeBps > 1000) {
       return NextResponse.json({ ok: false, data: null, error: { code: 'INVALID_FEE', message: 'Creator fee must be between 0% and 10%.' } }, { status: 400 });

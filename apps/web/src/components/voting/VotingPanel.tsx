@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useArenaStore, VoteTally } from '../../stores/arena-store';
+import { useArenaStore } from '../../stores/arena-store';
 import { PieceType, Team } from '../../types/chess';
 import Image from 'next/image';
 import { useAccount } from 'wagmi';
