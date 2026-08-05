@@ -182,22 +182,22 @@ export default function Home() {
       </a>
 
       {/* Header / Nav Bar */}
-      <header className="sticky top-0 z-40 w-full border-b border-[#26211e]/60 bg-[#070605]/80 backdrop-blur-md px-4 py-3 md:px-8">
+      <header className="sticky top-0 z-40 w-full border-b border-[#26211e]/40 bg-[#070605]/90 backdrop-blur-md px-4 py-4 md:px-8">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 group outline-none">
-              <span className="bg-gradient-to-r from-[#e6a855] to-[#c7883a] text-[#070605] font-extrabold px-3 py-1 rounded-md text-sm uppercase tracking-widest font-mono transition-transform group-hover:scale-105">
+          <div className="flex items-center gap-10">
+            <Link href="/" className="flex items-center gap-3 group outline-none">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e6a855]/30 bg-[#e6a855]/5 text-[#e6a855] transition-transform group-hover:scale-105">
+                <KnightIcon className="h-5 w-5" />
+              </span>
+              <span className="font-mono text-base font-extrabold uppercase tracking-[0.2em] text-[#ede6dc] transition-colors group-hover:text-[#e6a855]">
                 PawnPool
               </span>
-              <span className="text-[10px] uppercase tracking-[0.3em] font-mono font-bold text-[#8e8276] hidden md:inline transition-colors group-hover:text-[#ede6dc]">
-                Tactical Chess Arena
-              </span>
             </Link>
-            <nav className="hidden md:flex items-center gap-6 text-xs font-mono font-bold text-[#8e8276]">
-              <Link href="/matches" className="hover:text-[#ede6dc] transition-colors">Matches</Link>
-              <Link href="/agents" className="hover:text-[#ede6dc] transition-colors">Agents</Link>
-              <Link href="/how-to-play" className="hover:text-[#ede6dc] transition-colors">Rules</Link>
-              <Link href="/leaderboard" className="hover:text-[#ede6dc] transition-colors">Rankings</Link>
+            <nav className="hidden md:flex items-center gap-8 text-xs font-mono font-bold text-[#8e8276]">
+              <Link href="/matches" className="relative py-1 hover:text-[#ede6dc] transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[1.5px] after:w-0 after:bg-[#e6a855] hover:after:w-full after:transition-all">Matches</Link>
+              <Link href="/agents" className="relative py-1 hover:text-[#ede6dc] transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[1.5px] after:w-0 after:bg-[#e6a855] hover:after:w-full after:transition-all">Agents</Link>
+              <Link href="/how-to-play" className="relative py-1 hover:text-[#ede6dc] transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[1.5px] after:w-0 after:bg-[#e6a855] hover:after:w-full after:transition-all">Rules</Link>
+              <Link href="/leaderboard" className="relative py-1 hover:text-[#ede6dc] transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[1.5px] after:w-0 after:bg-[#e6a855] hover:after:w-full after:transition-all">Rankings</Link>
             </nav>
           </div>
           <div className="flex items-center gap-3">
