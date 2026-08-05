@@ -162,10 +162,6 @@ export default function Home() {
             Crowd Controlled Chess <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e6a855] to-[#c7883a]">Verifiable Rewards</span>
           </h1>
-          
-          <p className="mt-8 text-[#8e8276] text-base leading-relaxed md:text-lg max-w-2xl mx-auto">
-            Host community-led chess arenas. Spectators pick a side, back dynamic turn-by-turn strategies with native tokens or points, and watch local AI resolvers enforce deterministic outcomes.
-          </p>
 
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link
@@ -194,9 +190,6 @@ export default function Home() {
             <h2 className="mt-3 text-3xl font-extrabold uppercase tracking-tight sm:text-4xl text-[#ede6dc] leading-[1.0]">
               Unlock B2B Stream monetization
             </h2>
-            <p className="mt-4 text-[#8e8276] text-sm leading-relaxed max-w-2xl">
-              PawnPool replaces static Twitch/YouTube polls with a decentralized strategy playground. Creators host community arenas, viewers back tactics, and smart contracts secure platform incentives.
-            </p>
           </div>
 
           <div className="grid gap-12 md:grid-cols-3">
