@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import WalletConnectButton from '../components/layout/WalletConnectButton';
+import ScrollFrameAnimation from '../components/arena/ScrollFrameAnimation';
 
 // Types
 type Match = {
@@ -44,12 +45,6 @@ export default function Home() {
   const [defense, setDefense] = useState(20);
   const [randomness, setRandomness] = useState(10);
 
-  // Live Simulator Loop State
-  const [simStep, setSimStep] = useState<'IDLE' | 'VOTING' | 'THINKING' | 'RESOLVING' | 'MOVED'>('IDLE');
-  const [simTally, setSimTally] = useState({ PAWN: 25, KNIGHT: 65, BISHOP: 10 });
-  const [simMoveIndex, setSimMoveIndex] = useState(0); // 0 = start, 1 = Knight moved
-  const [simLog, setSimLog] = useState<string[]>(['Match created. Waiting for team White strategy.']);
-
   // Fetch Matches
   useEffect(() => {
     let active = true;
@@ -68,61 +63,6 @@ export default function Home() {
       active = false;
     };
   }, []);
-
-  // Simulator Loop Effect
-  useEffect(() => {
-    let timer: any;
-    const runSimulator = () => {
-      if (simStep === 'IDLE') {
-        timer = setTimeout(() => {
-          setSimStep('VOTING');
-          setSimLog((prev) => [...prev.slice(-4), 'White team voting opened. BACK dynamic strategies.']);
-        }, 2500);
-      } else if (simStep === 'VOTING') {
-        let count = 0;
-        const interval = setInterval(() => {
-          setSimTally((prev) => {
-            const addedPawn = Math.floor(Math.random() * 12);
-            const addedKnight = Math.floor(Math.random() * 25);
-            return {
-              PAWN: prev.PAWN + addedPawn,
-              KNIGHT: prev.KNIGHT + addedKnight,
-              BISHOP: prev.BISHOP,
-            };
-          });
-          count++;
-          if (count >= 4) {
-            clearInterval(interval);
-            setSimStep('THINKING');
-            setSimLog((prev) => [...prev.slice(-4), 'Voting closed. Winning strategy: KNIGHT. AI tactical resolver resolving…']);
-          }
-        }, 700);
-      } else if (simStep === 'THINKING') {
-        timer = setTimeout(() => {
-          setSimStep('RESOLVING');
-          setSimLog((prev) => [...prev.slice(-4), 'Selected move: Nb1-c3. Simulating FEN transitions…']);
-        }, 1800);
-      } else if (simStep === 'RESOLVING') {
-        timer = setTimeout(() => {
-          setSimMoveIndex(1); // Knight moves to c3
-          setSimStep('MOVED');
-          setSimLog((prev) => [...prev.slice(-4), 'Move confirmed by resolver. Knight deployed to c3.']);
-        }, 1200);
-      } else if (simStep === 'MOVED') {
-        timer = setTimeout(() => {
-          setSimMoveIndex(0);
-          setSimTally({ PAWN: 25, KNIGHT: 65, BISHOP: 10 });
-          setSimStep('IDLE');
-          setSimLog(['Resetting simulator state. Match restarted.']);
-        }, 4000);
-      }
-    };
-
-    runSimulator();
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [simStep]);
 
   // Preset Selection
   const handlePreset = (preset: 'AGGRESSIVE' | 'DEFENSIVE' | 'BALANCED') => {
@@ -263,145 +203,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Hero Right: Premium Tactical Terminal Board (Visual Signature) */}
-            <div className="lg:col-span-6">
-              <div className="relative rounded-2xl border border-[#26211e] bg-[#141210] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.8)] overflow-hidden">
-                {/* Glowing subtle ambient amber aura */}
-                <div className="absolute top-0 right-0 h-48 w-48 bg-[#e6a855]/5 rounded-full filter blur-[80px] pointer-events-none" />
-
-                {/* Simulated game state bar */}
-                <div className="flex items-center justify-between border-b border-[#26211e] pb-4 mb-6">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e6a855] opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#e6a855]"></span>
-                    </span>
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#8e8276]">
-                      LIVE CONSOLE SIMULATION
-                    </span>
-                  </div>
-                  <span className="font-mono text-[9px] text-[#e6a855] uppercase tracking-widest px-2 py-0.5 rounded border border-[#e6a855]/20 bg-[#e6a855]/5">
-                    STAGE: {simStep}
-                  </span>
-                </div>
-
-                {/* The Chessboard Grid */}
-                <div className="flex justify-center mb-6">
-                  <div className="relative p-2 rounded-xl bg-[#0d0b0a] border border-[#26211e]">
-                    
-                    {/* File labels (A-D) */}
-                    <div className="flex justify-between px-3 text-[8px] font-mono text-[#8e8276] mb-1">
-                      <span>a</span>
-                      <span>b</span>
-                      <span>c</span>
-                      <span>d</span>
-                    </div>
-
-                    <div className="flex gap-1">
-                      {/* Rank labels (4-1) */}
-                      <div className="flex flex-col justify-between text-[8px] font-mono text-[#8e8276] py-3 pr-1">
-                        <span>4</span>
-                        <span>3</span>
-                        <span>2</span>
-                        <span>1</span>
-                      </div>
-
-                      {/* 4x4 Grid Board */}
-                      <div className="grid grid-cols-4 grid-rows-4 gap-1 w-[260px] h-[260px] bg-[#070605] rounded overflow-hidden">
-                        {Array.from({ length: 16 }).map((_, i) => {
-                          const row = Math.floor(i / 4);
-                          const col = i % 4;
-                          const isDark = (row + col) % 2 === 1;
-                          
-                          // Track simulated coordinates
-                          // Knight starts on b1 (row 3, col 1 in our 4x4 grid representation)
-                          const showKnightStart = simMoveIndex === 0 && row === 3 && col === 1;
-                          // Knight moves to c3 (row 2, col 2)
-                          const showKnightEnd = simMoveIndex === 1 && row === 2 && col === 2;
-                          // Show path highlighting when thinking/resolving
-                          const isHighlighted = (simStep === 'THINKING' || simStep === 'RESOLVING') && 
-                            ((row === 3 && col === 1) || (row === 2 && col === 2));
-
-                          return (
-                            <div
-                              key={i}
-                              className={`relative flex items-center justify-center transition-colors duration-300 ${
-                                isDark ? 'bg-[#181513]' : 'bg-[#292420]'
-                              } ${isHighlighted ? 'ring-1 ring-[#e6a855]/40 bg-[#e6a855]/5' : ''}`}
-                            >
-                              {showKnightStart && (
-                                <div className="absolute inset-0 flex items-center justify-center p-2 text-[#e6a855] animate-pulse">
-                                  <KnightIcon className="h-full w-full object-contain filter drop-shadow-[0_0_8px_rgba(230,168,85,0.4)]" />
-                                </div>
-                              )}
-                              {showKnightEnd && (
-                                <div className="absolute inset-0 flex items-center justify-center p-2 text-[#e6a855] scale-110">
-                                  <KnightIcon className="h-full w-full object-contain filter drop-shadow-[0_0_12px_rgba(230,168,85,0.6)]" />
-                                </div>
-                              )}
-                              
-                              {/* Square coord indicator in corner */}
-                              <span className="absolute bottom-1 right-1 text-[6px] font-mono text-[#8e8276]/30">
-                                {['a','b','c','d'][col]}{4-row}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Voting interface simulator */}
-                <div className="grid gap-3 border-t border-[#26211e] pt-5">
-                  <div className="flex justify-between items-center">
-                    <span className="font-mono text-[9px] font-bold text-[#8e8276] uppercase">STRATEGIC VOTE SPECTRUM</span>
-                    <span className="font-mono text-[9px] text-[#8e8276]">{simStep === 'VOTING' ? 'VOTES STREAMING' : 'LOCKED'}</span>
-                  </div>
-
-                  <div className="grid gap-2.5">
-                    {Object.entries(simTally).map(([piece, count]) => {
-                      const max = Math.max(...Object.values(simTally));
-                      const percent = (count / max) * 100;
-                      const isLeading = count === max && simStep !== 'IDLE';
-
-                      return (
-                        <div key={piece} className="text-xs">
-                          <div className="flex justify-between items-center mb-1 font-mono text-[10px]">
-                            <span className="font-bold flex items-center gap-1.5 text-[#ede6dc]">
-                              {piece}
-                              {isLeading && (
-                                <span className="bg-[#e6a855] text-[#070605] text-[7px] px-1 rounded font-black tracking-widest scale-90">
-                                  LEADING
-                                </span>
-                              )}
-                            </span>
-                            <span className="text-[#8e8276]">{count} votes</span>
-                          </div>
-                          <div className="h-1 w-full bg-[#070605] rounded-full overflow-hidden">
-                            <div
-                              className={`h-full transition-all duration-300 ${
-                                isLeading ? 'bg-gradient-to-r from-[#e6a855] to-[#c7883a]' : 'bg-[#26211e]'
-                              }`}
-                              style={{ width: `${percent}%` }}
-                            />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Console Output */}
-                <div className="mt-5 rounded-lg bg-[#070605] p-3 font-mono text-[9px] text-[#8e8276] border border-[#26211e]/50 h-[84px] overflow-y-auto">
-                  {simLog.map((log, index) => (
-                    <div key={index} className="mb-1 leading-normal">
-                      <span className="text-[#e6a855]">&gt;&nbsp;</span>{log}
-                    </div>
-                  ))}
-                </div>
-
-              </div>
+            {/* Hero Right: Premium Tactical Scroll Animation (Visual Signature) */}
+            <div className="lg:col-span-6 flex items-center justify-center">
+              <ScrollFrameAnimation />
             </div>
 
           </div>
