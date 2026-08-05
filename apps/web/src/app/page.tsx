@@ -170,15 +170,15 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link
               href="/arena/live"
-              className="inline-flex items-center justify-center rounded-xl bg-[#e6a855] px-7 py-4 text-xs font-mono font-extrabold uppercase tracking-widest text-[#070605] transition-all hover:bg-[#ffbe6b] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#e6a855] focus-visible:ring-offset-2 focus-visible:ring-offset-[#070605] outline-none"
+              className="inline-flex items-center justify-center rounded-lg bg-[#e6a855] px-8 py-4 text-xs font-mono font-extrabold uppercase tracking-widest text-[#070605] transition-all hover:bg-[#ffbe6b] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#e6a855] focus-visible:ring-offset-2 focus-visible:ring-offset-[#070605] outline-none"
             >
-              Enter Live Arena
+              ENTER LIVE ARENA
             </Link>
             <Link
               href="/host"
-              className="inline-flex items-center justify-center rounded-xl border border-[#26211e] bg-[#141210]/50 px-7 py-4 text-xs font-mono font-extrabold uppercase tracking-widest text-[#ede6dc] transition-all hover:bg-[#26211e] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#8e8276] focus-visible:ring-offset-2 focus-visible:ring-offset-[#070605] outline-none"
+              className="inline-flex items-center justify-center rounded-lg border border-[#26211e] bg-[#141210]/50 px-8 py-4 text-xs font-mono font-extrabold uppercase tracking-widest text-[#ede6dc] transition-all hover:bg-[#26211e] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#8e8276] focus-visible:ring-offset-2 focus-visible:ring-offset-[#070605] outline-none"
             >
-              Host Match
+              HOST MATCH
             </Link>
           </div>
 

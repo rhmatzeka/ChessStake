@@ -17,7 +17,7 @@ export const ScrollFrameAnimation: React.FC = () => {
   const rawIndex = useTransform(scrollYProgress, [0, 0.28], [1, 128]);
 
   // Efek fade out background saat scroll mendekati section kedua
-  const opacity = useTransform(scrollYProgress, [0.15, 0.28], [0.65, 0]);
+  const opacity = useTransform(scrollYProgress, [0.15, 0.28], [0.85, 0]);
 
   useMotionValueEvent(rawIndex, "change", (latest) => {
     const rounded = Math.max(1, Math.min(128, Math.round(latest)));
@@ -46,18 +46,20 @@ export const ScrollFrameAnimation: React.FC = () => {
       className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden z-0"
     >
       {/* Background Frame rendering */}
-      <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-[#070605]">
+      <div 
+        className="absolute inset-0 w-full h-full flex items-center justify-center bg-[#070605]"
+        style={{ opacity: opacity as any }}
+      >
         <img
           src={imageSrc}
           alt="PawnPool tactical background sequence"
           className="w-full h-full object-cover transition-opacity duration-75 select-none pointer-events-none"
           style={{ 
-            imageRendering: 'pixelated',
-            opacity: opacity.get() // React rendering sync via state or dynamic inline style
+            imageRendering: 'pixelated'
           }}
         />
         {/* Dark overlay to make hero text highly readable */}
-        <div className="absolute inset-0 bg-[#070605]/85 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-[#070605]/60 mix-blend-multiply" />
         
         {/* Subtle grid pattern overlay */}
         <div 
