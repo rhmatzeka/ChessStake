@@ -12,12 +12,11 @@ export const ScrollFrameAnimation: React.FC = () => {
     offset: ["start start", "end end"]
   });
 
-  // Map progress scroll (0 ke 0.35) ke index frame (1 ke 128)
-  // 0.35 adalah perkiraan ketika user melewati section Hero pertama
-  const rawIndex = useTransform(scrollYProgress, [0, 0.28], [1, 128]);
+  // Map progress scroll (0 ke 0.15) ke index frame (1 ke 128)
+  const rawIndex = useTransform(scrollYProgress, [0, 0.15], [1, 128]);
 
-  // Efek fade out background saat scroll mendekati section kedua
-  const opacity = useTransform(scrollYProgress, [0.15, 0.28], [0.85, 0]);
+  // Efek fade out background dipercepat agar menghilang sepenuhnya sebelum section kedua
+  const opacity = useTransform(scrollYProgress, [0.05, 0.15], [0.85, 0]);
 
   useMotionValueEvent(rawIndex, "change", (latest) => {
     const rounded = Math.max(1, Math.min(128, Math.round(latest)));

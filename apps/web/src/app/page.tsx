@@ -181,22 +181,6 @@ export default function Home() {
               HOST MATCH
             </Link>
           </div>
-
-          {/* Stats block */}
-          <div className="mt-16 grid grid-cols-3 gap-12 border-t border-[#26211e] pt-10 w-full max-w-xl mx-auto">
-            <div>
-              <div className="font-mono text-2xl font-extrabold text-[#ede6dc]">20s</div>
-              <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">Voting window</div>
-            </div>
-            <div>
-              <div className="font-mono text-2xl font-extrabold text-[#e6a855]">100%</div>
-              <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">On-chain escrow</div>
-            </div>
-            <div>
-              <div className="font-mono text-2xl font-extrabold text-[#ede6dc]">AI</div>
-              <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">Resolver path</div>
-            </div>
-          </div>
         </div>
       </section>
 
