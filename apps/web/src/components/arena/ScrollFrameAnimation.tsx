@@ -47,7 +47,7 @@ export const ScrollFrameAnimation: React.FC = () => {
     >
       {/* Background Frame rendering */}
       <div 
-        className="absolute inset-0 w-full h-full flex items-center justify-center bg-[#070605]"
+        className="absolute inset-0 w-full h-full flex items-start justify-center bg-[#070605]"
         style={{ opacity: opacity as any }}
       >
         <img
@@ -55,7 +55,8 @@ export const ScrollFrameAnimation: React.FC = () => {
           alt="PawnPool tactical background sequence"
           className="w-full h-full object-cover transition-opacity duration-75 select-none pointer-events-none"
           style={{ 
-            imageRendering: 'pixelated'
+            imageRendering: 'pixelated',
+            objectPosition: 'center 20%'
           }}
         />
         {/* Dark overlay to make hero text highly readable */}

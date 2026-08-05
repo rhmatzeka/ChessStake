@@ -146,7 +146,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section id="main-content" className="relative overflow-hidden pt-20 pb-32 md:pt-32 md:pb-48">
+      <section id="main-content" className="relative overflow-hidden pt-10 pb-20 md:pt-16 md:pb-28">
         {/* Background Scroll animation */}
         <ScrollFrameAnimation />
 
