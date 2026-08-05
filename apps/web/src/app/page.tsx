@@ -146,68 +146,56 @@ export default function Home() {
         </div>
       </header>
 
-      <section id="main-content" className="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32">
-        {/* Subtle grid background */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#151311_1px,transparent_1px),linear-gradient(to_bottom,#151311_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      <section id="main-content" className="relative overflow-hidden pt-20 pb-32 md:pt-32 md:pb-48">
+        {/* Background Scroll animation */}
+        <ScrollFrameAnimation />
 
-        <div className="mx-auto max-w-7xl px-4 md:px-8 relative">
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16 items-start">
-            
-            {/* Hero Left: Editorial style layout */}
-            <div className="lg:col-span-6 flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-6">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#e6a855] animate-pulse" />
-                <span className="text-[10px] font-mono font-bold tracking-[0.3em] text-[#8e8276] uppercase">
-                  Audience-Driven Strategy Engine
-                </span>
-              </div>
-              
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter text-[#ede6dc] uppercase text-wrap-balance leading-[0.9]">
-                Crowd Controlled Chess <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e6a855] to-[#c7883a]">Verifiable Rewards</span>
-              </h1>
-              
-              <p className="mt-8 text-[#8e8276] text-base leading-relaxed md:text-lg max-w-xl">
-                Host community-led chess arenas. Spectators pick a side, back dynamic turn-by-turn strategies with native tokens or points, and watch local AI resolvers enforce deterministic outcomes.
-              </p>
+        <div className="mx-auto max-w-4xl px-4 md:px-8 relative z-10 text-center flex flex-col items-center">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#e6a855] animate-pulse" />
+            <span className="text-[10px] font-mono font-bold tracking-[0.3em] text-[#8e8276] uppercase">
+              Audience-Driven Strategy Engine
+            </span>
+          </div>
+          
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter text-[#ede6dc] uppercase text-wrap-balance leading-[0.9]">
+            Crowd Controlled Chess <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e6a855] to-[#c7883a]">Verifiable Rewards</span>
+          </h1>
+          
+          <p className="mt-8 text-[#8e8276] text-base leading-relaxed md:text-lg max-w-2xl mx-auto">
+            Host community-led chess arenas. Spectators pick a side, back dynamic turn-by-turn strategies with native tokens or points, and watch local AI resolvers enforce deterministic outcomes.
+          </p>
 
-              <div className="mt-10 flex flex-wrap gap-4">
-                <Link
-                  href="/arena/live"
-                  className="inline-flex items-center justify-center rounded-xl bg-[#e6a855] px-7 py-4 text-xs font-mono font-extrabold uppercase tracking-widest text-[#070605] transition-all hover:bg-[#ffbe6b] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#e6a855] focus-visible:ring-offset-2 focus-visible:ring-offset-[#070605] outline-none"
-                >
-                  Enter Live Arena
-                </Link>
-                <Link
-                  href="/host"
-                  className="inline-flex items-center justify-center rounded-xl border border-[#26211e] bg-[#141210]/50 px-7 py-4 text-xs font-mono font-extrabold uppercase tracking-widest text-[#ede6dc] transition-all hover:bg-[#26211e] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#8e8276] focus-visible:ring-offset-2 focus-visible:ring-offset-[#070605] outline-none"
-                >
-                  Host Match
-                </Link>
-              </div>
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
+            <Link
+              href="/arena/live"
+              className="inline-flex items-center justify-center rounded-xl bg-[#e6a855] px-7 py-4 text-xs font-mono font-extrabold uppercase tracking-widest text-[#070605] transition-all hover:bg-[#ffbe6b] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#e6a855] focus-visible:ring-offset-2 focus-visible:ring-offset-[#070605] outline-none"
+            >
+              Enter Live Arena
+            </Link>
+            <Link
+              href="/host"
+              className="inline-flex items-center justify-center rounded-xl border border-[#26211e] bg-[#141210]/50 px-7 py-4 text-xs font-mono font-extrabold uppercase tracking-widest text-[#ede6dc] transition-all hover:bg-[#26211e] active:scale-95 focus-visible:ring-2 focus-visible:ring-[#8e8276] focus-visible:ring-offset-2 focus-visible:ring-offset-[#070605] outline-none"
+            >
+              Host Match
+            </Link>
+          </div>
 
-              {/* Stats block */}
-              <div className="mt-16 grid grid-cols-3 gap-6 border-t border-[#26211e] pt-10">
-                <div>
-                  <div className="font-mono text-2xl font-extrabold text-[#ede6dc]">20s</div>
-                  <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">Voting window</div>
-                </div>
-                <div>
-                  <div className="font-mono text-2xl font-extrabold text-[#e6a855]">100%</div>
-                  <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">On-chain escrow</div>
-                </div>
-                <div>
-                  <div className="font-mono text-2xl font-extrabold text-[#ede6dc]">AI</div>
-                  <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">Resolver path</div>
-                </div>
-              </div>
+          {/* Stats block */}
+          <div className="mt-16 grid grid-cols-3 gap-12 border-t border-[#26211e] pt-10 w-full max-w-xl mx-auto">
+            <div>
+              <div className="font-mono text-2xl font-extrabold text-[#ede6dc]">20s</div>
+              <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">Voting window</div>
             </div>
-
-            {/* Hero Right: Premium Tactical Scroll Animation (Visual Signature) */}
-            <div className="lg:col-span-6 flex items-center justify-center">
-              <ScrollFrameAnimation />
+            <div>
+              <div className="font-mono text-2xl font-extrabold text-[#e6a855]">100%</div>
+              <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">On-chain escrow</div>
             </div>
-
+            <div>
+              <div className="font-mono text-2xl font-extrabold text-[#ede6dc]">AI</div>
+              <div className="text-[9px] uppercase tracking-wider text-[#8e8276] font-mono mt-1">Resolver path</div>
+            </div>
           </div>
         </div>
       </section>
