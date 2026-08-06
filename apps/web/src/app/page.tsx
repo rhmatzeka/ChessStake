@@ -37,6 +37,7 @@ export default function Home() {
   const { isConnected, address } = useAccount();
   const [matches, setMatches] = useState<Match[]>([]);
   const [matchesLoading, setMatchesLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Agent Customizer State
   const [agentName, setAgentName] = useState('PawnStormer');
@@ -122,7 +123,7 @@ export default function Home() {
       </a>
 
       {/* Header / Nav Bar */}
-      <header className="sticky top-0 z-40 w-full border-b border-[#26211e]/40 bg-[#070605]/90 backdrop-blur-md px-4 py-4 md:px-8">
+      <header className="sticky top-0 z-40 w-full border-b border-[#26211e]/40 bg-[#070605]/95 backdrop-blur-md px-4 py-4 md:px-8 relative">
         <div className="mx-auto max-w-7xl flex items-center justify-between">
           <div className="flex items-center gap-10">
             <Link href="/" className="flex items-center gap-3 group outline-none">
@@ -140,10 +141,37 @@ export default function Home() {
               <Link href="/leaderboard" className="relative py-1 hover:text-[#ede6dc] transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[1.5px] after:w-0 after:bg-[#e6a855] hover:after:w-full after:transition-all">Rankings</Link>
             </nav>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <WalletConnectButton />
+            {/* Hamburger Button for mobile */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMobileMenuOpen}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#26211e] bg-[#141210]/50 text-[#8e8276] hover:text-[#ede6dc] active:scale-95 md:hidden"
+            >
+              {isMobileMenuOpen ? (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Dropdown */}
+        {isMobileMenuOpen && (
+          <nav className="absolute left-0 right-0 top-full border-b border-[#26211e]/60 bg-[#070605]/98 px-6 py-5 flex flex-col gap-4 font-mono text-sm font-bold text-[#8e8276] md:hidden shadow-xl z-50">
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/matches" className="hover:text-[#ede6dc] py-1 border-b border-[#26211e]/20">Matches</Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/agents" className="hover:text-[#ede6dc] py-1 border-b border-[#26211e]/20">Agents</Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/how-to-play" className="hover:text-[#ede6dc] py-1 border-b border-[#26211e]/20">Rules</Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/leaderboard" className="hover:text-[#ede6dc] py-1">Rankings</Link>
+          </nav>
+        )}
       </header>
 
       <section id="main-content" className="relative overflow-hidden pt-10 pb-20 md:pt-16 md:pb-28">
