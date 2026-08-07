@@ -211,11 +211,11 @@ export default function Home() {
       {/* Structured Value Proposition */}
       <section className="border-t border-[#26211e] bg-[#0d0b0a] py-20 md:py-28">
         <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="max-w-3xl mb-16 md:mb-24">
+          <div className="w-full mb-16 md:mb-24">
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-[#e6a855]">
               CREATOR REVENUE &amp; ENGAGEMENT
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold uppercase tracking-tight sm:text-4xl text-[#ede6dc] leading-[1.0]">
+            <h2 className="mt-3 text-3xl font-extrabold uppercase tracking-tight sm:text-4xl text-[#ede6dc] leading-[1.0] max-w-3xl">
               Unlock B2B Stream monetization
             </h2>
           </div>
