@@ -1,148 +1,129 @@
-# PawnPool - Interactive AI Chess Arena
+# ChessStake (PawnPool): AI Chess Arena
 
-PawnPool adalah arena permainan catur Web3 berbasis kecerdasan buatan (AI) di mana penonton dapat connect wallet, memilih tim White/Black, dan memasang taruhan/vote untuk menentukan jenis bidak yang akan digerakkan. Untuk demo Vercel-only, vote berjalan dalam mock mode dan AI resolve dilakukan lewat Next.js API routes
+A live chess game where **the audience plays instead of two players**. Viewers connect a crypto wallet, join team White or Black, and bet on **which piece should move next**. When the voting timer ends, the piece with the most bets wins, and an **AI picks the best legal move** for that piece.
 
----
+Because the AI always makes the move, no single person can sabotage the game.
 
-## Konsep Inti
+**Live demo:** https://pawnpool.rahmateka.my.id
 
-1. **AI-Driven Movement**: Menghilangkan faktor kecurangan/sabotase dari pemain manusia. AI selalu melangkah secara optimal untuk bidak yang memenangkan voting.
-2. **Tiered Betting per Piece**: Setiap bidak memiliki harga vote yang berbeda:
-   - Pawn: 0.0001 ETH
-   - King: 0.0002 ETH
-   - Knight: 0.0003 ETH
-   - Bishop: 0.0003 ETH
-   - Rook: 0.0005 ETH
-   - Queen: 0.0010 ETH
-3. **Turn Rules**:
-   - Durasi voting per turn adalah 20 detik.
-   - User hanya boleh memasang taruhan 1 kali per turn.
-   - User tidak boleh pindah tim (White/Black) setelah first bet di game tersebut.
-   - Jika satu turn tidak mendapat vote, timer dibuka ulang maksimal 3 kali sebelum game dibatalkan otomatis (auto-cancel).
-4. **Pool & Settlement**:
-   - Pemenang mendapatkan 90% dari total pool (White + Black pool combined) secara proporsional.
-   - Platform/developer fee adalah 10%, ditarik otomatis ke treasury saat game resolve.
-   - Draw refund mengembalikan 90% pool secara proporsional ke semua bettor.
-   - Cancel game mengembalikan 100% pool (tanpa platform fee).
-   - Late transaction (tx confirmed setelah turn lock) tidak dihitung sebagai vote dan dapat diklaim refund 100% tanpa fee.
+## How a game works
 
----
+1. Join a team (White or Black) by placing your first bet. You can't switch teams after that.
+2. Each turn has a **20-second vote**. You can bet **once per turn**.
+3. Each piece has its own price per vote:
 
-## Tech Stack
+   | Piece | Price per vote |
+   | --- | --- |
+   | Pawn | 0.0001 ETH |
+   | King | 0.0002 ETH |
+   | Knight | 0.0003 ETH |
+   | Bishop | 0.0003 ETH |
+   | Rook | 0.0005 ETH |
+   | Queen | 0.0010 ETH |
 
-- **Frontend + API Demo**: Next.js App Router (TypeScript, Tailwind CSS, Zustand, polling API routes)
-- **Database**: Prisma ORM + PostgreSQL (Neon Free direkomendasikan untuk Vercel)
-- **Backend Legacy**: Express.js + Socket.IO masih ada di `apps/api`, tetapi tidak wajib untuk Vercel-only demo
-- **Smart Contract**: Solidity (Hardhat, OpenZeppelin v5, deployed on Ethereum Sepolia)
-- **AI Logic**: chess.js + Stockfish heuristik resolver
+4. The piece with the most money on it wins the vote, and the AI moves it.
+5. If nobody votes, the timer restarts up to 3 times, then the game is cancelled.
 
----
+## Payouts
 
-## Struktur Folder Project
+| Result | What happens to the pool |
+| --- | --- |
+| Win | The winning team shares **90%** of the whole pool, in proportion to what each person bet. **10%** goes to the platform. |
+| Draw | Everyone gets **90%** back, in proportion to their bets. |
+| Cancelled | Everyone gets **100%** back. |
+| Late bet (confirmed after the turn closed) | Doesn't count as a vote; you can claim a **full refund**. |
+
+## Pages
+
+| Page | What you can do |
+| --- | --- |
+| `/arena` | Watch the live board and place your vote |
+| `/matches` | Browse matches; `/host` lets you start a new one |
+| `/agents` | Pick an **AI betting agent** that recommends a piece or votes for you automatically |
+| `/leaderboard` | Top bettors and top AI agents |
+| `/claim` | Collect rewards and refunds |
+| `/how-to-play` | The rules in plain language |
+
+## Tech stack
+
+- **Web app + game API**: Next.js (App Router), TypeScript, Tailwind CSS, Zustand, wagmi, ConnectKit
+- **Database**: PostgreSQL with Prisma (a free [Neon](https://neon.tech) database works)
+- **AI move picker**: chess.js with a Stockfish-style evaluation
+- **Smart contract**: Solidity, Hardhat, OpenZeppelin v5, on Ethereum Sepolia
+- **Older backend** (optional): Express + Socket.IO in `apps/api`
+
+## Project structure
 
 ```text
-pawnpool/
-├── apps/
-│   ├── web/                          # Next.js Frontend + API routes untuk Vercel-only demo
-│   └── api/                          # Legacy Express REST API & Socket.IO Server
-├── packages/
-│   ├── contracts/                    # Hardhat Smart Contracts (Solidity)
-│   └── shared/                       # Global Constants & Type-safe ABI exports
-├── infra/                            # Docker compose & configuration
-├── package.json                      # Workspace configuration
-└── pnpm-workspace.yaml
+apps/web/            Next.js app and the game API (/api) used for the demo
+apps/api/            Older Express + Socket.IO server (not needed for the demo)
+packages/contracts/  Solidity contracts (Hardhat)
+packages/shared/     Shared constants, types, and contract ABIs
 ```
 
----
+## Getting started
 
-## Persiapan & Instalasi
+You need Node.js 20+, pnpm 9+, and a PostgreSQL database.
 
-### 1. Prasyarat System
-- Node.js >= 20
-- pnpm >= 9
-- PostgreSQL (Neon Free direkomendasikan)
+1. Install everything from the project root:
 
-### 2. Setup Project Dependencies
-Jalankan di root folder:
+   ```bash
+   pnpm install --no-frozen-lockfile --ignore-scripts
+   ```
+
+2. Copy `.env.example` to `.env` and fill it in. For a local demo these are enough:
+
+   ```env
+   DATABASE_URL=postgresql://user:password@localhost:5432/pawnpool
+   NEXT_PUBLIC_MOCK_CHAIN=true
+   ```
+
+   `NEXT_PUBLIC_MOCK_CHAIN=true` fakes the blockchain, so you can play without real ETH.
+
+3. Generate the database client and start the app:
+
+   ```bash
+   pnpm --filter web prisma:generate
+   pnpm --filter web dev
+   ```
+
+   Open http://localhost:3000. The game API runs at http://localhost:3000/api.
+
+### Smart contracts
+
 ```bash
-pnpm install --no-frozen-lockfile --ignore-scripts
-```
-
-### 3. Setup Environment Variables
-Salin `.env.example` ke `.env` di root project dan sesuaikan nilainya:
-```bash
-DATABASE_URL=postgresql://user:password@localhost:5432/pawnpool
-RPC_ETHEREUM_SEPOLIA=https://ethereum-sepolia-rpc.publicnode.com
-NEXT_PUBLIC_MOCK_CHAIN=true
-PRIVATE_KEY=your_private_key
-```
-
-### 4. Setup Database & Prisma
-Untuk Vercel-only demo, generate Prisma client di `apps/web`:
-```bash
-pnpm --filter web prisma:generate
-```
-
----
-
-## Menjalankan Project (Local Development)
-
-### 1. Compile Smart Contracts
-Jalankan kompilasi Solidity di packages/contracts:
-```bash
+cd packages/contracts
 npx hardhat compile
-```
-Untuk menjalankan unit tests:
-```bash
 npx hardhat test
 ```
 
-### 2. Build Shared Package
-Build constants & ABI compiler:
-```bash
-pnpm --filter shared build
-```
+## Deploying to Vercel
 
-### 3. Run Dev Server Vercel-Only
-Jalankan Next.js web app. API game tersedia di route `/api` pada server yang sama:
-```bash
-pnpm --filter web dev
-```
-- Frontend berjalan di: http://localhost:3000
-- API route berjalan di: http://localhost:3000/api
+The demo runs entirely on Vercel, with no separate backend server.
 
----
+1. Create a free PostgreSQL database on Neon.
+2. Set these environment variables in Vercel:
 
-## Deploy Vercel-Only
+   ```env
+   DATABASE_URL=postgresql://...
+   NEXT_PUBLIC_MOCK_CHAIN=true
+   NEXT_PUBLIC_ENABLE_ONCHAIN_BETS=false
+   ```
 
-Mode ini tidak membutuhkan Railway/Render/Koyeb. Next.js API routes menggantikan backend Express untuk demo.
+3. Use these commands:
+   - Install: `pnpm install --no-frozen-lockfile --ignore-scripts`
+   - Build: `pnpm --filter web build`
 
-1. Buat database PostgreSQL gratis di Neon.
-2. Set Vercel environment variables:
-```text
-DATABASE_URL=postgresql://...
-NEXT_PUBLIC_MOCK_CHAIN=true
-NEXT_PUBLIC_ENABLE_ONCHAIN_BETS=false
-```
-3. Install command:
-```bash
-pnpm install --no-frozen-lockfile --ignore-scripts
-```
-4. Build command:
-```bash
-pnpm --filter web build
-```
-5. Redeploy dari branch `main`.
+A few things to know about the demo mode:
 
-Catatan: mode Vercel-only memakai polling setiap 2 detik, bukan Socket.IO. Timer 0 memanggil `/api/games/:gameId/resolve-expired-turn` pada domain Vercel yang sama. Build web menjalankan `prisma db push` untuk membuat tabel demo di database yang ditunjuk `DATABASE_URL`.
+- The page **checks for updates every 2 seconds** instead of using a live socket.
+- When a turn's timer hits zero, the page calls `/api/games/:gameId/resolve-expired-turn`.
+- The build runs `prisma db push`, which creates the demo tables for you.
+- Rewards and refunds on `/claim` are only **marked in the database**; no real ETH is sent.
 
-Demo reward/refund tersedia di halaman `/claim` dan endpoint `/api/games/:gameId/settlement?address=0x...`. Mode ini hanya menandai settlement di database demo, bukan transfer ETH on-chain.
+## Security
 
----
-
-## Security & Invariants
-
-- **ReentrancyGuard**: Dipakai pada penarikan rewards & refunds.
-- **AccessControl**: Membagi otorisasi admin (`DEFAULT_ADMIN_ROLE`) dan backend operator (`OPERATOR_ROLE`).
-- **Late Refund Safe accounting**: late bet dikeluarkan dari game.totalPool dan dipisahkan ke pool refundable user.
-- **Idempotent Indexing**: Log events di-track menggunakan log index dan transaction hash agar aman dari reorg & replay.
+- **ReentrancyGuard** protects reward and refund withdrawals.
+- **AccessControl** separates the admin (`DEFAULT_ADMIN_ROLE`) from the backend operator (`OPERATOR_ROLE`).
+- **Late bets are kept separate** from the game pool so they can always be refunded safely.
+- **Event indexing is idempotent**: events are tracked by transaction hash and log index, so chain reorgs or replays can't double-count them.
