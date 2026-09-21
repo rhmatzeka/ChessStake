@@ -127,3 +127,7 @@ A few things to know about the demo mode:
 - **AccessControl** separates the admin (`DEFAULT_ADMIN_ROLE`) from the backend operator (`OPERATOR_ROLE`).
 - **Late bets are kept separate** from the game pool so they can always be refunded safely.
 - **Event indexing is idempotent**: events are tracked by transaction hash and log index, so chain reorgs or replays can't double-count them.
+
+## License
+
+Released under the [MIT License](LICENSE).
