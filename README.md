@@ -6,6 +6,8 @@ Because the AI always makes the move, no single person can sabotage the game.
 
 **Live demo:** https://pawnpool.rahmateka.my.id
 
+![PawnPool landing page: crowd-controlled chess with verifiable rewards](docs/images/preview.png)
+
 ## How a game works
 
 1. Join a team (White or Black) by placing your first bet. You can't switch teams after that.
