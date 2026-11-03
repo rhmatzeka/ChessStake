@@ -37,10 +37,12 @@ try {
   const { res, body } = await get(stateUrl);
   const json = JSON.parse(body);
   const cc = res.headers.get("cache-control") ?? "";
+  // The Vercel CDN consumes s-maxage and only forwards "public", but it adds x-vercel-cache.
+  const cdnCached = cc.includes("s-maxage=1") || (cc.includes("public") && res.headers.has("x-vercel-cache"));
   if (res.status !== 200) fail(`GET ${stateUrl} returned ${res.status}`);
   else if (json.ok !== true) fail(`GET ${stateUrl} ok is not true`);
   else if (!json.data?.serverNow) fail(`GET ${stateUrl} has no data.serverNow`);
-  else if (!cc.includes("s-maxage=1")) fail(`GET ${stateUrl} Cache-Control "${cc}" lacks s-maxage=1`);
+  else if (!cdnCached) fail(`GET ${stateUrl} is not CDN-cacheable (Cache-Control "${cc}")`);
   else ok(`GET ${stateUrl}`);
 } catch (e) {
   fail(`GET ${stateUrl} threw: ${e.message}`);
