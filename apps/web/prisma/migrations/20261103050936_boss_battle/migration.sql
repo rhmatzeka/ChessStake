@@ -38,6 +38,7 @@ CREATE TABLE "Event" (
     "isPractice" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "finishedAt" TIMESTAMP(3),
+    "startedAt" TIMESTAMP(3),
 
     CONSTRAINT "Event_pkey" PRIMARY KEY ("id")
 );
@@ -142,3 +143,4 @@ ALTER TABLE "EventScore" ADD CONSTRAINT "EventScore_eventId_fkey" FOREIGN KEY ("
 
 -- AddForeignKey
 ALTER TABLE "EventScore" ADD CONSTRAINT "EventScore_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

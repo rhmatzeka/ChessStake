@@ -12,6 +12,10 @@ const TURN_MS = 15_000;
 const BOSS_DELAY_MS = 2_000;
 const CLAIM_TTL_MS = 30_000;
 const PRACTICE_RESTART_MS = 30_000;
+/** A failed resolve stays claimed but becomes re-claimable after this long (CLAIM_TTL_MS - RETRY_BACKOFF_MS). */
+const RETRY_BACKOFF_MS = 5_000;
+/** A LIVE event with no turn is only repaired by a reader after this long; the starter normally does it. */
+const NO_TURN_GRACE_MS = 10_000;
 const HISTORY_LIMIT = 40;
 const PRACTICE_SLUG = "practice";
 
@@ -65,10 +69,10 @@ async function findEvent(slug: string): Promise<Event | null> {
   return prisma.event.findFirst({ where: { isPractice: true }, orderBy: { createdAt: "desc" } });
 }
 
-/** Creates a practice round; the unique slug makes concurrent creation safe. Returns true if we created it. */
+/** Creates a practice round plus its turn 1; the unique slug means only one caller does either. Returns true if we created it. */
 async function createPracticeEvent(n: number): Promise<boolean> {
   try {
-    await prisma.event.create({
+    const created = await prisma.event.create({
       data: {
         slug: `practice-${n}`,
         title: "Practice Arena",
@@ -79,8 +83,10 @@ async function createPracticeEvent(n: number): Promise<boolean> {
         status: "LIVE",
         fen: INITIAL_FEN,
         isPractice: true,
+        startedAt: new Date(),
       },
     });
+    await createTurn(created, 1, new Date());
     return true;
   } catch (e) {
     if (isUniqueViolation(e)) return false;
@@ -126,15 +132,24 @@ async function progress(ev: Event): Promise<boolean> {
     if (ev.startsAt > now) return false;
     const claim = await prisma.event.updateMany({
       where: { id: ev.id, status: "SCHEDULED", startsAt: { lte: now } },
-      data: { status: "LIVE" },
+      data: { status: "LIVE", startedAt: now },
     });
-    if (claim.count !== 1) return true;
+    if (claim.count !== 1) return true; // someone else won the start and computes turn 1
     await createTurn(ev, 1, now);
     return true;
   }
   if (ev.status === "LIVE") {
     const latest = await prisma.turn.findFirst({ where: { eventId: ev.id }, orderBy: { number: "desc" } });
     if (!latest) {
+      // The starter normally creates turn 1 right away. Only repair after a grace period, and let
+      // exactly one reader do it by moving startedAt forward (conditional update).
+      const ref = ev.startedAt ?? ev.createdAt;
+      if (now.getTime() - ref.getTime() <= NO_TURN_GRACE_MS) return false;
+      const repair = await prisma.event.updateMany({
+        where: { id: ev.id, status: "LIVE", startedAt: ev.startedAt },
+        data: { startedAt: now },
+      });
+      if (repair.count !== 1) return false;
       await createTurn(ev, 1, now);
       return true;
     }
@@ -156,10 +171,7 @@ async function progress(ev: Event): Promise<boolean> {
     });
     if (!newest || newest.id !== ev.id) return false;
     const n = Number(/^practice-(\d+)$/.exec(ev.slug)?.[1] ?? 0) + 1;
-    if (await createPracticeEvent(n)) {
-      const created = await prisma.event.findUnique({ where: { slug: `practice-${n}` } });
-      if (created) await createTurn(created, 1, new Date());
-    }
+    await createPracticeEvent(n);
     return true;
   }
   return false;
@@ -190,6 +202,22 @@ export async function resolveTurn(eventId: string, turnNumber: number): Promise<
   });
   if (claim.count !== 1) return false;
 
+  try {
+    return await resolveClaimed(eventId, turnNumber, claimedAt);
+  } catch (e) {
+    // Release with a backoff: stay RESOLVING but pretend the claim is old enough that it can be
+    // re-claimed after RETRY_BACKOFF_MS. Guarded by claimedAt so we never touch someone else's claim.
+    await prisma.turn
+      .updateMany({
+        where: { eventId, number: turnNumber, status: "RESOLVING", claimedAt },
+        data: { claimedAt: new Date(Date.now() - (CLAIM_TTL_MS - RETRY_BACKOFF_MS)) },
+      })
+      .catch(() => undefined);
+    throw e;
+  }
+}
+
+async function resolveClaimed(eventId: string, turnNumber: number, claimedAt: Date): Promise<boolean> {
   const [ev, turn, groups] = await Promise.all([
     prisma.event.findUniqueOrThrow({ where: { id: eventId } }),
     prisma.turn.findUniqueOrThrow({ where: { eventId_number: { eventId, number: turnNumber } } }),
@@ -337,7 +365,13 @@ function shortAddress(address: string): string {
 export async function getPublicState(slug: string): Promise<PublicState> {
   let ev = await findEvent(slug);
   if (!ev) throw new AppError("EVENT_NOT_FOUND", 404);
-  const changed = await progress(ev);
+  let changed = false;
+  try {
+    changed = await progress(ev);
+  } catch (e) {
+    // Never fail a read because advancing the game failed; serve the current state and retry later.
+    console.error(`progress failed for event ${ev.id} (${ev.slug}), turn after ${ev.crowdMoveNumber}:`, e);
+  }
   if (changed || slug === PRACTICE_SLUG) ev = (await findEvent(slug)) ?? ev;
   const eventId = ev.id;
 

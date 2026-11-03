@@ -43,6 +43,7 @@ model Event {
   isPractice      Boolean      @default(false)
   createdAt       DateTime     @default(now())
   finishedAt      DateTime?
+  startedAt       DateTime?
   turns           Turn[]
   scores          EventScore[]
 

@@ -1,4 +1,5 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import * as engine from "@/game/engine";
 import { prisma } from "@/server/prisma";
 import { AppError } from "@/server/errors";
 import { getMyState, getPublicState, progressEvent, resolveTurn, submitPick } from "@/server/events";
@@ -43,6 +44,7 @@ async function expectCode(p: Promise<unknown>, code: string, status: number) {
 
 beforeAll(resetDatabase);
 beforeEach(truncateAll);
+afterEach(() => vi.restoreAllMocks());
 afterAll(() => prisma.$disconnect());
 
 describe("event lifecycle", () => {
@@ -179,8 +181,45 @@ describe("event lifecycle", () => {
   });
 
   it("creates the next turn when a LIVE event has none", async () => {
-    const ev = await mkEvent({ status: "LIVE" });
+    const ev = await mkEvent({ status: "LIVE", startedAt: PAST() });
     await Promise.all([progressEvent(ev.id), progressEvent(ev.id), progressEvent(ev.id)]);
+    expect(await prisma.turn.count({ where: { eventId: ev.id } })).toBe(1);
+  });
+
+  it("LIVE event without a turn is not repaired within the grace period", async () => {
+    const ev = await mkEvent({ status: "LIVE", startedAt: new Date() });
+    await progressEvent(ev.id);
+    expect(await prisma.turn.count({ where: { eventId: ev.id } })).toBe(0);
+  });
+
+  it("resolve failure is logged, state still served, turn retried later", async () => {
+    const ev = await mkEvent({ status: "SCHEDULED" });
+    await getPublicState("e1");
+    await expire(ev.id, 1);
+    const err = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const boss = vi.spyOn(engine, "bossMove").mockRejectedValueOnce(new Error("engine boom"));
+    const s = await getPublicState("e1");
+    expect(s.turn?.number).toBe(1);
+    expect(err).toHaveBeenCalledTimes(1);
+    expect(String(err.mock.calls[0]![0])).toContain(ev.id);
+    const t = () => prisma.turn.findUniqueOrThrow({ where: { eventId_number: { eventId: ev.id, number: 1 } } });
+    expect((await t()).status).toBe("RESOLVING");
+    // Backoff: not retried immediately.
+    await getPublicState("e1");
+    expect(boss).toHaveBeenCalledTimes(1);
+    expect((await t()).status).toBe("RESOLVING");
+    await new Promise((r) => setTimeout(r, 5_500));
+    const s2 = await getPublicState("e1");
+    expect(s2.turn?.number).toBe(2);
+    expect((await t()).status).toBe("RESOLVED");
+    expect(await prisma.turn.count({ where: { eventId: ev.id } })).toBe(2);
+  });
+
+  it("concurrent event start runs the engine once", async () => {
+    const ev = await mkEvent({ status: "SCHEDULED" });
+    const analyse = vi.spyOn(engine, "analyse");
+    await Promise.all(Array.from({ length: 10 }, () => getPublicState("e1")));
+    expect(analyse).toHaveBeenCalledTimes(1);
     expect(await prisma.turn.count({ where: { eventId: ev.id } })).toBe(1);
   });
 
