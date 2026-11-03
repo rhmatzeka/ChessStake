@@ -65,16 +65,17 @@ export default async function Home() {
       {/* Hero */}
       <section className="relative isolate flex h-[calc(85svh-4.5rem)] min-h-[34rem] items-center justify-center overflow-hidden bg-black md:h-[calc(100svh-4.5rem-3.25rem)] md:min-h-[36rem]">
         <div className="hero-media absolute inset-0 -z-20" aria-hidden="true">
+          <div className="absolute inset-0 origin-[50%_48%] scale-[1.35] sm:scale-100">
           <Image
             src="/assets/hero/board.webp"
             alt=""
             fill
             priority
-            unoptimized
             sizes="100vw"
             className="object-cover object-[50%_45%]"
           />
-          <HeroVideo poster="/assets/hero/board.webp" />
+          <HeroVideo />
+          </div>
         </div>
         <div
           className="absolute inset-0 -z-10"
@@ -160,7 +161,7 @@ export default async function Home() {
         <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-14">
           <figure aria-label="Example of one turn" className="relative mx-auto w-full max-w-[34rem]">
             <div
-              className="pointer-events-none absolute -inset-8 -z-10 opacity-80"
+              className="pointer-events-none absolute -inset-3 -z-10 md:-inset-8 opacity-80"
               aria-hidden="true"
               style={{ background: "radial-gradient(closest-side, rgb(230 168 85 / 0.18), transparent)" }}
             />

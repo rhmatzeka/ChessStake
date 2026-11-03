@@ -6,10 +6,10 @@ type Conn = { saveData?: boolean };
 
 /**
  * Short muted loop of the pieces exploding onto the board. It is only fetched and started once the page
- * has loaded and the browser is idle, and never for reduced motion or data saver. Until then (and always,
- * for those users) the still photo underneath is all there is.
+ * has loaded and the browser is idle, and never for reduced motion or data saver. The video stays invisible
+ * until it is really playing, so the still photo underneath (the LCP image) is the poster.
  */
-export function HeroVideo({ poster }: { poster: string }) {
+export function HeroVideo() {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
 
@@ -47,7 +47,6 @@ export function HeroVideo({ poster }: { poster: string }) {
       ref={ref}
       className="hero-video absolute inset-0 h-full w-full object-cover"
       data-playing={playing}
-      poster={poster}
       muted
       loop
       playsInline

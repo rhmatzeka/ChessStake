@@ -44,11 +44,11 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
     <>
       <PageHead kicker="This month" title="Season leaderboard" lead="Points from every event and the Practice Arena this month. Resets on the 1st." />
       <div className="mx-auto max-w-3xl px-5 pt-10">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href={`/leaderboard?month=${shift(month, -1)}`} className={nav} rel="nofollow">
             Previous month
           </Link>
-          <h2 className="display display-sm text-center">{label(month)}</h2>
+          <h2 className="display display-sm order-first w-full text-center sm:order-none sm:w-auto">{label(month)}</h2>
           {month < current ? (
             <Link href={`/leaderboard?month=${shift(month, 1)}`} className={nav} rel="nofollow">
               Next month
