@@ -6,13 +6,17 @@ import { AppError } from "./errors";
 import { prisma } from "./prisma";
 import { requireUser } from "./session";
 
-export async function requireAdmin(): Promise<{ userId: string; address: string }> {
-  const s = await requireUser();
+export function isAdminAddress(address: string): boolean {
   const allowed = (process.env.ADMIN_ADDRESSES ?? "")
     .split(",")
     .map((a) => a.trim().toLowerCase())
     .filter(Boolean);
-  if (!allowed.includes(s.address.toLowerCase())) throw new AppError("NOT_ADMIN", 403, "Admin only");
+  return allowed.includes(address.toLowerCase());
+}
+
+export async function requireAdmin(): Promise<{ userId: string; address: string }> {
+  const s = await requireUser();
+  if (!isAdminAddress(s.address)) throw new AppError("NOT_ADMIN", 403, "Admin only");
   return s;
 }
 
