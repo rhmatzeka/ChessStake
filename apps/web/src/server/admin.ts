@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { INITIAL_FEN } from "@/game/types";
 import { isPrizeEligible } from "@/game/scoring";
@@ -70,20 +71,33 @@ export async function patchEvent(id: string, input: unknown) {
   const d = patchSchema.parse(input);
   const ev = await prisma.event.findUnique({ where: { id } });
   if (!ev) throw new AppError("NOT_FOUND", 404, "Event not found");
+  let data: Prisma.EventUpdateManyMutationInput;
+  let statuses: string[];
   if ("action" in d) {
-    if (ev.status !== "SCHEDULED" && ev.status !== "LIVE") throw new AppError("EVENT_LOCKED", 409, "Event already ended");
-    return prisma.event.update({ where: { id }, data: { status: "ABANDONED", result: null, finishedAt: new Date() } });
+    statuses = ["SCHEDULED", "LIVE"];
+    data = { status: "ABANDONED", result: null, finishedAt: new Date() };
+  } else {
+    if (ev.isPractice) throw new AppError("EVENT_LOCKED", 409, "Practice events cannot be edited");
+    if (d.slug !== undefined) {
+      assertSlug(d.slug);
+      const other = await prisma.event.findUnique({ where: { slug: d.slug }, select: { id: true } });
+      if (other && other.id !== id) throw new AppError("SLUG_TAKEN", 409, "Slug already in use");
+    }
+    if (d.startsAt !== undefined && !futureStart(d.startsAt)) throw new AppError("VALIDATION_ERROR", 400, `startsAt: ${BAD_START}`);
+    const { startsAt, ...rest } = d;
+    statuses = ["SCHEDULED"];
+    data = { ...rest, ...(startsAt ? { startsAt: new Date(startsAt) } : {}) };
   }
-  if (ev.status !== "SCHEDULED") throw new AppError("EVENT_LOCKED", 409, "Only scheduled events can be edited");
-  if (ev.isPractice) throw new AppError("EVENT_LOCKED", 409, "Practice events cannot be edited");
-  if (d.slug !== undefined) {
-    assertSlug(d.slug);
-    const other = await prisma.event.findUnique({ where: { slug: d.slug }, select: { id: true } });
-    if (other && other.id !== id) throw new AppError("SLUG_TAKEN", 409, "Slug already in use");
+  // The status condition is part of the write, so a concurrent start/finish cannot be overwritten.
+  let res;
+  try {
+    res = await prisma.event.updateMany({ where: { id, status: { in: statuses } }, data });
+  } catch (e) {
+    if ((e as { code?: string }).code === "P2002") throw new AppError("SLUG_TAKEN", 409, "Slug already in use");
+    throw e;
   }
-  if (d.startsAt !== undefined && !futureStart(d.startsAt)) throw new AppError("VALIDATION_ERROR", 400, `startsAt: ${BAD_START}`);
-  const { startsAt, ...rest } = d;
-  return prisma.event.update({ where: { id }, data: { ...rest, ...(startsAt ? { startsAt: new Date(startsAt) } : {}) } });
+  if (res.count !== 1) throw new AppError("EVENT_LOCKED", 409, "Event status changed; action not allowed");
+  return prisma.event.findUniqueOrThrow({ where: { id } });
 }
 
 export async function assertEventExists(id: string): Promise<void> {

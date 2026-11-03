@@ -396,8 +396,9 @@ async function resolveClaimed(eventId: string, turnNumber: number, claimedAt: Da
           }
         }
 
-        await tx.event.update({
-          where: { id: eventId },
+        // Guard against an admin cancel that landed while this turn was RESOLVING: abort and roll back.
+        const upd = await tx.event.updateMany({
+          where: { id: eventId, status: "LIVE" },
           data: {
             fen: fenAfter,
             crowdMoveNumber,
@@ -407,6 +408,7 @@ async function resolveClaimed(eventId: string, turnNumber: number, claimedAt: Da
             finishedAt: next.status === "LIVE" ? null : resolvedAt,
           },
         });
+        if (upd.count !== 1) throw new LostClaim();
 
         if (nextCandidates) {
           const opensAt = new Date(resolvedAt.getTime() + BOSS_DELAY_MS);

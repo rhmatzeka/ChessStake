@@ -5,6 +5,9 @@ vi.mock("next/headers", () => ({
   cookies: async () => ({ get: (n: string) => (n === "pp_session" && jar.value ? { name: n, value: jar.value } : undefined) }),
 }));
 
+import * as engine from "@/game/engine";
+import { patchEvent } from "@/server/admin";
+import { getPublicState } from "@/server/events";
 import { prisma } from "@/server/prisma";
 import { signSession } from "@/server/session";
 import { INITIAL_FEN } from "@/game/types";
@@ -49,7 +52,10 @@ beforeEach(async () => {
   jar.value = undefined;
   vi.stubEnv("ADMIN_ADDRESSES", ` ${ADMIN.toUpperCase().replace("0X", "0x")} , 0xdead `);
 });
-afterEach(() => vi.unstubAllEnvs());
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.restoreAllMocks();
+});
 afterAll(() => prisma.$disconnect());
 
 describe("auth", () => {
@@ -195,5 +201,50 @@ describe("leads", () => {
     expect((await ldPatch(req("/api/admin/leads", "PATCH", { id: a.id, handled: false }))).status).toBe(200);
     expect((await prisma.lead.findUniqueOrThrow({ where: { id: a.id } })).handledAt).toBeNull();
     expect((await ldPatch(req("/api/admin/leads", "PATCH", { id: "nope", handled: true }))).status).toBe(404);
+  });
+});
+
+describe("cancel races", () => {
+  it("cancel of an event that just finished returns EVENT_LOCKED", async () => {
+    await loginAdmin();
+    const e = await mkEvent({ status: "LIVE" });
+    // Simulate the event finishing between the admin's read and write: the read sees LIVE, then it ends.
+    const snapshot = await prisma.event.findUniqueOrThrow({ where: { id: e.id } });
+    await prisma.event.update({ where: { id: e.id }, data: { status: "FINISHED", result: "WIN" } });
+    const delegate = prisma.event as unknown as { findUnique: unknown };
+    const orig = delegate.findUnique;
+    delegate.findUnique = async () => snapshot;
+    try {
+      await expect(patchEvent(e.id, { action: "cancel" })).rejects.toMatchObject({ code: "EVENT_LOCKED", status: 409 });
+    } finally {
+      delegate.findUnique = orig;
+    }
+    const after = await prisma.event.findUniqueOrThrow({ where: { id: e.id } });
+    expect([after.status, after.result]).toEqual(["FINISHED", "WIN"]);
+  });
+
+  it("cancel during RESOLVING is not reverted", async () => {
+    const ev = await mkEvent({ slug: "race", status: "SCHEDULED", startsAt: new Date(Date.now() - 60_000) });
+    await getPublicState("race"); // starts, creates turn 1
+    await prisma.turn.update({ where: { eventId_number: { eventId: ev.id, number: 1 } }, data: { endsAt: new Date(Date.now() - 1000) } });
+    const u = await mkUser(`0x${"9".repeat(40)}`);
+    const t1 = await prisma.turn.findUniqueOrThrow({ where: { eventId_number: { eventId: ev.id, number: 1 } } });
+    const cand = (t1.candidates as unknown as { uci: string }[])[0].uci;
+    await prisma.pick.create({ data: { eventId: ev.id, turnNumber: 1, userId: u.id, uci: cand } });
+    const realBoss = engine.bossMove;
+    vi.spyOn(engine, "bossMove").mockImplementationOnce(async (...a) => {
+      await patchEvent(ev.id, { action: "cancel" });
+      return realBoss(...a);
+    });
+    const err = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    await getPublicState("race");
+    const after = await prisma.event.findUniqueOrThrow({ where: { id: ev.id } });
+    expect([after.status, after.result, after.crowdMoveNumber, after.fen]).toEqual(["ABANDONED", null, 0, INITIAL_FEN]);
+    expect(await prisma.turn.count({ where: { eventId: ev.id } })).toBe(1);
+    expect(await prisma.eventScore.count({ where: { eventId: ev.id } })).toBe(0);
+    expect(err).not.toHaveBeenCalled();
+    // Stays stopped on later reads.
+    await getPublicState("race");
+    expect((await prisma.event.findUniqueOrThrow({ where: { id: ev.id } })).status).toBe("ABANDONED");
   });
 });
