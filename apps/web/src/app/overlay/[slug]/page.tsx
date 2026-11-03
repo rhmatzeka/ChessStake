@@ -5,6 +5,7 @@ import { AppError } from "@/server/errors";
 import { OverlayArena } from "@/components/arena/OverlayArena";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 export const metadata: Metadata = { title: "Overlay", robots: { index: false, follow: false } };
 

@@ -3,7 +3,7 @@ import { getPublicState } from "@/server/events";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 10;
+export const maxDuration = 30;
 
 // Must not read cookies or the session: the response is shared through the CDN.
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {

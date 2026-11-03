@@ -6,6 +6,7 @@ import { AppError } from "@/server/errors";
 import { Arena } from "@/components/arena/Arena";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 const load = cache(async (slug: string) => {
   try {

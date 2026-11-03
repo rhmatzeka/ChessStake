@@ -43,7 +43,7 @@ You need Node 22, pnpm 9 and Docker.
    cp apps/web/.env.example apps/web/.env
    ```
 
-   In `apps/web/.env` set `DATABASE_URL` and `DIRECT_URL` to `postgresql://postgres:pp@localhost:5544/postgres`, and `SESSION_SECRET` to a random string of at least 32 characters.
+   In `apps/web/.env` set `DATABASE_URL` and `DIRECT_URL` to `postgresql://postgres:pp@localhost:5544/postgres` (a local database needs no pooler flags), and `SESSION_SECRET` to a random string of at least 32 characters.
 
 3. Apply the migrations and seed the practice room:
 
@@ -71,7 +71,7 @@ The integration tests use the database in `TEST_DATABASE_URL`, which defaults to
 
 ## Deploy
 
-The site runs on Vercel with a Neon Postgres database. In the Vercel project set the Root Directory to `apps/web`, which reads `apps/web/vercel.json`. Add the variables from `apps/web/.env.example` (database URLs, `SESSION_SECRET`, `ADMIN_ADDRESSES`, `CRON_SECRET`, and optionally the WalletConnect id and site URL). The build runs `prisma migrate deploy` whenever `DATABASE_URL` is set. After the first deploy, seed the practice room once with `pnpm --filter web db:seed`. A daily cron calls `/api/cron`.
+The site runs on Vercel with a Neon Postgres database. In the Vercel project set the Root Directory to `apps/web`, which reads `apps/web/vercel.json`. Add the variables from `apps/web/.env.example` (database URLs, `SESSION_SECRET`, `ADMIN_ADDRESSES`, `CRON_SECRET`, and optionally the WalletConnect id and site URL). On Neon, `DATABASE_URL` is the pooled URL and must end with `?pgbouncer=true&connect_timeout=15` (or `&pgbouncer=true&connect_timeout=15` when it already has a query string). `DIRECT_URL` is the non-pooled URL and is required in every environment, because the build runs `prisma migrate deploy` whenever `DATABASE_URL` is set and fails without it. `vercel.json` pins the functions to `sin1` to sit next to the Singapore database. After the first deploy, seed the practice room once with `pnpm --filter web db:seed`. A daily cron calls `/api/cron`.
 
 ## Stockfish
 

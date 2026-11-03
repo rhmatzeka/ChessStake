@@ -5,7 +5,7 @@ import { progressAllEvents } from "@/server/events";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 10;
+export const maxDuration = 30;
 
 function authorised(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
