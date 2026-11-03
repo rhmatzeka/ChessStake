@@ -19,3 +19,12 @@ export type Candidate = {
   cpLoss: number;
   quality: Quality;
 };
+
+/** How a Boss Battle event ended for the crowd. */
+export type EventResult = "WIN" | "SURVIVED" | "LOST";
+
+/** Lifecycle state of a Boss Battle event. */
+export type EventStatus = "SCHEDULED" | "LIVE" | "FINISHED" | "ABANDONED";
+
+/** Votes per candidate for one turn; firstAt is the timestamp of the earliest pick. */
+export type PickTally = { uci: string; count: number; firstAt: number }[];
