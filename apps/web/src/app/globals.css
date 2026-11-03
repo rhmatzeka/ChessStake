@@ -236,6 +236,8 @@ body {
 }
 .hero-video[data-playing="true"] { opacity: 1; }
 
+.hero-shadow { filter: drop-shadow(0 2px 16px rgb(0 0 0 / 0.65)); }
+
 /* Progressive enhancement: as the page scrolls, the photo drifts and fades back. */
 @supports (animation-timeline: scroll()) {
   .hero-media {

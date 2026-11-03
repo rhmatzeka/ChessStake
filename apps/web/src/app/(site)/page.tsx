@@ -93,6 +93,14 @@ export default async function Home() {
               "radial-gradient(ellipse 110% 42% at 50% 34%, rgb(7 6 5 / 0.9) 0%, rgb(7 6 5 / 0.62) 65%, transparent 100%), linear-gradient(to bottom, #070605 0%, rgb(7 6 5 / 0.55) 40%, transparent 62%)",
           }}
         />
+        <div
+          className="absolute inset-0 -z-10 hidden sm:block"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse 52% 50% at 50% 50%, rgb(7 6 5 / 0.72) 0%, rgb(7 6 5 / 0.5) 55%, transparent 100%)",
+          }}
+        />
         <div className="grid-fine absolute inset-0 -z-10 opacity-60" aria-hidden="true" />
 
         <div className="relative mx-auto flex max-w-6xl flex-col items-center px-5 text-center">
@@ -100,12 +108,12 @@ export default async function Home() {
             <span className="live-dot" aria-hidden="true" />
             Live crowd chess
           </p>
-          <h1 className="display mt-6 text-[clamp(3rem,10.5vw,7.75rem)] leading-[0.86]">
+          <h1 className="display hero-shadow mt-6 text-[clamp(3rem,10.5vw,7.75rem)] leading-[0.86]">
             <span className="rise block" style={{ animationDelay: "120ms" }}>Your crowd</span>
             <span className="rise block" style={{ animationDelay: "220ms" }}>vs the</span>
             <span className="rise gold-text block" style={{ animationDelay: "320ms" }}>AI Boss</span>
           </h1>
-          <p className="rise mt-7 max-w-md text-lg text-[#d8d0c4]" style={{ animationDelay: "480ms" }}>
+          <p className="rise hero-shadow mt-7 max-w-md text-lg text-[#e6dfd3]" style={{ animationDelay: "480ms" }}>
             Free to play. Sponsors put up the prizes.
           </p>
           <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "600ms" }}>

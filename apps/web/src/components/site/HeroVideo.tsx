@@ -20,25 +20,42 @@ export function HeroVideo() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || conn?.saveData) return;
 
     let cancelled = false;
+    let started = false;
+    let inView = true;
     let idle = 0;
     let timer = 0;
+    const sync = () => {
+      if (!started) return;
+      if (inView && !document.hidden) v.play().catch(() => {});
+      else v.pause();
+    };
     const start = () => {
       if (cancelled) return;
+      started = true;
       v.preload = "auto";
-      v.play().catch(() => {});
+      sync();
     };
     const schedule = () => {
       if (typeof window.requestIdleCallback === "function") idle = window.requestIdleCallback(start, { timeout: 4000 });
       else timer = window.setTimeout(start, 2000) as unknown as number;
     };
+    const io = new IntersectionObserver(([entry]) => {
+      inView = !!entry?.isIntersecting;
+      sync();
+    });
+    io.observe(v);
+    document.addEventListener("visibilitychange", sync);
     if (document.readyState === "complete") schedule();
     else window.addEventListener("load", schedule, { once: true });
 
     return () => {
       cancelled = true;
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
       window.removeEventListener("load", schedule);
       if (idle && typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
       clearTimeout(timer);
+      v.pause();
     };
   }, []);
 
