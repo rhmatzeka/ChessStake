@@ -178,9 +178,102 @@ async function progress(ev: Event): Promise<boolean> {
 }
 
 /** Lazy start, resolve an expired turn, practice restart. Safe to call from many requests at once. */
-export async function progressEvent(eventId: string): Promise<void> {
+export async function progressEvent(eventId: string): Promise<boolean> {
   const ev = await prisma.event.findUnique({ where: { id: eventId } });
-  if (ev) await progress(ev);
+  return ev ? progress(ev) : false;
+}
+
+/** Cron entry point: progresses every LIVE event, due SCHEDULED events and the latest practice round. Returns how many changed. */
+export async function progressAllEvents(): Promise<number> {
+  const now = new Date();
+  const [due, practice] = await Promise.all([
+    prisma.event.findMany({
+      where: { OR: [{ status: "LIVE" }, { status: "SCHEDULED", startsAt: { lte: now } }] },
+      select: { id: true },
+    }),
+    prisma.event.findFirst({ where: { isPractice: true }, orderBy: [{ createdAt: "desc" }, { slug: "desc" }], select: { id: true } }),
+  ]);
+  const ids = new Set(due.map((e) => e.id));
+  if (practice) ids.add(practice.id);
+  let n = 0;
+  for (const id of ids) {
+    try {
+      if (await progressEvent(id)) n++;
+    } catch (e) {
+      console.error(`cron progress failed for event ${id}:`, e);
+    }
+  }
+  return n;
+}
+
+export type LobbyItem = {
+  slug: string;
+  title: string;
+  hostName: string;
+  sponsorName: string | null;
+  bossLevel: number;
+  status: EventStatus;
+  result: EventResult | null;
+  startsAt: string;
+  isPractice: boolean;
+  playersCount: number;
+  top3: { name: string; points: number }[];
+};
+
+type LobbyRow = Event & { _count: { scores: number } };
+
+function toLobbyItem(e: LobbyRow, top3: LobbyItem["top3"] = []): LobbyItem {
+  return {
+    slug: e.isPractice ? PRACTICE_SLUG : e.slug,
+    title: e.title,
+    hostName: e.hostName,
+    sponsorName: e.sponsorName,
+    bossLevel: e.bossLevel,
+    status: e.status as EventStatus,
+    result: e.result as EventResult | null,
+    startsAt: e.startsAt.toISOString(),
+    isPractice: e.isPractice,
+    playersCount: e._count.scores,
+    top3,
+  };
+}
+
+export async function listEvents(): Promise<{ live: LobbyItem[]; upcoming: LobbyItem[]; past: LobbyItem[] }> {
+  const count = { select: { scores: true } } as const;
+  const [live, upcoming, past, practice] = await Promise.all([
+    prisma.event.findMany({ where: { status: "LIVE", isPractice: false }, orderBy: { startsAt: "asc" }, include: { _count: count } }),
+    prisma.event.findMany({ where: { status: "SCHEDULED", isPractice: false }, orderBy: { startsAt: "asc" }, include: { _count: count } }),
+    prisma.event.findMany({
+      where: { status: { in: ["FINISHED", "ABANDONED"] }, isPractice: false },
+      orderBy: [{ finishedAt: "desc" }, { startsAt: "desc" }],
+      take: 20,
+      include: { _count: count },
+    }),
+    prisma.event.findFirst({ where: { isPractice: true }, orderBy: [{ createdAt: "desc" }, { slug: "desc" }], include: { _count: count } }),
+  ]);
+
+  const tops = new Map<string, LobbyItem["top3"]>();
+  if (past.length) {
+    const ids = past.map((e) => e.id);
+    const rows = await prisma.$queryRaw<{ eventId: string; address: string; displayName: string | null; total: number }[]>`
+      SELECT "eventId", "address", "displayName", "total" FROM (
+        SELECT s."eventId" AS "eventId", u."address" AS "address", u."displayName", (s."points" + s."bonus")::int AS "total",
+               ROW_NUMBER() OVER (PARTITION BY s."eventId" ORDER BY (s."points" + s."bonus") DESC, u."address" ASC) AS "rn"
+        FROM "EventScore" s JOIN "User" u ON u."id" = s."userId"
+        WHERE s."eventId" IN (${Prisma.join(ids)}) AND NOT s."disqualified"
+      ) t WHERE "rn" <= 3 ORDER BY "eventId", "rn"`;
+    for (const r of rows) {
+      const list = tops.get(r.eventId) ?? [];
+      list.push({ name: r.displayName ?? shortAddress(r.address), points: r.total });
+      tops.set(r.eventId, list);
+    }
+  }
+
+  return {
+    live: [...live.map((e) => toLobbyItem(e)), ...(practice ? [toLobbyItem(practice)] : [])],
+    upcoming: upcoming.map((e) => toLobbyItem(e)),
+    past: past.map((e) => toLobbyItem(e, tops.get(e.id) ?? [])),
+  };
 }
 
 /**
