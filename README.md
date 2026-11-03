@@ -1,135 +1,82 @@
-# ChessStake (PawnPool): AI Chess Arena
+# PawnPool
 
-A live chess game where **the audience plays instead of two players**. Viewers connect a crypto wallet, join team White or Black, and bet on **which piece should move next**. When the voting timer ends, the piece with the most bets wins, and an **AI picks the best legal move** for that piece.
+Your community plays chess together against an AI Boss. Free to play, sponsors put up the prizes.
 
-Because the AI always makes the move, no single person can sabotage the game.
+Live at https://pawnpool.rahmateka.my.id
 
-**Live demo:** https://pawnpool.rahmateka.my.id
+![PawnPool landing page](docs/images/preview.png)
 
-![PawnPool landing page: crowd-controlled chess with verifiable rewards](docs/images/preview.png)
+## How a Boss Battle works
 
-## How a game works
+Every turn the arena shows three candidate moves for the crowd. You have 15 seconds to pick one. When the timer ends, the move with the most picks is played on the board, and then the Boss replies. This goes on until the Boss is checkmated, the crowd runs out of moves, or the game is drawn.
 
-1. Join a team (White or Black) by placing your first bet. You can't switch teams after that.
-2. Each turn has a **20-second vote**. You can bet **once per turn**.
-3. Each piece has its own price per vote:
+You earn points for every turn you pick. Showing up gives 10 points. On top of that you get `round(100 * max(0, 1 - cpLoss / 300))`, where `cpLoss` is how many centipawns worse your pick was than the best candidate. So the best move is worth 110 points and a blunder is worth close to 10. After each turn the quality of all three candidates is revealed, so you can see what you should have picked.
 
-   | Piece | Price per vote |
-   | --- | --- |
-   | Pawn | 0.0001 ETH |
-   | King | 0.0002 ETH |
-   | Knight | 0.0003 ETH |
-   | Bishop | 0.0003 ETH |
-   | Rook | 0.0005 ETH |
-   | Queen | 0.0010 ETH |
+If you picked in at least 5 turns you get an end-of-event bonus. It is 500 points when the crowd checkmates the Boss, and 200 when the crowd survives to the move limit or draws. To be eligible for the prizes of an event you need to have picked in at least 10 turns. Points count on a per-event leaderboard and on a monthly season leaderboard. Practice rooms never have prizes.
 
-4. The piece with the most money on it wins the vote, and the AI moves it.
-5. If nobody votes, the timer restarts up to 3 times, then the game is cancelled.
+## Why it is free
 
-## Payouts
+There is no betting in PawnPool. Playing is free and you never put money in. Sponsors and creators are the ones who pay, so the prizes come from them.
 
-| Result | What happens to the pool |
-| --- | --- |
-| Win | The winning team shares **90%** of the whole pool, in proportion to what each person bet. **10%** goes to the platform. |
-| Draw | Everyone gets **90%** back, in proportion to their bets. |
-| Cancelled | Everyone gets **100%** back. |
-| Late bet (confirmed after the turn closed) | Doesn't count as a vote; you can claim a **full refund**. |
+## How it makes money
 
-## Pages
+Sponsors pay to run a named event with their logo, their prize text and a report afterwards. Later I want to add a Creator Pro plan for people who run events for their own community, and cosmetics for players. Playing stays free.
 
-| Page | What you can do |
-| --- | --- |
-| `/arena` | Watch the live board and place your vote |
-| `/matches` | Browse matches; `/host` lets you start a new one |
-| `/agents` | Pick an **AI betting agent** that recommends a piece or votes for you automatically |
-| `/leaderboard` | Top bettors and top AI agents |
-| `/claim` | Collect rewards and refunds |
-| `/how-to-play` | The rules in plain language |
+## Tech
 
-## Tech stack
+It is a Next.js app with Postgres through Prisma, a Stockfish WASM engine for the Boss and the candidate moves, and wallet sign-in with SIWE.
 
-- **Web app + game API**: Next.js (App Router), TypeScript, Tailwind CSS, Zustand, wagmi, ConnectKit
-- **Database**: PostgreSQL with Prisma (a free [Neon](https://neon.tech) database works)
-- **AI move picker**: chess.js with a Stockfish-style evaluation
-- **Smart contract**: Solidity, Hardhat, OpenZeppelin v5, on Ethereum Sepolia
-- **Older backend** (optional): Express + Socket.IO in `apps/api`
+## Run it locally
 
-## Project structure
+You need Node 22, pnpm 9 and Docker.
 
-```text
-apps/web/            Next.js app and the game API (/api) used for the demo
-apps/api/            Older Express + Socket.IO server (not needed for the demo)
-packages/contracts/  Solidity contracts (Hardhat)
-packages/shared/     Shared constants, types, and contract ABIs
-```
-
-## Getting started
-
-You need Node.js 20+, pnpm 9+, and a PostgreSQL database.
-
-1. Install everything from the project root:
+1. Start a Postgres database:
 
    ```bash
-   pnpm install --no-frozen-lockfile --ignore-scripts
+   docker run -d --name pp-dev -e POSTGRES_PASSWORD=pp -p 5544:5432 postgres:17-alpine
    ```
 
-2. Copy `.env.example` to `.env` and fill it in. For a local demo these are enough:
-
-   ```env
-   DATABASE_URL=postgresql://user:password@localhost:5432/pawnpool
-   NEXT_PUBLIC_MOCK_CHAIN=true
-   ```
-
-   `NEXT_PUBLIC_MOCK_CHAIN=true` fakes the blockchain, so you can play without real ETH.
-
-3. Generate the database client and start the app:
+2. Install and set up the env file:
 
    ```bash
-   pnpm --filter web prisma:generate
+   pnpm install
+   cp apps/web/.env.example apps/web/.env
+   ```
+
+   In `apps/web/.env` set `DATABASE_URL` and `DIRECT_URL` to `postgresql://postgres:pp@localhost:5544/postgres`, and `SESSION_SECRET` to a random string of at least 32 characters.
+
+3. Apply the migrations and seed the practice room:
+
+   ```bash
+   pnpm --filter web exec prisma migrate deploy
+   pnpm --filter web db:seed
+   ```
+
+4. Start the app and open http://localhost:3000:
+
+   ```bash
    pnpm --filter web dev
    ```
 
-   Open http://localhost:3000. The game API runs at http://localhost:3000/api.
-
-### Smart contracts
+Tests:
 
 ```bash
-cd packages/contracts
-npx hardhat compile
-npx hardhat test
+pnpm --filter web lint
+pnpm --filter web typecheck
+pnpm --filter web test
+pnpm --filter web test:int
 ```
 
-## Deploying to Vercel
+The integration tests use the database in `TEST_DATABASE_URL`, which defaults to the Docker database above. After a build you can check a running copy with `pnpm smoke http://localhost:3000`.
 
-The demo runs entirely on Vercel, with no separate backend server.
+## Deploy
 
-1. Create a free PostgreSQL database on Neon.
-2. Set these environment variables in Vercel:
+The site runs on Vercel with a Neon Postgres database. In the Vercel project set the Root Directory to `apps/web`, which reads `apps/web/vercel.json`. Add the variables from `apps/web/.env.example` (database URLs, `SESSION_SECRET`, `ADMIN_ADDRESSES`, `CRON_SECRET`, and optionally the WalletConnect id and site URL). The build runs `prisma migrate deploy` whenever `DATABASE_URL` is set. After the first deploy, seed the practice room once with `pnpm --filter web db:seed`. A daily cron calls `/api/cron`.
 
-   ```env
-   DATABASE_URL=postgresql://...
-   NEXT_PUBLIC_MOCK_CHAIN=true
-   NEXT_PUBLIC_ENABLE_ONCHAIN_BETS=false
-   ```
+## Stockfish
 
-3. Use these commands:
-   - Install: `pnpm install --no-frozen-lockfile --ignore-scripts`
-   - Build: `pnpm --filter web build`
-
-A few things to know about the demo mode:
-
-- The page **checks for updates every 2 seconds** instead of using a live socket.
-- When a turn's timer hits zero, the page calls `/api/games/:gameId/resolve-expired-turn`.
-- The build runs `prisma db push`, which creates the demo tables for you.
-- Rewards and refunds on `/claim` are only **marked in the database**; no real ETH is sent.
-
-## Security
-
-- **ReentrancyGuard** protects reward and refund withdrawals.
-- **AccessControl** separates the admin (`DEFAULT_ADMIN_ROLE`) from the backend operator (`OPERATOR_ROLE`).
-- **Late bets are kept separate** from the game pool so they can always be refunded safely.
-- **Event indexing is idempotent**: events are tracked by transaction hash and log index, so chain reorgs or replays can't double-count them.
+The engine is Stockfish 19 lite, vendored in `apps/web/vendor/stockfish` together with its GPL-3.0 license.
 
 ## License
 
-Released under the [MIT License](LICENSE).
+The PawnPool code is released under the [MIT License](LICENSE).
