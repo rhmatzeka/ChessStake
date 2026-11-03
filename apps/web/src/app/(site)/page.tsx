@@ -63,16 +63,16 @@ export default async function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative isolate flex h-[calc(85svh-4.5rem)] min-h-[34rem] items-center justify-center overflow-hidden bg-black md:h-[calc(100svh-4.5rem-3.25rem)] md:min-h-[36rem]">
+      <section className="relative isolate flex h-[calc(85svh-4.5rem)] min-h-[34rem] items-start justify-center pt-12 sm:items-center sm:pt-0 overflow-hidden bg-black md:h-[calc(100svh-4.5rem-3.25rem)] md:min-h-[36rem]">
         <div className="hero-media absolute inset-0 -z-20" aria-hidden="true">
-          <div className="absolute inset-0 origin-[50%_48%] scale-[1.35] sm:scale-100">
+          <div className="absolute inset-x-0 bottom-[6%] top-[40%] sm:inset-0">
           <Image
             src="/assets/hero/board.webp"
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[50%_45%]"
+            className="object-contain object-center sm:object-cover sm:object-[50%_45%]"
           />
           <HeroVideo />
           </div>
@@ -83,6 +83,14 @@ export default async function Home() {
           style={{
             background:
               "radial-gradient(ellipse 80% 70% at 50% 48%, rgb(7 6 5 / 0.38) 0%, rgb(7 6 5 / 0.62) 65%, rgb(7 6 5 / 0.92) 100%), linear-gradient(to bottom, rgb(7 6 5 / 0.5) 0%, transparent 25%, transparent 65%, #070605 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 -z-10 sm:hidden"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse 110% 42% at 50% 34%, rgb(7 6 5 / 0.9) 0%, rgb(7 6 5 / 0.62) 65%, transparent 100%), linear-gradient(to bottom, #070605 0%, rgb(7 6 5 / 0.55) 40%, transparent 62%)",
           }}
         />
         <div className="grid-fine absolute inset-0 -z-10 opacity-60" aria-hidden="true" />
