@@ -42,14 +42,29 @@ function ordered(chess: Chess): Move[] {
   return moves.sort((a, b) => key(b) - key(a));
 }
 
-function search(chess: Chess, depth: number, alpha: number, beta: number, ply: number): number {
+class OutOfTime extends Error {}
+
+function search(
+  chess: Chess,
+  depth: number,
+  alpha: number,
+  beta: number,
+  ply: number,
+  deadline: number,
+  tick: { n: number },
+): number {
+  if ((++tick.n & 255) === 0 && Date.now() > deadline) throw new OutOfTime();
   if (chess.isCheckmate()) return -MATE + ply;
   if (chess.isStalemate() || chess.isInsufficientMaterial() || chess.isThreefoldRepetition()) return 0;
   if (depth === 0) return evaluate(chess);
   for (const m of ordered(chess)) {
     chess.move(m);
-    const score = -search(chess, depth - 1, -beta, -alpha, ply + 1);
-    chess.undo();
+    let score: number;
+    try {
+      score = -search(chess, depth - 1, -beta, -alpha, ply + 1, deadline, tick);
+    } finally {
+      chess.undo();
+    }
     if (score >= beta) return beta;
     if (score > alpha) alpha = score;
   }
@@ -58,33 +73,55 @@ function search(chess: Chess, depth: number, alpha: number, beta: number, ply: n
 
 const toCp = (s: number) => Math.max(-CLAMP, Math.min(CLAMP, s));
 
-/** Score every legal move at the given depth (>=1). Sorted best first. */
-function scoreRoot(fen: string, depth: number): EngineLine[] {
+/** Score every legal move at exactly this depth. Throws OutOfTime past the deadline. */
+function scoreRoot(fen: string, depth: number, deadline: number): EngineLine[] {
   const chess = new Chess(fen);
+  const tick = { n: 0 };
   const out: EngineLine[] = [];
   for (const m of ordered(chess)) {
     chess.move(m);
-    const s = -search(chess, depth - 1, -MATE * 2, MATE * 2, 1);
-    chess.undo();
+    let s: number;
+    try {
+      s = -search(chess, depth - 1, -MATE * 2, MATE * 2, 1, deadline, tick);
+    } finally {
+      chess.undo();
+    }
     out.push({ uci: uciOf(m), cp: s });
   }
   out.sort((a, b) => b.cp - a.cp);
   return out;
 }
 
+/** Iterative deepening up to maxDepth; returns the last depth that finished before the deadline. */
+function iterate(fen: string, maxDepth: number, budgetMs: number): EngineLine[] {
+  const deadline = Date.now() + budgetMs;
+  // Depth 1 is cheap and always completes, so there is always an answer.
+  let best = scoreRoot(fen, 1, Infinity);
+  for (let d = 2; d <= maxDepth; d++) {
+    try {
+      best = scoreRoot(fen, d, deadline);
+    } catch (e) {
+      if (e instanceof OutOfTime) break;
+      throw e;
+    }
+  }
+  return best;
+}
+
 export async function analyseFallback(
   fen: string,
   opts: { lines: number; budgetMs: number },
 ): Promise<EngineLine[]> {
-  return scoreRoot(fen, 3)
+  return iterate(fen, 3, opts.budgetMs)
     .slice(0, Math.max(0, opts.lines))
     .map((l) => ({ uci: l.uci, cp: toCp(l.cp) }));
 }
 
 const FALLBACK_DEPTH: Record<BossLevel, number> = { 1: 1, 2: 2, 3: 2, 4: 3, 5: 3 };
+const FALLBACK_BOSS_BUDGET_MS = 800;
 
 export async function bossMoveFallback(fen: string, level: BossLevel): Promise<string> {
-  const scored = scoreRoot(fen, FALLBACK_DEPTH[level]);
+  const scored = iterate(fen, FALLBACK_DEPTH[level], FALLBACK_BOSS_BUDGET_MS);
   if (scored.length === 0) throw new Error("no legal moves");
   // Weak levels pick randomly among the top few so they stay beatable.
   const pool = level <= 2 ? scored.slice(0, level === 1 ? 5 : 3) : scored.slice(0, 1);

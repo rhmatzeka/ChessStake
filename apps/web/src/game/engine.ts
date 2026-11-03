@@ -17,7 +17,8 @@ export const BOSS_LEVELS: Record<BossLevel, { skill: number; depth: number }> = 
 };
 
 const CLAMP = 1000;
-const TIMEOUT_MARGIN_MS = 1500;
+// Kept small: on the failure path the fallback still has to answer inside the request budget.
+const TIMEOUT_MARGIN_MS = 500;
 const BOSS_MOVETIME_MS = 1500;
 const LOAD_TIMEOUT_MS = 5000;
 const ENGINE_FILE = "stockfish-19-lite-single.js";
@@ -77,10 +78,24 @@ function loadEngine(): Promise<SfEngine> {
   return enginePromise;
 }
 
+/**
+ * The vendored single-threaded build's terminate() is a no-op, so a timed-out instance would keep
+ * searching (and burn CPU) while the next call loads a fresh one. Ask it to stop and quit, then
+ * drop every reference to it so it can be garbage collected.
+ */
 function dropEngine(engine?: SfEngine) {
   enginePromise = null;
+  if (!engine) return;
+  engine.listener = null;
+  for (const cmd of ["stop", "quit"]) {
+    try {
+      engine.processCommand(cmd);
+    } catch {
+      /* ignore */
+    }
+  }
   try {
-    engine?.terminate?.();
+    engine.terminate?.();
   } catch {
     /* ignore */
   }
@@ -97,13 +112,7 @@ async function runSearch(
   const lines: string[] = [];
   return new Promise<string[]>((resolve, reject) => {
     const timer = setTimeout(() => {
-      engine.listener = null;
-      try {
-        engine.processCommand("stop");
-      } catch {
-        /* ignore */
-      }
-      dropEngine(engine); // the engine may be wedged; reload next time
+      dropEngine(engine); // may be wedged; stop+quit it and reload on the next call
       reject(new Error("engine timeout"));
     }, timeoutMs);
     engine.listener = (line) => {

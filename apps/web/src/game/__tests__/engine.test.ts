@@ -71,4 +71,14 @@ describe("engine-fallback", () => {
   it("fallback bossMove is legal", async () => {
     expect(legalUci(INITIAL_FEN)).toContain(await bossMoveFallback(INITIAL_FEN, 3));
   }, T);
+
+  it("fallback respects budget", async () => {
+    const busy = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
+    const t = Date.now();
+    const lines = await analyseFallback(busy, { lines: 8, budgetMs: 200 });
+    expect(Date.now() - t).toBeLessThan(600);
+    expect(lines.length).toBeGreaterThan(0);
+    const legal = legalUci(busy);
+    for (const l of lines) expect(legal).toContain(l.uci);
+  }, T);
 });
