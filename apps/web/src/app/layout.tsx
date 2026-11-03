@@ -1,10 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Hanken_Grotesk } from "next/font/google";
+import { Archivo, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const display = Bricolage_Grotesque({
+// Display: a heavy grotesk for the big uppercase headlines. Mono: labels and buttons. Body: Hanken.
+const display = Archivo({
   variable: "--font-display",
   subsets: ["latin"],
+  weight: ["700", "800", "900"],
+  display: "swap",
+});
+
+const mono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["500", "700"],
   display: "swap",
 });
 
@@ -29,7 +38,7 @@ export const viewport: Viewport = { themeColor: "#070605" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
+    <html lang="en" className={`${display.variable} ${mono.variable} ${body.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         {children}
       </body>
