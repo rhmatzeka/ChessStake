@@ -13,7 +13,7 @@
     "start": "node scripts/bin.mjs next start",
     "lint": "node scripts/bin.mjs eslint",
     "prisma:generate": "node scripts/bin.mjs prisma generate --schema prisma/schema.prisma",
-    "prisma:push": "node scripts/bin.mjs prisma db push --schema prisma/schema.prisma",
+    "db:seed": "node scripts/bin.mjs vite-node prisma/seed.ts",
     "typecheck": "node scripts/bin.mjs tsc --noEmit",
     "test": "node scripts/bin.mjs vitest run --passWithNoTests",
     "test:int": "node scripts/bin.mjs vitest run --passWithNoTests --config vitest.int.config.ts"
