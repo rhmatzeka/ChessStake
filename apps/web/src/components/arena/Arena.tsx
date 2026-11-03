@@ -91,8 +91,8 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
   const finished = state.status === "FINISHED" || state.status === "ABANDONED";
 
   return (
-    <div className="mx-auto max-w-6xl px-3 pb-6 pt-4 sm:px-5">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+    <div className="mx-auto max-w-6xl px-3 pb-6 pt-2 sm:px-5 sm:pt-4">
+      <div className="mb-2 flex items-center justify-between gap-x-6 gap-y-1 sm:mb-3">
         <div className="min-w-0">
           <h1 className="font-display text-xl font-extrabold leading-tight sm:text-3xl">{state.title}</h1>
           <p className="hidden text-sm text-muted sm:block">
@@ -101,7 +101,7 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
         </div>
         <div className="flex items-center gap-3 text-sm">
           {live && (
-            <span className="flex items-center gap-2 font-medium text-gold">
+            <span className="hidden items-center gap-2 font-medium text-gold sm:flex">
               <span className="h-2 w-2 rounded-full bg-gold" aria-hidden="true" />
               {state.isPractice ? "Practice, always open" : "Live now"}
             </span>
@@ -116,35 +116,27 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
         </p>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,620px)_minmax(0,1fr)]">
-        <div className="space-y-3">
+      <div className="grid gap-2.5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-x-6 lg:gap-y-3">
+        <div className="order-1 space-y-2 lg:col-start-2 lg:row-start-1">
           {live && <TurnBar turnNumber={turn?.number ?? null} clock={clock} thinking={thinking} note={turn ? undefined : "Setting up the next turn"} />}
-          <div className="mx-auto w-full max-w-[620px]">
-            <Board
-              fen={frame.fen}
-              lastMove={frame.lastMove}
-              animate={frame.animate}
-              arrows={arrows}
-              onArrow={live && turn ? onPick : undefined}
-            />
-          </div>
-
-          {live && !user && user !== undefined && turn && (
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-gold/40 bg-panel-hi px-4 py-3">
-              <p className="text-sm">Sign in to pick a move. It is free and sends no transaction.</p>
-              <button
-                onClick={() => setOpenSignal((n) => n + 1)}
-                className="shrink-0 rounded-md bg-gold px-3 py-1.5 text-sm font-semibold text-black hover:bg-[#f0b868]"
-              >
-                Sign in
-              </button>
+          {message && (
+            <div role="status" className="text-sm font-medium text-amber-200">
+              {message}
             </div>
           )}
+        </div>
 
-          <div role="status" className="min-h-0 text-sm font-medium text-amber-200">
-            {message}
-          </div>
+        <div className="order-2 mx-auto w-full max-w-[620px] lg:col-start-1 lg:row-span-4 lg:row-start-1 lg:max-w-[min(100%,calc(100svh-13rem))] lg:self-start">
+          <Board
+            fen={frame.fen}
+            lastMove={frame.lastMove}
+            animate={frame.animate}
+            arrows={arrows}
+            onArrow={live && turn ? onPick : undefined}
+          />
+        </div>
 
+        <div className="order-3 lg:col-start-2 lg:row-start-2">
           {live && reveal && <RevealCards item={reveal} bossSan={reveal.bossSan} />}
           {live && !reveal && turn && (
             <CandidateCards turn={turn} pick={pick} canPick={canPick} onPick={onPick} />
@@ -158,7 +150,22 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
           {state.status === "SCHEDULED" && <ScheduledCard state={state} serverNow={serverNow} />}
         </div>
 
-        <aside className="space-y-4">
+        {live && !user && user !== undefined && turn && (
+          <div className="order-4 flex items-center justify-between gap-3 rounded-xl border border-gold/40 bg-panel-hi px-3 py-2 lg:col-start-2 lg:row-start-3 lg:px-4 lg:py-3">
+            <p className="text-sm">
+              <span className="lg:hidden">Sign in to pick. Free, no transaction.</span>
+              <span className="hidden lg:inline">Sign in to pick a move. It is free and sends no transaction.</span>
+            </p>
+            <button
+              onClick={() => setOpenSignal((n) => n + 1)}
+              className="shrink-0 rounded-md bg-gold px-3 py-1 text-sm font-semibold text-black hover:bg-[#f0b868]"
+            >
+              Sign in
+            </button>
+          </div>
+        )}
+
+        <aside className="order-5 space-y-4 lg:col-start-2 lg:row-start-4">
           {finished && <ResultCard state={state} user={user} me={me} />}
           {state.status === "SCHEDULED" && <RulesSummary />}
           <MeCard user={user} onUser={setUser} openSignal={openSignal} me={me} />

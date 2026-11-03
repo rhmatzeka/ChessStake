@@ -33,7 +33,7 @@ export function CandidateCards({
 }) {
   const { rows, total } = tallyShares(turn.candidates, turn.tally);
   return (
-    <ul className={`grid gap-2 ${compact ? "grid-cols-3" : "sm:grid-cols-3"}`}>
+    <ul className={`grid gap-2 ${compact ? "grid-cols-3" : "sm:grid-cols-3 lg:grid-cols-1"}`}>
       {turn.candidates.map((c, i) => {
         const row = rows[i]!;
         const color = CANDIDATE_COLORS[i % CANDIDATE_COLORS.length]!;
@@ -42,7 +42,7 @@ export function CandidateCards({
           <>
             <span className="flex items-start gap-2">
               <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full" style={{ background: color }} aria-hidden="true" />
-              <span className="min-w-0">
+              <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 sm:block">
                 <span className={`block font-display font-bold leading-snug ${compact ? "text-base" : "text-[17px]"}`}>{c.label}</span>
                 <span className="block text-sm text-muted">{c.san}</span>
               </span>
@@ -50,7 +50,7 @@ export function CandidateCards({
                 <span className="ml-auto shrink-0 rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-black">Your pick</span>
               )}
             </span>
-            <span className="mt-2 flex items-center gap-2 sm:mt-3">
+            <span className="mt-1.5 flex items-center gap-2 sm:mt-3">
               <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
                 <span
                   className="block h-full rounded-full transition-[width] duration-500"
@@ -64,7 +64,7 @@ export function CandidateCards({
             </span>
           </>
         );
-        const base = "block w-full rounded-xl border p-2.5 text-left sm:p-3 transition-colors";
+        const base = "block w-full rounded-xl border px-2.5 py-2 text-left sm:p-3 transition-colors";
         const tone = picked ? "border-gold bg-panel-hi" : "border-line bg-panel hover:border-gold/50";
         return (
           <li key={c.uci}>
@@ -104,7 +104,7 @@ export function RevealCards({ item, bossSan }: { item: PublicState["history"][nu
           "."
         )}
       </p>
-      <ul className="grid gap-2 sm:grid-cols-3">
+      <ul className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
         {item.candidates.map((c, i) => {
           const played = c.san === item.crowdSan;
           const color = CANDIDATE_COLORS[i % CANDIDATE_COLORS.length]!;
