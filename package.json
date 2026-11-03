@@ -12,7 +12,8 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "test": "turbo test"
+    "test": "turbo test",
+    "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {
     "prettier": "^3.9.4",

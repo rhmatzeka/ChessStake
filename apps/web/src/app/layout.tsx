@@ -18,7 +18,7 @@ const PITCH =
   "Your community plays chess together against an AI Boss. Free to play, sponsors put up the prizes.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pawnpool.rahmateka.my.id"),
   title: { default: "PawnPool | Your community vs the AI Boss", template: "%s | PawnPool" },
   description: PITCH,
   openGraph: { title: "PawnPool", description: PITCH, siteName: "PawnPool", type: "website" },
