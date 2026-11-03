@@ -72,8 +72,8 @@ export function EventForm({ event, onClose, onSaved }: { event: AdminEvent | nul
   }
 
   return (
-    <form onSubmit={submit} className="mt-5 rounded-lg border border-line bg-panel p-5">
-      <h3 className="font-display text-lg font-bold">{event ? "Edit event" : "New event"}</h3>
+    <form onSubmit={submit} className="mt-5 panel p-5">
+      <h3 className="display display-xs">{event ? "Edit event" : "New event"}</h3>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <Field label="Title">
           <input name="title" required minLength={3} maxLength={80} defaultValue={event?.title} className={inputCls} />

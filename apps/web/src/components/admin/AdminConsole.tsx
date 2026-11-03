@@ -7,7 +7,7 @@ import { LeadsPanel } from "./LeadsPanel";
 export function AdminConsole() {
   const [tab, setTab] = useState<"events" | "leads">("events");
   const tabCls = (t: string) =>
-    `rounded-md px-4 py-2 text-sm font-semibold ${tab === t ? "bg-gold text-black" : "border border-line text-muted hover:text-foreground"}`;
+    `btn btn-sm ${tab === t ? "btn-gold" : "btn-glass"}`;
   return (
     <div>
       <div className="mb-8 flex gap-2" role="tablist">

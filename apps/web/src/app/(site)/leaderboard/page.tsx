@@ -38,17 +38,17 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
   } catch {
     failed = true;
   }
-  const nav = "rounded-md border border-line px-3 py-1.5 text-sm hover:border-gold/60";
+  const nav = "btn btn-glass btn-sm";
 
   return (
     <>
-      <PageHead title="Season leaderboard" lead="Points from every event and the Practice Arena this month. Resets on the 1st." />
-      <div className="mx-auto max-w-3xl px-5">
+      <PageHead kicker="This month" title="Season leaderboard" lead="Points from every event and the Practice Arena this month. Resets on the 1st." />
+      <div className="mx-auto max-w-3xl px-5 pt-10">
         <div className="flex items-center justify-between gap-3">
           <Link href={`/leaderboard?month=${shift(month, -1)}`} className={nav} rel="nofollow">
             Previous month
           </Link>
-          <h2 className="font-display text-xl font-bold">{label(month)}</h2>
+          <h2 className="display display-sm text-center">{label(month)}</h2>
           {month < current ? (
             <Link href={`/leaderboard?month=${shift(month, 1)}`} className={nav} rel="nofollow">
               Next month
@@ -59,21 +59,21 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
         </div>
 
         {failed ? (
-          <p role="alert" className="mt-8 rounded-md border border-line bg-panel px-4 py-3 text-muted">
+          <p role="alert" className="mt-8 panel px-4 py-3 text-muted">
             We could not load the leaderboard. Refresh in a moment.
           </p>
         ) : rows.length === 0 ? (
           <p className="mt-8 text-muted">No points yet in {label(month)}. Play the Practice Arena to get on the board.</p>
         ) : (
-          <ol className="mt-6 divide-y divide-line rounded-xl border border-line bg-panel">
+          <ol className="mt-6 divide-y divide-line overflow-hidden panel">
             {rows.map((r) => (
-              <li key={r.rank} className="flex items-center gap-4 px-4 py-3">
-                <span className={`w-8 text-right font-display text-lg font-bold tabular-nums ${r.rank <= 3 ? "text-gold" : "text-muted"}`}>
-                  {r.rank}
+              <li key={r.rank} className={`flex items-center gap-4 px-4 py-3.5 ${r.rank <= 3 ? "bg-panel-hi" : ""}`}>
+                <span className={`w-10 text-right font-display text-2xl font-black tabular-nums ${r.rank === 1 ? "gold-text" : r.rank <= 3 ? "text-gold" : "text-muted"}`}>
+                  {String(r.rank).padStart(2, "0")}
                 </span>
                 <span className="min-w-0 flex-1 truncate">{r.name}</span>
-                <span className="tabular-nums text-foreground">{r.points.toLocaleString("en-US")}</span>
-                <span className="text-sm text-muted">pts</span>
+                <span className="font-mono font-bold tabular-nums text-foreground">{r.points.toLocaleString("en-US")}</span>
+                <span className="th">pts</span>
               </li>
             ))}
           </ol>

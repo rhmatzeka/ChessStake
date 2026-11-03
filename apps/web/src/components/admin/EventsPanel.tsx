@@ -45,7 +45,7 @@ export function EventsPanel() {
   return (
     <section>
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-display text-2xl font-bold">Events</h2>
+        <h2 className="display display-sm">Events</h2>
         <button className={btnCls} onClick={() => setForm("new")}>
           New event
         </button>
@@ -70,7 +70,7 @@ export function EventsPanel() {
       ) : (
         <div className="mt-5 overflow-x-auto rounded-lg border border-line">
           <table className="w-full text-left text-sm">
-            <thead className="bg-panel text-xs uppercase text-muted">
+            <thead className="bg-panel th">
               <tr>
                 <th className="px-3 py-2">Title</th>
                 <th className="px-3 py-2">Slug</th>

@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 export const SignInLoader = dynamic(() => import("./SignInPanel"), {
   ssr: false,
   loading: () => (
-    <button disabled className="w-full rounded-md bg-gold px-4 py-2.5 text-sm font-semibold text-black opacity-60">
+    <button disabled className="btn btn-gold w-full">
       Sign in with wallet
     </button>
   ),

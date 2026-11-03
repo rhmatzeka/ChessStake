@@ -31,16 +31,16 @@ export function ScheduledCard({ state, serverNow }: { state: PublicState; server
     setIcs(buildIcsDataUrl({ slug: state.slug, title: state.title, startsAt: state.startsAt, url: `${window.location.origin}/events/${state.slug}` }));
   }, [state.slug, state.title, state.startsAt]);
   return (
-    <div className="rounded-xl border border-line bg-panel p-5">
-      <p className="text-sm text-muted">Starts {formatWib(state.startsAt)}</p>
-      <p className="mt-2 font-display text-5xl font-extrabold tabular-nums text-gold" aria-live="off">
+    <div className="panel p-5">
+      <p className="kicker kicker-muted">Starts {formatWib(state.startsAt)}</p>
+      <p className="mt-2 display text-5xl tabular-nums text-gold" aria-live="off">
         {left === null ? "-" : left <= 0 ? "Starting now" : formatCountdown(left)}
       </p>
       <p className="mt-3 text-muted">The board opens when the event starts. This page updates by itself.</p>
       <a
         href={ics}
         download={`${state.slug}.ics`}
-        className="mt-5 inline-block rounded-md border border-gold/60 px-4 py-2 text-sm font-medium text-gold transition-colors hover:bg-gold hover:text-black"
+        className="btn btn-glass btn-sm mt-5"
       >
         Add to calendar
       </a>
@@ -77,9 +77,9 @@ export function ResultCard({ state, user, me }: { state: PublicState; user: Auth
   }
 
   return (
-    <div className="rounded-xl border border-gold/50 bg-panel-hi p-5">
+    <div className="panel panel-gold p-5">
       <Sprite piece={state.result === "LOST" ? "king" : "queen"} side={state.result === "LOST" ? "Black" : "White"} size={56} />
-      <h2 className="mt-3 font-display text-3xl font-extrabold leading-tight">{copy.title}</h2>
+      <h2 className="display display-md mt-3">{copy.title}</h2>
       <p className="mt-1 text-muted">{copy.text}</p>
       {user && me && (
         <p className="mt-4 text-lg">
@@ -95,10 +95,10 @@ export function ResultCard({ state, user, me }: { state: PublicState; user: Auth
       )}
       {state.isPractice && <p className="mt-3 text-sm text-muted">Next practice round starts in a moment.</p>}
       <div className="mt-5 flex flex-wrap items-center gap-3">
-        <button onClick={share} className="rounded-md bg-gold px-4 py-2 text-sm font-semibold text-black hover:bg-[#f0b868]">
+        <button onClick={share} className="btn btn-gold btn-sm">
           Share
         </button>
-        <Link href="/events" className="rounded-md border border-line px-4 py-2 text-sm font-medium hover:border-gold/60">
+        <Link href="/events" className="btn btn-glass btn-sm">
           See more events
         </Link>
         <span role="status" className="text-sm text-muted">

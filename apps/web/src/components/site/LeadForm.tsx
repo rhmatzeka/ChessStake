@@ -5,8 +5,7 @@ import { useState } from "react";
 type Kind = "SPONSOR" | "CREATOR";
 type State = { s: "idle" } | { s: "sending" } | { s: "done" } | { s: "error"; msg: string };
 
-const field =
-  "w-full rounded-md border border-line bg-panel-hi px-3 py-2.5 text-base text-foreground placeholder:text-muted/60 focus:border-gold focus:outline-none";
+const field = "field";
 
 export function LeadForm({
   type,
@@ -50,8 +49,8 @@ export function LeadForm({
 
   if (state.s === "done") {
     return (
-      <div role="status" className="rounded-xl border border-gold/50 bg-panel p-6">
-        <p className="font-display text-xl font-bold text-gold">Thanks, we got it.</p>
+      <div role="status" className="panel panel-gold p-6">
+        <p className="display display-sm text-gold">Thanks, we got it.</p>
         <p className="mt-2 text-muted">{successText}</p>
       </div>
     );
@@ -60,20 +59,20 @@ export function LeadForm({
   return (
     <form onSubmit={onSubmit} className="grid gap-4" noValidate={false}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="grid gap-1.5 text-sm text-muted">
+        <label className="grid gap-1.5 font-mono text-[0.68rem] font-bold uppercase tracking-[0.16em] text-muted">
           Your name
           <input name="name" required maxLength={80} autoComplete="name" className={field} />
         </label>
-        <label className="grid gap-1.5 text-sm text-muted">
+        <label className="grid gap-1.5 font-mono text-[0.68rem] font-bold uppercase tracking-[0.16em] text-muted">
           Email, Telegram or X handle
           <input name="contact" required maxLength={120} className={field} />
         </label>
       </div>
-      <label className="grid gap-1.5 text-sm text-muted">
+      <label className="grid gap-1.5 font-mono text-[0.68rem] font-bold uppercase tracking-[0.16em] text-muted">
         Community or company (optional)
         <input name="organization" maxLength={120} autoComplete="organization" className={field} />
       </label>
-      <label className="grid gap-1.5 text-sm text-muted">
+      <label className="grid gap-1.5 font-mono text-[0.68rem] font-bold uppercase tracking-[0.16em] text-muted">
         {messageLabel}
         <textarea name="message" required maxLength={1000} rows={5} className={field} />
       </label>
@@ -92,7 +91,7 @@ export function LeadForm({
       <button
         type="submit"
         disabled={state.s === "sending"}
-        className="justify-self-start rounded-md bg-gold px-6 py-3 font-semibold text-black transition-colors hover:bg-[#f0b96a] disabled:opacity-60"
+        className="btn btn-gold justify-self-start"
       >
         {state.s === "sending" ? "Sending..." : submitLabel}
       </button>

@@ -13,8 +13,8 @@ export default async function Admin() {
   const state = !s ? "anon" : isAdminAddress(s.address) ? "admin" : "denied";
   return (
     <>
-      <PageHead title="Admin" />
-      <div className="mx-auto max-w-6xl px-5 pb-20">
+      <PageHead kicker="Owner only" title="Admin" photo="board" />
+      <div className="mx-auto max-w-6xl px-5 pb-20 pt-10">
         {state === "admin" ? <AdminConsole /> : <AdminAuth state={state} address={s?.address ?? null} />}
       </div>
     </>

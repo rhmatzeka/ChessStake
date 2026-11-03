@@ -184,7 +184,11 @@ body {
     border: 1px solid var(--color-line);
     background: var(--color-panel-hi);
     padding: 0.65rem 0.8rem;
+    font-family: var(--font-body), system-ui, sans-serif;
     font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    text-transform: none;
     color: var(--foreground);
   }
   .field::placeholder { color: rgb(142 130 118 / 0.6); }

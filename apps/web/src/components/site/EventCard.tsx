@@ -29,21 +29,21 @@ export function EventCard({ e }: { e: LobbyItem }) {
   return (
     <Link
       href={`/events/${e.slug}`}
-      className="group flex flex-col gap-4 rounded-xl border border-line bg-panel p-5 transition-colors hover:border-gold/50"
+      className="group panel flex flex-col gap-4 p-5 transition-colors hover:border-gold/60 hover:bg-panel-hi"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h3 className="font-display text-lg font-bold leading-snug">{e.title}</h3>
-          <p className="mt-0.5 text-sm text-muted">
+          <h3 className="display display-xs leading-tight">{e.title}</h3>
+          <p className="mt-1.5 text-sm text-muted">
             Hosted by {e.hostName}
             {e.sponsorName ? `, prizes from ${e.sponsorName}` : ""}
           </p>
         </div>
         <Sprite piece="king" side="Black" size={40} className="shrink-0 opacity-80 group-hover:opacity-100" />
       </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-        <span className={live ? "font-medium text-gold" : "text-foreground"}>
-          {live && <span className="mr-2 inline-block h-2 w-2 rounded-full bg-gold align-middle" />}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[0.7rem] font-bold uppercase tracking-[0.14em]">
+        <span className={live ? "text-gold" : "text-foreground"}>
+          {live && <span className="live-dot mr-2 inline-block align-middle" aria-hidden="true" />}
           {label}
         </span>
         <span className="text-muted">Boss level {e.bossLevel}</span>
@@ -59,7 +59,7 @@ export function EventCard({ e }: { e: LobbyItem }) {
           {e.top3.map((p, i) => (
             <li key={i} className="flex justify-between gap-3">
               <span className="truncate">
-                <span className="mr-2 text-gold">{i + 1}</span>
+                <span className="mr-2 font-mono text-gold">{i + 1}</span>
                 {p.name}
               </span>
               <span className="tabular-nums text-muted">{p.points} pts</span>

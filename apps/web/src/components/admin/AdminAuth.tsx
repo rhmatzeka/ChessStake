@@ -6,7 +6,7 @@ import { SignInLoader } from "@/components/auth/SignInLoader";
 export function AdminAuth({ state, address }: { state: "anon" | "denied"; address: string | null }) {
   const router = useRouter();
   return (
-    <div className="max-w-sm rounded-lg border border-line bg-panel p-5">
+    <div className="max-w-sm panel p-5">
       {state === "denied" ? (
         <p role="alert" className="mb-4 font-semibold text-red-300">
           Not allowed

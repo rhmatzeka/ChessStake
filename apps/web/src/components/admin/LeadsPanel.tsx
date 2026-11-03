@@ -50,7 +50,7 @@ export function LeadsPanel() {
   return (
     <section>
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-display text-2xl font-bold">Leads</h2>
+        <h2 className="display display-sm">Leads</h2>
         <label className="flex items-center gap-2 text-sm text-muted">
           <input type="checkbox" checked={unhandledOnly} onChange={(e) => setUnhandledOnly(e.target.checked)} />
           Only unhandled
@@ -64,7 +64,7 @@ export function LeadsPanel() {
       ) : (
         <ul className="mt-5 space-y-3">
           {leads.map((l) => (
-            <li key={l.id} className="rounded-lg border border-line bg-panel p-4">
+            <li key={l.id} className="panel p-4">
               <div className="flex flex-wrap items-center gap-3">
                 <Badge tone={l.type === "SPONSOR" ? "gold" : "muted"}>{l.type}</Badge>
                 <span className="font-semibold">{l.name}</span>

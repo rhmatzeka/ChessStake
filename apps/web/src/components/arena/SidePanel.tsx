@@ -6,8 +6,8 @@ import { formatEval } from "./quality";
 
 export function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border border-line bg-panel p-4">
-      <h2 className="font-display text-base font-bold">{title}</h2>
+    <section className="panel p-4">
+      <h2 className="kicker">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>
   );
@@ -41,8 +41,8 @@ export function MeCard({
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-lg bg-background px-2 py-2">
-      <dd className="font-display text-xl font-bold tabular-nums text-gold">{value}</dd>
-      <dt className="text-xs text-muted">{label}</dt>
+      <dd className="font-display text-xl font-black tabular-nums text-gold">{value}</dd>
+      <dt className="th !text-[0.6rem]">{label}</dt>
     </div>
   );
 }
@@ -76,7 +76,7 @@ export function SponsorCard({ sponsor }: { sponsor: NonNullable<PublicState["spo
           <img src={sponsor.logoUrl} alt="" className="h-10 w-10 shrink-0 rounded-md object-contain" />
         )}
         <div className="min-w-0">
-          <p className="text-xs text-muted">Prizes from</p>
+          <p className="th">Prizes from</p>
           <p className="truncate font-display text-base font-bold">{sponsor.name}</p>
         </div>
       </div>
@@ -88,12 +88,12 @@ export function SponsorCard({ sponsor }: { sponsor: NonNullable<PublicState["spo
       href={sponsor.url}
       target="_blank"
       rel="noopener noreferrer sponsored"
-      className="block rounded-xl border border-gold/40 bg-panel-hi p-4 transition-colors hover:border-gold"
+      className="panel panel-gold block p-4 transition-colors hover:border-gold"
     >
       {inner}
     </a>
   ) : (
-    <div className="rounded-xl border border-gold/40 bg-panel-hi p-4">{inner}</div>
+    <div className="panel panel-gold p-4">{inner}</div>
   );
 }
 

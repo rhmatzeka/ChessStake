@@ -127,9 +127,9 @@ export function SignInButton({
               required
               aria-label="Display name"
               placeholder="2 to 20 characters"
-              className="min-w-0 flex-1 rounded-md border border-line bg-background px-2 py-1 text-sm"
+              className="field min-w-0 flex-1 !px-2 !py-1 !text-sm"
             />
-            <button className="rounded-md bg-gold px-3 py-1 text-sm font-medium text-black">Save</button>
+            <button className="btn btn-gold btn-sm">Save</button>
           </form>
         ) : (
           <div className="mt-2 flex gap-4 text-xs text-muted">
@@ -161,7 +161,7 @@ export function SignInButton({
       <button
         onClick={start}
         disabled={busy || user === undefined}
-        className="w-full rounded-md bg-gold px-4 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-[#f0b868] disabled:opacity-60"
+        className="btn btn-gold w-full"
       >
         {busy ? "Check your wallet…" : "Sign in with wallet"}
       </button>
