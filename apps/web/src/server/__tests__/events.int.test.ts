@@ -282,6 +282,21 @@ describe("practice arena", () => {
     expect(s.turn?.number).toBe(1);
   });
 
+  it("practice event keeps playing after 5 empty turns", async () => {
+    await getPublicState("practice");
+    const p1 = await prisma.event.findUniqueOrThrow({ where: { slug: "practice-1" } });
+    for (let n = 1; n <= 6; n++) {
+      await expire(p1.id, n);
+      await getPublicState("practice");
+    }
+    const after = await prisma.event.findUniqueOrThrow({ where: { id: p1.id } });
+    expect(after.status).toBe("LIVE");
+    expect(after.finishedAt).toBeNull();
+    const s = await getPublicState("practice");
+    expect(s.slug).toBe("practice-1");
+    expect(s.turn?.number).toBe(7);
+  });
+
   it("does not restart before 30 s, restarts after", async () => {
     await getPublicState("practice");
     const p1 = await prisma.event.findUniqueOrThrow({ where: { slug: "practice-1" } });
