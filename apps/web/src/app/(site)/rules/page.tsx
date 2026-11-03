@@ -6,21 +6,21 @@ export const metadata: Metadata = {
   description: "How a Boss Battle works, how points are scored, how prizes are decided, plus Terms and Privacy.",
 };
 
-const h2 = "font-display text-2xl font-bold sm:text-3xl";
+const h2 = "display display-sm";
 
 export default function Rules() {
   return (
     <>
-      <PageHead title="Rules" lead="How to play, how points work, and how prizes are decided." />
-      <div className="mx-auto grid max-w-6xl gap-14 px-5 md:grid-cols-[14rem_1fr]">
-        <nav aria-label="On this page" className="hidden text-sm text-muted md:block">
-          <ul className="sticky top-6 grid gap-2">
-            <li><a href="#play" className="hover:text-foreground">How to play</a></li>
-            <li><a href="#points" className="hover:text-foreground">Points</a></li>
-            <li><a href="#fair" className="hover:text-foreground">Fair choices</a></li>
-            <li><a href="#prizes" className="hover:text-foreground">Prizes</a></li>
-            <li><a href="#terms" className="hover:text-foreground">Terms</a></li>
-            <li><a href="#privacy" className="hover:text-foreground">Privacy</a></li>
+      <PageHead kicker="Read before you play" title="Rules" lead="How to play, how points work, and how prizes are decided." />
+      <div className="mx-auto grid max-w-6xl gap-14 px-5 pt-14 md:grid-cols-[14rem_1fr]">
+        <nav aria-label="On this page" className="hidden md:block">
+          <ul className="sticky top-6 grid gap-1 border-l border-line pl-4">
+            <li><a href="#play" className="nav-link block">How to play</a></li>
+            <li><a href="#points" className="nav-link block">Points</a></li>
+            <li><a href="#fair" className="nav-link block">Fair choices</a></li>
+            <li><a href="#prizes" className="nav-link block">Prizes</a></li>
+            <li><a href="#terms" className="nav-link block">Terms</a></li>
+            <li><a href="#privacy" className="nav-link block">Privacy</a></li>
           </ul>
         </nav>
 
@@ -36,7 +36,7 @@ export default function Rules() {
           <section id="points" className="scroll-mt-6 grid gap-4">
             <h2 className={h2}>Points</h2>
             <p>Each turn you pick, you get 10 points for showing up plus up to 100 more for the quality of your move:</p>
-            <p className="rounded-lg border border-line bg-panel px-4 py-3 font-medium text-foreground">
+            <p className="panel px-4 py-3 font-mono text-sm font-bold text-foreground">
               points = 10 + round(100 × max(0, 1 − cpLoss / 300))
             </p>
             <p>

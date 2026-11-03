@@ -43,11 +43,11 @@ export function OverlayArena({ slug, initial }: { slug: string; initial: PublicS
         </div>
       </div>
       <div className="min-w-0 flex-1 space-y-3 rounded-2xl bg-black/35 p-3 backdrop-blur-[2px]">
-        <p className="font-display text-xl font-bold leading-tight">{state.title}</p>
+        <p className="display display-xs leading-tight">{state.title}</p>
         {live && <TurnBar turnNumber={turn?.number ?? null} clock={clock} thinking={thinking} note={turn ? undefined : "Setting up the next turn"} />}
         {live && reveal && <RevealCards item={reveal} bossSan={reveal.bossSan} />}
         {live && !reveal && turn && <CandidateCards turn={turn} pick={null} canPick={false} onPick={() => {}} interactive={false} />}
-        {(ended || state.status === "SCHEDULED") && headline && <p className="font-display text-3xl font-extrabold">{headline}</p>}
+        {(ended || state.status === "SCHEDULED") && headline && <p className="display text-3xl">{headline}</p>}
         <p className="text-sm text-muted">Pick your move on PawnPool. Free to play. {state.playersOnline} playing</p>
       </div>
     </div>

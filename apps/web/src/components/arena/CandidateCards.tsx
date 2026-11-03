@@ -8,7 +8,7 @@ type Turn = NonNullable<PublicState["turn"]>;
 export function QualityBadge({ quality }: { quality: "best" | "okay" | "blunder" }) {
   const b = qualityBadge(quality);
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${b.classes}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-mono text-[0.65rem] font-bold uppercase tracking-wider ${b.classes}`}>
       <span aria-hidden="true">{b.glyph}</span>
       {b.text}
     </span>
@@ -47,7 +47,7 @@ export function CandidateCards({
                 <span className="block text-sm text-muted">{c.san}</span>
               </span>
               {picked && (
-                <span className="ml-auto shrink-0 rounded-full bg-gold px-2 py-0.5 text-xs font-bold text-black">Your pick</span>
+                <span className="ml-auto shrink-0 rounded-full bg-gold px-2 py-0.5 font-mono text-[0.65rem] font-bold uppercase tracking-wider text-black">Your pick</span>
               )}
             </span>
             <span className="mt-1.5 flex items-center gap-2 sm:mt-3">
@@ -64,7 +64,7 @@ export function CandidateCards({
             </span>
           </>
         );
-        const base = "block w-full rounded-xl border px-2.5 py-2 text-left sm:p-3 transition-colors";
+        const base = "block w-full rounded-lg border px-2.5 py-2 text-left sm:p-3 transition-colors";
         const tone = picked ? "border-gold bg-panel-hi" : "border-line bg-panel hover:border-gold/50";
         return (
           <li key={c.uci}>
@@ -111,7 +111,7 @@ export function RevealCards({ item, bossSan }: { item: PublicState["history"][nu
           return (
             <li
               key={c.uci}
-              className={`rounded-xl border p-3 ${played ? "border-gold bg-panel-hi" : "border-line bg-panel"}`}
+              className={`rounded-lg border p-3 ${played ? "border-gold bg-panel-hi" : "border-line bg-panel"}`}
             >
               <div className="flex items-start gap-2">
                 <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full" style={{ background: color }} aria-hidden="true" />

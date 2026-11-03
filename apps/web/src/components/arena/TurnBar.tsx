@@ -21,10 +21,10 @@ export function TurnBar({
   const open = !!clock?.isOpen && !thinking;
   const title = thinking ? "AI Boss is thinking" : open ? "Your move" : note ?? "Next turn opens in a moment";
   return (
-    <div className="rounded-xl border border-line bg-panel px-3 py-2 sm:px-4 sm:py-3">
+    <div className="panel px-3 py-2 sm:px-4 sm:py-3">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-display text-base font-bold leading-tight sm:text-lg">
+          <p className="display text-base !leading-tight sm:text-xl">
             {title}
             {thinking && (
               <span aria-hidden="true" className="ml-1 inline-flex gap-0.5">
@@ -40,10 +40,10 @@ export function TurnBar({
           </p>
         </div>
         <div className="shrink-0 text-right">
-          <p className="font-display text-3xl font-extrabold sm:text-4xl leading-none tabular-nums text-gold" aria-hidden="true">
+          <p className="font-display text-3xl font-black sm:text-4xl leading-none tabular-nums text-gold" aria-hidden="true">
             {clock && open ? secs : "-"}
           </p>
-          <p className="hidden text-xs text-muted sm:block">seconds</p>
+          <p className="th hidden !text-[0.6rem] sm:block">seconds</p>
         </div>
       </div>
       <div className="mt-1.5 h-1.5 sm:mt-3 overflow-hidden rounded-full bg-line" aria-hidden="true">

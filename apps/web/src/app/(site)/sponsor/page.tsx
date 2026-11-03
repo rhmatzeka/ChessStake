@@ -11,14 +11,16 @@ export default function Sponsor() {
   return (
     <>
       <PageHead
+        kicker="For sponsors"
         title="Sponsor a Boss Battle"
         lead="Put up the prizes for a live crowd game. Players see your name on every turn and your prizes on the leaderboard."
       />
-      <div className="mx-auto max-w-6xl px-5">
+      <div className="mx-auto max-w-6xl px-5 pt-12">
         <div className="grid gap-5 md:grid-cols-2">
-          <article className="rounded-2xl border border-gold/50 bg-panel p-6">
-            <h2 className="font-display text-2xl font-bold">Sponsored Event</h2>
-            <p className="mt-1 text-lg text-gold">from Rp3.000.000 per event (about US$190)</p>
+          <article className="panel panel-gold p-7">
+            <p className="kicker">Sponsored Event</p>
+            <h2 className="display display-md mt-3 text-gold">From Rp3.000.000</h2>
+            <p className="mt-2 font-mono text-xs font-bold uppercase tracking-[0.16em] text-muted">per event, about US$190</p>
             <p className="mt-4 text-muted">One scheduled Boss Battle, branded with you.</p>
             <ul className="mt-4 grid list-disc gap-2 pl-5 text-[#c9c0b3]">
               <li>Your name, logo and link on the event page</li>
@@ -28,9 +30,10 @@ export default function Sponsor() {
             </ul>
             <p className="mt-4 text-sm text-muted">Example split: Rp1.500.000 goes to prizes, Rp1.500.000 to the platform.</p>
           </article>
-          <article className="rounded-2xl border border-line bg-panel p-6">
-            <h2 className="font-display text-2xl font-bold">Season Sponsor</h2>
-            <p className="mt-1 text-lg text-gold">from Rp10.000.000 per month</p>
+          <article className="panel p-7">
+            <p className="kicker">Season Sponsor</p>
+            <h2 className="display display-md mt-3 text-gold">From Rp10.000.000</h2>
+            <p className="mt-2 font-mono text-xs font-bold uppercase tracking-[0.16em] text-muted">per month</p>
             <p className="mt-4 text-muted">Be the name behind the whole month.</p>
             <ul className="mt-4 grid list-disc gap-2 pl-5 text-[#c9c0b3]">
               <li>Your logo on every event that month</li>
@@ -43,9 +46,10 @@ export default function Sponsor() {
           Prices are starting points and can change. Creator Pro and cosmetics are coming later and are not part of sponsoring.
         </p>
 
-        <section className="mt-16 grid gap-10 md:grid-cols-[1fr_1.3fr]">
+        <section className="mt-24 grid gap-10 md:grid-cols-[1fr_1.3fr]">
           <div>
-            <h2 className="font-display text-3xl font-bold">Tell us what you have in mind</h2>
+            <p className="kicker">Get in touch</p>
+            <h2 className="display display-md mt-3">Tell us what you have in mind</h2>
             <p className="mt-4 max-w-sm text-muted">
               Send a short note. We reply by chat or email, agree the details, and you receive an invoice by bank transfer or USDC. We then set up the event with your name and prizes.
             </p>

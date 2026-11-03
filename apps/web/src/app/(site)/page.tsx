@@ -1,8 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { listEvents, type LobbyItem } from "@/server/events";
 import { Countdown } from "@/components/site/Countdown";
 import { formatWib } from "@/components/site/EventCard";
+import { HeroVideo } from "@/components/site/HeroVideo";
 import { Sprite } from "@/components/site/Sprite";
+import { Board, type BoardArrow } from "@/components/arena/Board";
+import { CANDIDATE_COLORS } from "@/components/arena/geometry";
 
 export const revalidate = 60;
 
@@ -15,16 +19,41 @@ async function nextEvent(): Promise<LobbyItem | null> {
   }
 }
 
+// After 1.e4 e5 2.Nf3 Nc6: three moves, the crowd leans to the bishop.
+const EXAMPLE_FEN = "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3";
 const EXAMPLE = [
-  { piece: "knight", label: "Take the knight", pct: 58, win: true },
-  { piece: "king", label: "Castle to safety", pct: 31, win: false },
-  { piece: "pawn", label: "Push the center pawn", pct: 11, win: false },
+  { uci: "f1c4", label: "Develop the bishop", san: "Bc4", picks: 58 },
+  { uci: "d2d4", label: "Push the center pawn", san: "d4", picks: 31 },
+  { uci: "f3e5", label: "Take the pawn", san: "Nxe5", picks: 11 },
 ] as const;
+const ARROWS: BoardArrow[] = EXAMPLE.map((m, i) => ({
+  uci: m.uci,
+  color: CANDIDATE_COLORS[i]!,
+  state: i === 0 ? "picked" : "normal",
+}));
 
 const STEPS = [
-  { piece: "pawn", title: "Join an event", text: "Watch for free. Sign in with your wallet when you want to pick. No gas, no payment." },
-  { piece: "knight", title: "Pick 1 of 3 moves", text: "Every turn you get 15 seconds. The move the crowd picks most is the one that gets played." },
-  { piece: "queen", title: "Earn points, win prizes", text: "Better moves score more points. The top 10 of an event win the prizes its sponsor puts up." },
+  {
+    n: "01",
+    word: "Pick",
+    piece: "pawn",
+    title: "1 of 3 moves",
+    text: "Watch for free. Sign in with your wallet when you want to pick. No gas, no payment. Every turn shows three candidate moves.",
+  },
+  {
+    n: "02",
+    word: "Play",
+    piece: "knight",
+    title: "The crowd decides",
+    text: "You have 15 seconds. The move the crowd picks most is the one that gets played. Then the AI Boss answers.",
+  },
+  {
+    n: "03",
+    word: "Win",
+    piece: "queen",
+    title: "Points and prizes",
+    text: "Better moves score more points. The top 10 of an event win the prizes its sponsor puts up.",
+  },
 ] as const;
 
 export default async function Home() {
@@ -34,166 +63,220 @@ export default async function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="checker pointer-events-none absolute inset-0" aria-hidden="true" />
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-5 pb-16 pt-12 md:grid-cols-[1.1fr_1fr] md:items-center md:pt-20">
-          <div>
-            <h1 className="font-display text-[2.75rem] font-extrabold leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl">
-              Your community vs the AI&nbsp;Boss
-            </h1>
-            <p className="mt-6 max-w-md text-lg text-muted">
-              Free to play. Sponsors put up the prizes.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link
-                href="/events/practice"
-                className="rounded-md bg-gold px-7 py-3.5 text-lg font-semibold text-black transition-colors hover:bg-[#f0b96a]"
-              >
-                Play now
-              </Link>
-              <Link href="/rules" className="py-2 text-muted underline-offset-4 hover:text-foreground hover:underline">
-                How the points work
-              </Link>
-            </div>
+      <section className="relative isolate flex h-[calc(85svh-4.5rem)] min-h-[34rem] items-start justify-center pt-12 sm:items-center sm:pt-0 overflow-hidden bg-black md:h-[calc(100svh-4.5rem-3.25rem)] md:min-h-[36rem]">
+        <div className="hero-media absolute inset-0 -z-20" aria-hidden="true">
+          <div className="absolute inset-x-0 bottom-[6%] top-[40%] sm:inset-0">
+          <Image
+            src="/assets/hero/board.webp"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-contain object-center sm:object-cover sm:object-[50%_45%]"
+          />
+          <HeroVideo />
           </div>
+        </div>
+        <div
+          className="absolute inset-0 -z-10"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 70% at 50% 48%, rgb(7 6 5 / 0.38) 0%, rgb(7 6 5 / 0.62) 65%, rgb(7 6 5 / 0.92) 100%), linear-gradient(to bottom, rgb(7 6 5 / 0.5) 0%, transparent 25%, transparent 65%, #070605 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 -z-10 sm:hidden"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse 110% 42% at 50% 34%, rgb(7 6 5 / 0.9) 0%, rgb(7 6 5 / 0.62) 65%, transparent 100%), linear-gradient(to bottom, #070605 0%, rgb(7 6 5 / 0.55) 40%, transparent 62%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 -z-10 hidden sm:block"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse 52% 50% at 50% 50%, rgb(7 6 5 / 0.72) 0%, rgb(7 6 5 / 0.5) 55%, transparent 100%)",
+          }}
+        />
+        <div className="grid-fine absolute inset-0 -z-10 opacity-60" aria-hidden="true" />
 
-          {/* One example turn: three candidate moves, the crowd votes, the Boss waits. */}
-          <figure aria-label="Example of one turn" className="rounded-2xl border border-line bg-panel/90 p-5 sm:p-6">
-            <div className="flex items-center justify-between gap-4 border-b border-line pb-4">
-              <div className="flex items-center gap-3">
-                <Sprite piece="king" side="Black" size={56} />
-                <div>
-                  <p className="font-display text-base font-bold leading-tight">AI Boss, level 3</p>
-                  <p className="text-sm text-muted">Waiting for the crowd</p>
-                </div>
-              </div>
-              <p className="text-right font-display text-3xl font-extrabold tabular-nums text-gold">
-                0:09
-              </p>
-            </div>
-            <ul className="mt-4 grid gap-3">
-              {EXAMPLE.map((m) => (
-                <li key={m.label}>
-                  <div className="flex items-center gap-3">
-                    <Sprite piece={m.piece} size={36} />
-                    <span className={`flex-1 text-[15px] ${m.win ? "font-semibold" : "text-muted"}`}>{m.label}</span>
-                    <span className={`tabular-nums text-sm ${m.win ? "text-gold" : "text-muted"}`}>{m.pct}%</span>
-                  </div>
-                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-line">
-                    <div
-                      className={`bar-fill h-full rounded-full ${m.win ? "bg-gold" : "bg-muted/60"}`}
-                      style={{ width: `${m.pct}%` }}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <figcaption className="mt-4 text-xs text-muted">Example turn. The crowd plays White.</figcaption>
-          </figure>
+        <div className="relative mx-auto flex max-w-6xl flex-col items-center px-5 text-center">
+          <p className="rise pill" style={{ animationDelay: "0ms" }}>
+            <span className="live-dot" aria-hidden="true" />
+            Live crowd chess
+          </p>
+          <h1 className="display hero-shadow mt-6 text-[clamp(3rem,10.5vw,7.75rem)] leading-[0.86]">
+            <span className="rise block" style={{ animationDelay: "120ms" }}>Your crowd</span>
+            <span className="rise block" style={{ animationDelay: "220ms" }}>vs the</span>
+            <span className="rise gold-text block" style={{ animationDelay: "320ms" }}>AI Boss</span>
+          </h1>
+          <p className="rise hero-shadow mt-7 max-w-md text-lg text-[#e6dfd3]" style={{ animationDelay: "480ms" }}>
+            Free to play. Sponsors put up the prizes.
+          </p>
+          <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "600ms" }}>
+            <Link href="/events/practice" className="btn btn-gold">Play now</Link>
+            <Link href="#how" className="btn btn-glass">How it works</Link>
+          </div>
         </div>
       </section>
 
-      {/* Next event */}
-      <section className="mx-auto max-w-6xl px-5">
-        <div className="rounded-2xl border border-gold/40 bg-panel p-6 sm:p-8">
+      {/* Live strip */}
+      <section aria-label="Live status" className="border-y border-line bg-[#0a0807]">
+        <div className="mx-auto flex max-w-6xl flex-col gap-x-8 gap-y-1 px-5 py-3 font-mono text-[0.72rem] font-bold uppercase tracking-[0.18em] md:h-[3.25rem] md:flex-row md:items-center md:justify-between md:py-0">
+          <Link href="/events/practice" className="flex items-center gap-3 hover:text-gold">
+            <span className="live-dot" aria-hidden="true" />
+            Practice Arena
+            <span className="text-muted">Open all day</span>
+          </Link>
           {next ? (
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-sm text-gold">{live ? "Live right now" : "Next Boss Battle"}</p>
-                <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">{next.title}</h2>
-                <p className="mt-1 text-muted">
-                  Hosted by {next.hostName}
-                  {next.sponsorName ? `, prizes from ${next.sponsorName}` : ""}. Boss level {next.bossLevel}.
-                </p>
-                {!live && <p className="mt-1 text-sm text-muted">{formatWib(next.startsAt)}</p>}
-              </div>
-              <div className="flex items-center gap-5">
-                {!live && (
-                  <p className="font-display text-3xl font-extrabold text-gold sm:text-4xl">
-                    <Countdown target={Date.parse(next.startsAt)} />
-                  </p>
-                )}
-                <Link
-                  href={`/events/${next.slug}`}
-                  className="rounded-md border border-gold px-5 py-2.5 font-medium text-gold transition-colors hover:bg-gold hover:text-black"
-                >
-                  {live ? "Join the event" : "See the event"}
-                </Link>
-              </div>
-            </div>
+            <Link href={`/events/${next.slug}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 hover:text-gold">
+              <span className="text-muted">{live ? "Live now" : "Next Boss Battle"}</span>
+              <span className="truncate">{next.title}</span>
+              {live ? (
+                <span className="text-gold">Join</span>
+              ) : (
+                <span className="text-gold">
+                  Starts in <Countdown target={Date.parse(next.startsAt)} />
+                </span>
+              )}
+              {!live && <span className="hidden text-muted lg:inline">{formatWib(next.startsAt)}</span>}
+            </Link>
           ) : (
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="font-display text-2xl font-bold">Next Boss Battle coming soon</h2>
-                <p className="mt-1 text-muted">Practice Arena is open all day while we line up the next one.</p>
-              </div>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <Link href="/host" className="text-gold underline-offset-4 hover:underline">Host an event</Link>
-                <Link href="/sponsor" className="text-gold underline-offset-4 hover:underline">Sponsor one</Link>
-              </div>
-            </div>
+            <p className="text-muted">Next Boss Battle coming soon</p>
           )}
         </div>
       </section>
 
       {/* How it works */}
-      <section className="mx-auto mt-24 max-w-6xl px-5">
-        <h2 className="font-display text-3xl font-bold sm:text-4xl">How a Boss Battle works</h2>
-        <ol className="mt-10 grid gap-8 md:grid-cols-3">
-          {STEPS.map((s, i) => (
-            <li key={s.title} className="relative border-t border-gold/50 pt-6">
-              <Sprite piece={s.piece} size={56} />
-              <h3 className="mt-4 font-display text-xl font-bold">
-                <span className="mr-2 text-gold">{i + 1}.</span>
-                {s.title}
-              </h3>
-              <p className="mt-2 max-w-sm text-muted">{s.text}</p>
+      <section id="how" className="mx-auto max-w-6xl scroll-mt-4 px-5 pt-24 md:pt-32">
+        <p className="kicker">How a Boss Battle works</p>
+        <h2 className="display display-md mt-4 max-w-3xl">Three moves. One crowd. One Boss.</h2>
+        <ol className="mt-14 grid gap-px overflow-hidden rounded-lg border border-line bg-line md:grid-cols-3">
+          {STEPS.map((s) => (
+            <li key={s.n} className="relative flex flex-col bg-panel p-7 md:p-8">
+              <div className="flex items-start justify-between">
+                <span className="numeral text-[6.5rem] md:text-[8rem]" aria-hidden="true">{s.n}</span>
+                <Sprite piece={s.piece} size={56} />
+              </div>
+              <p className="kicker mt-8">
+                <span className="sr-only">Step {s.n}: </span>
+                {s.word}
+              </p>
+              <h3 className="display display-sm mt-3">{s.title}</h3>
+              <p className="mt-4 text-muted">{s.text}</p>
             </li>
           ))}
         </ol>
       </section>
 
-      {/* Sponsors */}
-      <section className="mx-auto mt-24 max-w-6xl px-5">
-        <div className="grid gap-10 md:grid-cols-[1fr_1.2fr]">
+      {/* Example turn */}
+      <section className="mx-auto mt-24 max-w-6xl px-5 md:mt-32">
+        <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] md:gap-14">
+          <figure aria-label="Example of one turn" className="relative mx-auto w-full max-w-[34rem]">
+            <div
+              className="pointer-events-none absolute -inset-3 -z-10 md:-inset-8 opacity-80"
+              aria-hidden="true"
+              style={{ background: "radial-gradient(closest-side, rgb(230 168 85 / 0.18), transparent)" }}
+            />
+            <div className="panel p-2 sm:p-3">
+              <Board fen={EXAMPLE_FEN} lastMove={null} animate={false} arrows={ARROWS} />
+            </div>
+            <figcaption className="kicker kicker-muted mt-3">Example turn. The crowd plays White.</figcaption>
+          </figure>
           <div>
-            <h2 className="font-display text-3xl font-bold sm:text-4xl">Put your name on the board</h2>
-            <p className="mt-4 max-w-md text-muted">
-              Sponsors fund the prizes and get a crowd that shows up, plays together and sees your brand every turn.
+            <p className="kicker">The real arena</p>
+            <h2 className="display display-md mt-4">See the three arrows. Choose one.</h2>
+            <p className="mt-5 max-w-md text-muted">
+              Each turn the engine offers its best move, an okay move and a tempting trap, shuffled. Spotting the trap is the skill.
             </p>
-            <Link href="/sponsor" className="mt-6 inline-block rounded-md bg-gold px-6 py-3 font-semibold text-black hover:bg-[#f0b96a]">
-              See sponsor packages
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-line bg-panel p-5">
-              <h3 className="font-display text-lg font-bold">Sponsored Event</h3>
-              <p className="mt-1 text-gold">from Rp3.000.000 per event</p>
-              <p className="mt-3 text-sm text-muted">One Boss Battle with your name, logo and prize text. Half of it goes to prizes for the top 10.</p>
-            </div>
-            <div className="rounded-xl border border-line bg-panel p-5">
-              <h3 className="font-display text-lg font-bold">Season Sponsor</h3>
-              <p className="mt-1 text-gold">from Rp10.000.000 per month</p>
-              <p className="mt-3 text-sm text-muted">Your logo on every event and on the season leaderboard, plus a season prize pool.</p>
-            </div>
+            <ul className="mt-8 grid gap-2.5">
+              {EXAMPLE.map((m, i) => {
+                const win = i === 0;
+                return (
+                  <li
+                    key={m.uci}
+                    className={`rounded-lg border px-4 py-3 ${win ? "border-gold bg-panel-hi" : "border-line bg-panel"}`}
+                    style={win ? { boxShadow: `0 0 0 1px ${CANDIDATE_COLORS[i]}` } : undefined}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="mt-2 h-3 w-3 shrink-0 rounded-full" style={{ background: CANDIDATE_COLORS[i] }} aria-hidden="true" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-display text-[1.05rem] font-bold leading-snug">{m.label}</p>
+                        <p className="text-sm text-muted">{m.san}</p>
+                      </div>
+                      {win && <span className="rounded-full bg-gold px-2 py-0.5 font-mono text-[0.65rem] font-bold uppercase tracking-wider text-black">Crowd pick</span>}
+                    </div>
+                    <div className="mt-2.5 flex items-center gap-3">
+                      <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
+                        <span className="bar-fill block h-full rounded-full" style={{ width: `${m.picks}%`, background: CANDIDATE_COLORS[i] }} />
+                      </span>
+                      <span className="w-12 text-right font-mono text-xs tabular-nums text-muted">{m.picks}%</span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* Creators */}
-      <section className="mx-auto mt-24 max-w-6xl px-5">
-        <div className="flex flex-col gap-6 rounded-2xl border border-line bg-panel p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-          <div className="flex items-center gap-5">
-            <Sprite piece="rook" size={56} className="shrink-0" />
-            <div>
-              <h2 className="font-display text-2xl font-bold">Run a Boss Battle for your community</h2>
-              <p className="mt-1 text-muted">Creator Pro is coming. Join the waitlist.</p>
+      {/* Sponsors */}
+      <section className="photo-band mt-24 border-y border-line md:mt-32">
+        <div className="photo-band-img" aria-hidden="true">
+          <Image src="/assets/hero/flight.webp" alt="" fill sizes="100vw" className="object-cover" />
+        </div>
+        <div className="mx-auto max-w-6xl px-5 py-24 md:py-32">
+          <p className="kicker">For sponsors</p>
+          <h2 className="display display-md mt-4 max-w-3xl">Put your name on the board</h2>
+          <p className="mt-5 max-w-lg text-lg text-[#d8d0c4]">
+            Sponsors fund the prizes and get a crowd that shows up, plays together and sees your brand every turn.
+          </p>
+          <div className="mt-12 grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-line bg-black/70 p-6 backdrop-blur-sm">
+              <p className="kicker">Sponsored Event</p>
+              <p className="display display-sm mt-4 text-gold">From Rp3.000.000</p>
+              <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-muted">per event</p>
+              <p className="mt-4 text-[#c9c0b3]">One Boss Battle with your name, logo and prize text. Half of it goes to prizes for the top 10.</p>
+            </div>
+            <div className="rounded-lg border border-line bg-black/70 p-6 backdrop-blur-sm">
+              <p className="kicker">Season Sponsor</p>
+              <p className="display display-sm mt-4 text-gold">From Rp10.000.000</p>
+              <p className="mt-1 font-mono text-xs uppercase tracking-[0.18em] text-muted">per month</p>
+              <p className="mt-4 text-[#c9c0b3]">Your logo on every event and on the season leaderboard, plus a season prize pool.</p>
             </div>
           </div>
-          <Link href="/host" className="shrink-0 rounded-md border border-gold px-5 py-2.5 text-center font-medium text-gold transition-colors hover:bg-gold hover:text-black">
-            Join the waitlist
-          </Link>
+          <Link href="/sponsor" className="btn btn-gold mt-10">See sponsor packages</Link>
         </div>
+      </section>
+
+      {/* Creators */}
+      <section className="mx-auto mt-24 max-w-6xl px-5 md:mt-32">
+        <div className="photo-band panel-gold rounded-lg border">
+          <div className="photo-band-img opacity-60" aria-hidden="true">
+            <Image src="/assets/hero/settled.webp" alt="" fill sizes="(min-width: 1152px) 1152px, 100vw" className="object-cover" />
+          </div>
+          <div className="flex flex-col gap-8 p-8 md:flex-row md:items-center md:justify-between md:p-14">
+            <div className="max-w-xl">
+              <Sprite piece="rook" size={56} />
+              <p className="kicker mt-6">For creators</p>
+              <h2 className="display display-md mt-3">Run a Boss Battle for your community</h2>
+              <p className="mt-4 text-[#d8d0c4]">Creator Pro is coming. Join the waitlist.</p>
+            </div>
+            <Link href="/host" className="btn btn-glass shrink-0">Join the waitlist</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Closing */}
+      <section className="mx-auto max-w-6xl px-5 pt-24 text-center md:pt-32">
+        <h2 className="display text-[clamp(2.4rem,8vw,6rem)]">
+          The Boss is <span className="gold-text">waiting</span>
+        </h2>
+        <p className="mt-5 text-muted">The Practice Arena is open right now. No account needed to watch.</p>
+        <Link href="/events/practice" className="btn btn-gold mt-8">Play now</Link>
       </section>
     </>
   );

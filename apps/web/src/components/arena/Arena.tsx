@@ -94,19 +94,19 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
     <div className="mx-auto max-w-6xl px-3 pb-6 pt-2 sm:px-5 sm:pt-4">
       <div className="mb-2 flex items-center justify-between gap-x-6 gap-y-1 sm:mb-3">
         <div className="min-w-0">
-          <h1 className="font-display text-xl font-extrabold leading-tight sm:text-3xl">{state.title}</h1>
-          <p className="hidden text-sm text-muted sm:block">
+          <h1 className="display text-xl !leading-none sm:text-4xl">{state.title}</h1>
+          <p className="mt-1 hidden text-sm text-muted sm:block">
             The crowd (White) vs the AI Boss, level {state.bossLevel}. Hosted by {state.hostName}.
           </p>
         </div>
         <div className="flex items-center gap-3 text-sm">
           {live && (
-            <span className="hidden items-center gap-2 font-medium text-gold sm:flex">
-              <span className="h-2 w-2 rounded-full bg-gold" aria-hidden="true" />
+            <span className="kicker hidden items-center gap-2 sm:flex">
+              <span className="live-dot" aria-hidden="true" />
               {state.isPractice ? "Practice, always open" : "Live now"}
             </span>
           )}
-          <span className="text-muted">{state.playersOnline} playing</span>
+          <span className="th">{state.playersOnline} playing</span>
         </div>
       </div>
 
@@ -142,7 +142,7 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
             <CandidateCards turn={turn} pick={pick} canPick={canPick} onPick={onPick} />
           )}
           {live && !reveal && !turn && (
-            <p className="rounded-xl border border-line bg-panel px-4 py-6 text-center text-muted">
+            <p className="panel px-4 py-6 text-center text-muted">
               <Sprite piece="knight" size={36} className="mx-auto mb-2" />
               Setting up the next turn…
             </p>
@@ -151,14 +151,14 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
         </div>
 
         {live && !user && user !== undefined && turn && (
-          <div className="order-4 flex items-center justify-between gap-3 rounded-xl border border-gold/40 bg-panel-hi px-3 py-2 lg:col-start-2 lg:row-start-3 lg:px-4 lg:py-3">
+          <div className="order-4 flex items-center justify-between gap-3 panel panel-gold px-3 py-2 lg:col-start-2 lg:row-start-3 lg:px-4 lg:py-3">
             <p className="text-sm">
               <span className="lg:hidden">Sign in to pick. Free, no transaction.</span>
               <span className="hidden lg:inline">Sign in to pick a move. It is free and sends no transaction.</span>
             </p>
             <button
               onClick={() => setOpenSignal((n) => n + 1)}
-              className="shrink-0 rounded-md bg-gold px-3 py-1 text-sm font-semibold text-black hover:bg-[#f0b868]"
+              className="btn btn-gold btn-sm shrink-0 !min-h-8 !px-3 !py-1"
             >
               Sign in
             </button>

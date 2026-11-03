@@ -52,9 +52,9 @@ export function ScoresPanel({ event, onClose }: { event: AdminEvent; onClose: ()
   }
 
   return (
-    <div className="mt-10 rounded-lg border border-line bg-panel p-5">
+    <div className="mt-10 panel p-5">
       <div className="flex flex-wrap items-center gap-3">
-        <h3 className="font-display text-xl font-bold">Scores: {event.title}</h3>
+        <h3 className="display display-sm">Scores: {event.title}</h3>
         <a href={`${base}?format=csv`} download className={`${ghostBtn} ml-auto`}>
           Download CSV
         </a>
@@ -70,7 +70,7 @@ export function ScoresPanel({ event, onClose }: { event: AdminEvent; onClose: ()
       ) : (
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-xs uppercase text-muted">
+            <thead className="th">
               <tr>
                 <th className="px-3 py-2">Rank</th>
                 <th className="px-3 py-2">Name</th>
