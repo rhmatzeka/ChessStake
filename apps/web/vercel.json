@@ -1,5 +1,7 @@
 {
-  "installCommand": "pnpm install --no-frozen-lockfile --ignore-scripts",
+  "framework": "nextjs",
+  "regions": ["sin1"],
+  "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm build",
-  "framework": "nextjs"
+  "crons": [{ "path": "/api/cron", "schedule": "0 3 * * *" }]
 }

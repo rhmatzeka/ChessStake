@@ -4,57 +4,45 @@
   "private": true,
   "packageManager": "pnpm@9.0.0",
   "engines": {
-    "node": "20.x",
+    "node": "22.x",
     "pnpm": "9.x"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "(node_modules/.bin/prisma generate --schema prisma/schema.prisma || ../../node_modules/.bin/prisma generate --schema prisma/schema.prisma) && next build",
-    "start": "next start",
-    "lint": "eslint",
-    "prisma:generate": "node_modules/.bin/prisma generate --schema prisma/schema.prisma || ../../node_modules/.bin/prisma generate --schema prisma/schema.prisma",
-    "prisma:push": "node_modules/.bin/prisma db push --schema prisma/schema.prisma || ../../node_modules/.bin/prisma db push --schema prisma/schema.prisma",
-    "typecheck": "tsc --noEmit"
+    "dev": "node scripts/bin.mjs next dev",
+    "build": "node scripts/bin.mjs prisma generate --schema prisma/schema.prisma && node scripts/migrate-if-db.mjs && node scripts/bin.mjs next build",
+    "start": "node scripts/bin.mjs next start",
+    "lint": "node scripts/bin.mjs eslint",
+    "prisma:generate": "node scripts/bin.mjs prisma generate --schema prisma/schema.prisma",
+    "db:seed": "node scripts/bin.mjs vite-node prisma/seed.ts",
+    "typecheck": "node scripts/bin.mjs tsc --noEmit",
+    "test": "node scripts/bin.mjs vitest run --passWithNoTests",
+    "test:int": "node scripts/bin.mjs vitest run --passWithNoTests --config vitest.int.config.ts"
   },
   "dependencies": {
     "next": "16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "zustand": "^4.5.2",
     "@tanstack/react-query": "^5.28.9",
-    "socket.io-client": "^4.7.5",
-    "framer-motion": "^11.0.24",
     "chess.js": "^1.0.0-beta.6",
     "lucide-react": "^0.359.0",
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.2.2",
     "@prisma/client": "^5.14.0",
-    "shared": "workspace:*",
     "wagmi": "^2.10.4",
     "viem": "^2.13.5",
-    "connectkit": "^1.8.2"
+    "connectkit": "^1.8.2",
+    "zod": "^3.23.8"
   },
-  "onlyBuiltDependencies": [
-    "@prisma/client",
-    "prisma",
-    "@prisma/engines",
-    "esbuild",
-    "keccak",
-    "secp256k1",
-    "sharp",
-    "bufferutil",
-    "utf-8-validate",
-    "styled-components"
-  ],
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "prisma": "^5.14.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.1.9"
   }
 }

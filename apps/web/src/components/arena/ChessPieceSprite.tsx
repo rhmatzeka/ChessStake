@@ -1,5 +1,12 @@
 import React from 'react';
-import { ChessPiece } from '../../types/chess';
+export type Team = 'WHITE' | 'BLACK';
+export type PieceType = 'PAWN' | 'KNIGHT' | 'BISHOP' | 'ROOK' | 'QUEEN' | 'KING';
+
+export interface ChessPiece {
+  type: PieceType;
+  team: Team;
+  id: string;
+}
 
 interface ChessPieceSpriteProps {
   piece: ChessPiece;

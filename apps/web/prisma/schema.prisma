@@ -1,6 +1,7 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -8,201 +9,107 @@ generator client {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  address     String   @unique
-  createdAt   DateTime @default(now())
-  lastLoginAt DateTime?
-  bets        Bet[]
+  id          String       @id @default(cuid())
+  address     String       @unique
+  displayName String?
+  createdAt   DateTime     @default(now())
+  picks       Pick[]
+  scores      EventScore[]
 }
 
-model Game {
-  id             String   @id
-  chainGameId    String   @unique
-  title          String?
-  description    String?
-  creatorName    String?
-  creatorAddress String?
-  creatorSlug    String?
-  creatorFeeBps  Int      @default(0)
-  isPublic       Boolean  @default(true)
-  scheduledAt    DateTime?
-  startedAt      DateTime?
-  endedAt        DateTime?
-  sponsorName    String?
-  sponsorUrl     String?
-  status         String
-  result         String?
-  currentFen     String
-  currentTurn    String
-  turnNumber     Int      @default(1)
-  turnStatus     String   @default("OPEN")
-  winner         String?
-  whitePoolWei   String   @default("0")
-  blackPoolWei   String   @default("0")
-  rewardPoolWei  String   @default("0")
-  feeAmountWei   String   @default("0")
-  noVoteCount    Int      @default(0)
-  maxTurns       Int      @default(120)
-  contractTxHash String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  turns          Turn[]
-  bets           Bet[]
-  moves          Move[]
+model AuthNonce {
+  nonce     String    @id
+  expiresAt DateTime
+  usedAt    DateTime?
+}
+
+model Event {
+  id              String       @id @default(cuid())
+  slug            String       @unique
+  title           String
+  hostName        String
+  sponsorName     String?
+  sponsorLogoUrl  String?
+  sponsorUrl      String?
+  prizeText       String?
+  bossLevel       Int
+  maxCrowdMoves   Int
+  startsAt        DateTime
+  status          String       @default("SCHEDULED") // SCHEDULED | LIVE | FINISHED | ABANDONED
+  result          String? // WIN | SURVIVED | LOST
+  fen             String
+  crowdMoveNumber Int          @default(0)
+  emptyTurnStreak Int          @default(0)
+  isPractice      Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  finishedAt      DateTime?
+  startedAt       DateTime?
+  turns           Turn[]
+  scores          EventScore[]
+
+  @@index([isPractice, createdAt])
+  @@index([status, startsAt])
 }
 
 model Turn {
-  id              String    @id @default(cuid())
-  gameId          String
-  turnNumber      Int
-  team            String
-  status          String
-  openedAt        DateTime
-  endsAt          DateTime?
-  lockedAt        DateTime?
-  resolvedAt      DateTime?
-  voteReopenCount Int       @default(0)
-  lockedTxHash    String?
-  winningPiece    String?
-  game            Game      @relation(fields: [gameId], references: [id])
+  id           String    @id @default(cuid())
+  eventId      String
+  event        Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  number       Int
+  status       String    @default("OPEN") // OPEN | RESOLVING | RESOLVED
+  claimedAt    DateTime?
+  opensAt      DateTime
+  endsAt       DateTime
+  fenBefore    String
+  candidates   Json
+  chosenUci    String?
+  crowdSan     String?
+  bossReplyUci String?
+  bossReplySan String?
+  fenAfter     String?
+  resolvedAt   DateTime?
 
-  @@unique([gameId, turnNumber])
+  @@unique([eventId, number])
 }
 
-model Bet {
-  id          String    @id @default(cuid())
-  gameId      String
-  userId      String
-  address     String
-  turnNumber  Int
-  team        String
-  piece       String
-  amountWei   String
-  status      String
-  txHash      String    @unique
-  blockNumber BigInt?
-  logIndex    Int?
-  isLate      Boolean   @default(false)
-  confirmedAt DateTime?
-  refundedAt  DateTime?
-  claimedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  game        Game      @relation(fields: [gameId], references: [id])
-  user        User      @relation(fields: [userId], references: [id])
-
-  @@unique([gameId, turnNumber, address])
-}
-
-model Move {
-  id          String   @id @default(cuid())
-  gameId      String
-  turnNumber  Int
-  fromSquare  String
-  toSquare    String
-  piece       String
-  san         String
-  uci         String
-  fenBefore   String
-  fenAfter    String
-  aiEval      String?
-  createdAt   DateTime @default(now())
-  game        Game     @relation(fields: [gameId], references: [id])
-}
-
-model PlayerGameState {
+model Pick {
   id         String   @id @default(cuid())
-  gameId     String
+  eventId    String
+  turnNumber Int
   userId     String
-  address    String
-  lockedTeam String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  uci        String
+  points     Int?
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
 
-  @@unique([gameId, address])
+  @@unique([eventId, turnNumber, userId])
+  @@index([userId])
 }
 
-model ChainEvent {
-  id          String   @id @default(cuid())
-  chainId     Int
-  blockNumber BigInt
-  txHash      String
-  logIndex    Int
-  eventName   String
-  payload     Json
-  processedAt DateTime @default(now())
+model EventScore {
+  eventId      String
+  event        Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  turnsPicked  Int       @default(0)
+  points       Int       @default(0)
+  bonus        Int       @default(0)
+  disqualified Boolean   @default(false)
+  prizePaidAt  DateTime?
 
-  @@unique([chainId, txHash, logIndex])
+  @@id([eventId, userId])
+  @@index([eventId, points])
+  @@index([userId])
 }
 
-model IndexerState {
-  id               String   @id
-  chainId          Int
-  contractAddress  String
-  deploymentBlock  BigInt
-  lastIndexedBlock BigInt
-  updatedAt        DateTime @updatedAt
-}
-
-model SpectatorPresence {
-  id        String   @id @default(cuid())
-  gameId    String
-  sessionId String
-  lastSeen  DateTime @default(now())
-
-  @@unique([gameId, sessionId])
-  @@index([gameId, lastSeen])
-}
-
-model AnalyticsEvent {
-  id        String   @id @default(cuid())
-  name      String
-  gameId    String?
-  address   String?
-  sessionId String?
-  payload   Json?
-  createdAt DateTime @default(now())
-
-  @@index([name, createdAt])
-  @@index([gameId, createdAt])
-}
-
-model PlayerAgent {
-  id              String   @id @default(cuid())
-  ownerAddress    String
-  name            String
-  description     String?
-  personality     String
-  riskLevel       String   @default("BALANCED")
-  preferredTeam   String?
-  isPublic        Boolean  @default(false)
-  autoVoteEnabled Boolean  @default(false)
-  maxVoteWei      String?
-  planTier        String   @default("FREE")
-  leagueEnabled   Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  decisions       AgentDecision[]
-
-  @@index([ownerAddress, createdAt])
-}
-
-model AgentDecision {
-  id                String   @id @default(cuid())
-  agentId           String
-  gameId            String
-  turnNumber        Int
-  fen               String
-  legalPieces       Json?
-  recommendedPiece  String
-  recommendedMove   String?
-  confidence        Int
-  reasoning         String?
-  scoringBreakdown  Json?
-  provider          String   @default("local")
-  fallbackUsed      Boolean  @default(false)
-  wasSubmitted      Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  agent             PlayerAgent @relation(fields: [agentId], references: [id])
-
-  @@index([agentId, createdAt])
-  @@index([gameId, turnNumber])
+model Lead {
+  id           String    @id @default(cuid())
+  type         String // SPONSOR | CREATOR
+  name         String
+  contact      String
+  organization String?
+  message      String
+  createdAt    DateTime  @default(now())
+  handledAt    DateTime?
 }

@@ -1,35 +1,37 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
-import AppShell from "../components/layout/AppShell";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const display = Bricolage_Grotesque({
+  variable: "--font-display",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const body = Hanken_Grotesk({
+  variable: "--font-body",
   subsets: ["latin"],
+  display: "swap",
 });
+
+const PITCH =
+  "Your community plays chess together against an AI Boss. Free to play, sponsors put up the prizes.";
 
 export const metadata: Metadata = {
-  title: "PawnPool - Interactive AI Chess Arena",
-  description: "Creator-hosted AI chess arenas where communities join teams, vote strategy, and follow every move live.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://pawnpool.rahmateka.my.id"),
+  title: { default: "PawnPool | Your community vs the AI Boss", template: "%s | PawnPool" },
+  description: PITCH,
+  openGraph: { title: "PawnPool", description: PITCH, siteName: "PawnPool", type: "website" },
+  twitter: { card: "summary_large_image", title: "PawnPool", description: PITCH },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = { themeColor: "#070605" };
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        <AppShell>{children}</AppShell>
+    <html lang="en" className={`${display.variable} ${body.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
+        {children}
       </body>
     </html>
   );
