@@ -342,7 +342,13 @@ async function resolveClaimed(eventId: string, turnNumber: number, claimedAt: Da
   }
   const emptyTurnStreak = zeroPick ? ev.emptyTurnStreak + 1 : 0;
   const crowdMoveNumber = ev.crowdMoveNumber + 1;
-  let next = nextStatusAfterTurn({ ended, crowdMoveNumber, maxCrowdMoves: ev.maxCrowdMoves, emptyStreak: emptyTurnStreak });
+  let next = nextStatusAfterTurn({
+    ended,
+    crowdMoveNumber,
+    maxCrowdMoves: ev.maxCrowdMoves,
+    // The practice arena is always on: empty turns never abandon it.
+    emptyStreak: ev.isPractice ? 0 : emptyTurnStreak,
+  });
 
   let nextCandidates: Candidate[] | null = null;
   if (next.status === "LIVE") {
