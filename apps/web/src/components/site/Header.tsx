@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PLAY_HREF } from "@/lib/links";
 import { Sprite } from "./Sprite";
 
 const NAV = [
@@ -28,7 +29,7 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <Link href="/events/practice" className="btn btn-gold btn-sm">
+        <Link href={PLAY_HREF} className="btn btn-gold btn-sm">
           Play now
         </Link>
       </div>

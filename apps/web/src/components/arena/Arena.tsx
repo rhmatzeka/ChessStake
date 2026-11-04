@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { PublicState } from "@/server/events";
 import { ApiError, apiFetch } from "@/lib/api";
 import { turnClock, useEventState, useServerNow } from "@/hooks/useEventState";
@@ -49,6 +50,15 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
     messageTimer.current = setTimeout(() => setMessage(null), 3500);
   }, []);
   useEffect(() => () => clearTimeout(messageTimer.current), []);
+
+  // Play now lands here with play=1: open sign-in once, then clear it so the button works again.
+  const wantsToPlay = useSearchParams().get("play") === "1";
+  useEffect(() => {
+    if (!wantsToPlay || user === undefined) return;
+    window.history.replaceState(null, "", window.location.pathname);
+    if (user) flash("You are signed in. Pick a move to play.");
+    else setOpenSignal((n) => n + 1);
+  }, [wantsToPlay, user, flash]);
 
   async function onPick(uci: string) {
     if (!turn) return;
