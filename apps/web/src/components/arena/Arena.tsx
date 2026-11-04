@@ -9,7 +9,7 @@ import { usePresentation } from "@/hooks/usePresentation";
 import { Sprite } from "@/components/site/Sprite";
 import { Board, type BoardArrow } from "./Board";
 import { CandidateCards, RevealCards } from "./CandidateCards";
-import { CANDIDATE_COLORS } from "./geometry";
+import { candidateLetter } from "./geometry";
 import { ResultCard, RulesSummary, ScheduledCard } from "./Screens";
 import { MeCard, MoveLog, SponsorCard, TopList } from "./SidePanel";
 import { TurnBar } from "./TurnBar";
@@ -83,7 +83,7 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
     live && turn && !reveal
       ? turn.candidates.map((c, i) => ({
           uci: c.uci,
-          color: CANDIDATE_COLORS[i % CANDIDATE_COLORS.length]!,
+          letter: candidateLetter(i),
           state: pick === null ? "normal" : pick === c.uci ? "picked" : "dim",
         }))
       : [];

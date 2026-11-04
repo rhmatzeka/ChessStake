@@ -2,7 +2,11 @@ import { arrowGeometry, parseFen, squareCoords } from "./geometry";
 import "./chess-board.css";
 import "./chess-pieces.css";
 
-export type BoardArrow = { uci: string; color: string; state: "normal" | "picked" | "dim" };
+export type BoardArrow = { uci: string; letter: string; state: "normal" | "picked" | "dim" };
+
+const IVORY = "#f3ecdf";
+const GOLD = "#e6a855";
+const INK = "#100d0a";
 
 /** The 8x8 grid sits inside the decorative frame of Board.png: 16px of 288px on every side. */
 const INSET = (16 / 288) * 100;
@@ -61,22 +65,30 @@ export function Board({
         <svg viewBox="0 0 8 8" className="absolute inset-0 z-20 h-full w-full" aria-hidden="true">
           {arrows.map((a) => {
             const g = arrowGeometry(a.uci);
-            const picked = a.state === "picked";
-            const dim = a.state === "dim";
-            const w = picked ? 0.22 : 0.15;
+            const tone = a.state === "picked" ? GOLD : IVORY;
             return (
               <g
                 key={a.uci}
-                opacity={dim ? 0.4 : picked ? 1 : 0.88}
+                opacity={a.state === "dim" ? 0.38 : 1}
                 style={{ cursor: onArrow ? "pointer" : "default" }}
                 onClick={onArrow ? () => onArrow(a.uci) : undefined}
               >
-                <line {...g.shaft} stroke="rgba(0,0,0,0.55)" strokeWidth={w + 0.1} strokeLinecap="round" />
-                <polygon points={g.head} fill="rgba(0,0,0,0.55)" stroke="rgba(0,0,0,0.55)" strokeWidth={0.1} strokeLinejoin="round" />
-                <line {...g.shaft} stroke={a.color} strokeWidth={w} strokeLinecap="round" />
-                <polygon points={g.head} fill={a.color} />
-                <circle cx={g.from.x} cy={g.from.y} r={picked ? 0.17 : 0.12} fill={a.color} stroke="rgba(0,0,0,0.55)" strokeWidth={0.05} />
-                {onArrow && <line {...g.shaft} stroke="transparent" strokeWidth={0.55} strokeLinecap="round" pointerEvents="stroke" />}
+                <polygon points={g.blade} fill={INK} fillOpacity={0.6} stroke={INK} strokeOpacity={0.6} strokeWidth={0.07} strokeLinejoin="round" />
+                <polygon points={g.blade} fill={tone} />
+                <circle cx={g.badge.x} cy={g.badge.y} r={0.15} fill={INK} stroke={tone} strokeWidth={0.022} />
+                <text
+                  x={g.badge.x}
+                  y={g.badge.y}
+                  fill={tone}
+                  fontSize={0.18}
+                  fontWeight={700}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  className="font-mono"
+                >
+                  {a.letter}
+                </text>
+                {onArrow && <line {...g.hit} stroke="transparent" strokeWidth={0.55} strokeLinecap="round" pointerEvents="stroke" />}
               </g>
             );
           })}

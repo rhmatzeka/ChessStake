@@ -14,7 +14,7 @@ You earn points for every turn you pick. Showing up gives 10 points. On top of t
 
 If you picked in at least 5 turns you get an end-of-event bonus. It is 500 points when the crowd checkmates the Boss, and 200 when the crowd survives to the move limit or draws. To be eligible for the prizes of an event you need to have picked in at least 10 turns. Points count on a per-event leaderboard and on a monthly season leaderboard. Practice rooms never have prizes.
 
-The arena shows the three candidate moves on the board as arrows, with the timer next to them.
+The arena shows the three candidate moves on the board as arrows marked A, B and C, with the timer next to them.
 
 ![PawnPool arena](docs/images/arena.png)
 

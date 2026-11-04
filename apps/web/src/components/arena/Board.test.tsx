@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Board } from "./Board";
+import { Board, type BoardArrow } from "./Board";
 import { Sprite } from "../site/Sprite";
 
 const START = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -11,6 +11,21 @@ const web = path.resolve(__dirname, "../../..");
 const dataUri = (file: string) =>
   `data:image/png;base64,${readFileSync(path.join(web, "public/assets/chess", file)).toString("base64")}`;
 const css = (file: string) => readFileSync(path.join(web, "src/components/arena", file), "utf8");
+
+describe("candidate arrows", () => {
+  const arrows: BoardArrow[] = [
+    { uci: "e2e4", letter: "A", state: "picked" },
+    { uci: "d2d4", letter: "B", state: "normal" },
+    { uci: "g1f3", letter: "C", state: "dim" },
+  ];
+
+  it("tells moves apart by letter, in the gold and ivory palette only", () => {
+    const html = renderToStaticMarkup(<Board fen={START} lastMove={null} animate={false} arrows={arrows} />);
+    for (const letter of ["A", "B", "C"]) expect(html).toContain(`>${letter}</text>`);
+    const colors = new Set(html.match(/#[0-9a-f]{6}/gi));
+    expect([...colors].sort()).toEqual(["#100d0a", "#e6a855", "#f3ecdf"]);
+  });
+});
 
 describe("board art never depends on a separate request", () => {
   it("renders the board and pieces without fetching an image", () => {

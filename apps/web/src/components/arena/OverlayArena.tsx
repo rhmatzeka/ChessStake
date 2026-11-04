@@ -5,7 +5,7 @@ import { turnClock, useEventState, useServerNow } from "@/hooks/useEventState";
 import { usePresentation } from "@/hooks/usePresentation";
 import { Board, type BoardArrow } from "./Board";
 import { CandidateCards, RevealCards } from "./CandidateCards";
-import { CANDIDATE_COLORS } from "./geometry";
+import { candidateLetter } from "./geometry";
 import { TurnBar } from "./TurnBar";
 
 /** Stream overlay: board, the 3 cards, timer and live counts on a transparent background. No sign-in. */
@@ -19,7 +19,7 @@ export function OverlayArena({ slug, initial }: { slug: string; initial: PublicS
   const thinking = live && (thinkingBeat || (!!clock && clock.pastEnd));
   const arrows: BoardArrow[] =
     live && turn && !reveal
-      ? turn.candidates.map((c, i) => ({ uci: c.uci, color: CANDIDATE_COLORS[i % CANDIDATE_COLORS.length]!, state: "normal" }))
+      ? turn.candidates.map((c, i) => ({ uci: c.uci, letter: candidateLetter(i), state: "normal" }))
       : [];
   const ended = state.status === "FINISHED" || state.status === "ABANDONED";
   const headline =

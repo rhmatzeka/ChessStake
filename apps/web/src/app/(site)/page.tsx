@@ -6,7 +6,8 @@ import { formatWib } from "@/components/site/EventCard";
 import { HeroVideo } from "@/components/site/HeroVideo";
 import { Sprite } from "@/components/site/Sprite";
 import { Board, type BoardArrow } from "@/components/arena/Board";
-import { CANDIDATE_COLORS } from "@/components/arena/geometry";
+import { CandidateMark } from "@/components/arena/CandidateMark";
+import { candidateLetter } from "@/components/arena/geometry";
 
 export const revalidate = 60;
 
@@ -28,7 +29,7 @@ const EXAMPLE = [
 ] as const;
 const ARROWS: BoardArrow[] = EXAMPLE.map((m, i) => ({
   uci: m.uci,
-  color: CANDIDATE_COLORS[i]!,
+  letter: candidateLetter(i),
   state: i === 0 ? "picked" : "normal",
 }));
 
@@ -198,11 +199,10 @@ export default async function Home() {
                 return (
                   <li
                     key={m.uci}
-                    className={`rounded-lg border px-4 py-3 ${win ? "border-gold bg-panel-hi" : "border-line bg-panel"}`}
-                    style={win ? { boxShadow: `0 0 0 1px ${CANDIDATE_COLORS[i]}` } : undefined}
+                    className={`rounded-lg border px-4 py-3 ${win ? "border-gold bg-panel-hi ring-1 ring-gold" : "border-line bg-panel"}`}
                   >
                     <div className="flex items-start gap-3">
-                      <span className="mt-2 h-3 w-3 shrink-0 rounded-full" style={{ background: CANDIDATE_COLORS[i] }} aria-hidden="true" />
+                      <CandidateMark letter={candidateLetter(i)} active={win} />
                       <div className="min-w-0 flex-1">
                         <p className="font-display text-[1.05rem] font-bold leading-snug">{m.label}</p>
                         <p className="text-sm text-muted">{m.san}</p>
@@ -211,7 +211,7 @@ export default async function Home() {
                     </div>
                     <div className="mt-2.5 flex items-center gap-3">
                       <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
-                        <span className="bar-fill block h-full rounded-full" style={{ width: `${m.picks}%`, background: CANDIDATE_COLORS[i] }} />
+                        <span className={`bar-fill block h-full rounded-full ${win ? "bg-gold" : "bg-gold/55"}`} style={{ width: `${m.picks}%` }} />
                       </span>
                       <span className="w-12 text-right font-mono text-xs tabular-nums text-muted">{m.picks}%</span>
                     </div>
