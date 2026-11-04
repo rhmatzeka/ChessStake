@@ -7,6 +7,7 @@ import { HeroVideo } from "@/components/site/HeroVideo";
 import { Sprite } from "@/components/site/Sprite";
 import { Board, type BoardArrow } from "@/components/arena/Board";
 import { CandidateMark } from "@/components/arena/CandidateMark";
+import { PLAY_HREF } from "@/lib/links";
 import { candidateLetter } from "@/components/arena/geometry";
 
 export const revalidate = 60;
@@ -118,7 +119,7 @@ export default async function Home() {
             Free to play. Sponsors put up the prizes.
           </p>
           <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "600ms" }}>
-            <Link href="/events/practice" className="btn btn-gold">Play now</Link>
+            <Link href={PLAY_HREF} className="btn btn-gold">Play now</Link>
             <Link href="#how" className="btn btn-glass">How it works</Link>
           </div>
         </div>
@@ -276,7 +277,7 @@ export default async function Home() {
           The Boss is <span className="gold-text">waiting</span>
         </h2>
         <p className="mt-5 text-muted">The Practice Arena is open right now. No account needed to watch.</p>
-        <Link href="/events/practice" className="btn btn-gold mt-8">Play now</Link>
+        <Link href={PLAY_HREF} className="btn btn-gold mt-8">Play now</Link>
       </section>
     </>
   );
