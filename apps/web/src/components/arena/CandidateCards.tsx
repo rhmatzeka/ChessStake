@@ -1,5 +1,6 @@
 import type { PublicState } from "@/server/events";
-import { CANDIDATE_COLORS } from "./geometry";
+import { CandidateMark } from "./CandidateMark";
+import { candidateLetter } from "./geometry";
 import { formatEval, qualityBadge } from "./quality";
 import { tallyShares } from "./tally";
 
@@ -36,12 +37,11 @@ export function CandidateCards({
     <ul className={`grid gap-2 ${compact ? "grid-cols-3" : "sm:grid-cols-3 lg:grid-cols-1"}`}>
       {turn.candidates.map((c, i) => {
         const row = rows[i]!;
-        const color = CANDIDATE_COLORS[i % CANDIDATE_COLORS.length]!;
         const picked = pick === c.uci;
         const body = (
           <>
             <span className="flex items-start gap-2">
-              <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full" style={{ background: color }} aria-hidden="true" />
+              <CandidateMark letter={candidateLetter(i)} active={picked} />
               <span className="flex min-w-0 flex-wrap items-baseline gap-x-2 sm:block">
                 <span className={`block font-display font-bold leading-snug ${compact ? "text-base" : "text-[17px]"}`}>{c.label}</span>
                 <span className="block text-sm text-muted">{c.san}</span>
@@ -53,8 +53,8 @@ export function CandidateCards({
             <span className="mt-1.5 flex items-center gap-2 sm:mt-3">
               <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
                 <span
-                  className="block h-full rounded-full transition-[width] duration-500"
-                  style={{ width: `${row.pct}%`, background: color }}
+                  className={`block h-full rounded-full transition-[width] duration-500 ${picked ? "bg-gold" : "bg-gold/55"}`}
+                  style={{ width: `${row.pct}%` }}
                 />
               </span>
               <span className="w-24 text-right text-xs tabular-nums text-muted">
@@ -65,7 +65,7 @@ export function CandidateCards({
           </>
         );
         const base = "block w-full rounded-lg border px-2.5 py-2 text-left sm:p-3 transition-colors";
-        const tone = picked ? "border-gold bg-panel-hi" : "border-line bg-panel hover:border-gold/50";
+        const tone = picked ? "border-gold bg-panel-hi ring-1 ring-gold" : "border-line bg-panel hover:border-gold/50";
         return (
           <li key={c.uci}>
             {interactive ? (
@@ -76,7 +76,6 @@ export function CandidateCards({
                 aria-pressed={picked}
                 aria-disabled={!canPick}
                 className={`${base} ${tone} ${canPick ? "" : "cursor-not-allowed opacity-70"}`}
-                style={picked ? { boxShadow: `0 0 0 1px ${color}` } : undefined}
               >
                 {body}
               </button>
@@ -107,14 +106,13 @@ export function RevealCards({ item, bossSan }: { item: PublicState["history"][nu
       <ul className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
         {item.candidates.map((c, i) => {
           const played = c.san === item.crowdSan;
-          const color = CANDIDATE_COLORS[i % CANDIDATE_COLORS.length]!;
           return (
             <li
               key={c.uci}
               className={`rounded-lg border p-3 ${played ? "border-gold bg-panel-hi" : "border-line bg-panel"}`}
             >
               <div className="flex items-start gap-2">
-                <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full" style={{ background: color }} aria-hidden="true" />
+                <CandidateMark letter={candidateLetter(i)} active={played} />
                 <div className="min-w-0">
                   <p className="font-display text-[17px] font-bold leading-snug">{c.label}</p>
                   <p className="text-sm text-muted">

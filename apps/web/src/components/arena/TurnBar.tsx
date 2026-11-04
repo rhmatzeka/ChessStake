@@ -26,13 +26,6 @@ export function TurnBar({
         <div className="min-w-0">
           <p className="display text-base !leading-tight sm:text-xl">
             {title}
-            {thinking && (
-              <span aria-hidden="true" className="ml-1 inline-flex gap-0.5">
-                <span className="thinking-dot">.</span>
-                <span className="thinking-dot">.</span>
-                <span className="thinking-dot">.</span>
-              </span>
-            )}
           </p>
           <p className="hidden text-sm text-muted sm:block">
             {turnNumber ? `Turn ${turnNumber}. ` : ""}

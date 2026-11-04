@@ -1,9 +1,9 @@
 export type Quality = "best" | "okay" | "blunder";
 
 const BADGES: Record<Quality, { text: string; glyph: string; classes: string }> = {
-  best: { text: "Best", glyph: "\u2713", classes: "border-emerald-400/60 bg-emerald-400/10 text-emerald-300" },
-  okay: { text: "Okay", glyph: "~", classes: "border-amber-400/60 bg-amber-400/10 text-amber-300" },
-  blunder: { text: "Blunder", glyph: "!", classes: "border-red-400/60 bg-red-400/10 text-red-300" },
+  best: { text: "Best", glyph: "\u2713", classes: "border-gold/70 bg-gold/10 text-gold" },
+  okay: { text: "Okay", glyph: "~", classes: "border-line text-muted" },
+  blunder: { text: "Blunder", glyph: "!", classes: "border-foreground/35 text-foreground/85" },
 };
 
 export function qualityBadge(q: Quality): { text: string; glyph: string; classes: string } {

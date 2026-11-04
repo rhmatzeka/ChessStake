@@ -22,11 +22,16 @@ describe("geometry", () => {
   });
   it("builds arrows that end at the destination", () => {
     const a = arrowGeometry("e2e4");
-    expect(a.shaft.x1).toBeCloseTo(4.5);
-    expect(a.shaft.y1).toBeLessThan(6.5);
-    expect(a.shaft.y1).toBeGreaterThan(5.5);
-    expect(a.head.split(" ")).toHaveLength(3);
-    expect(a.to).toEqual({ x: 4.5, y: 4.5 });
+    expect(a.hit.x1).toBeCloseTo(4.5);
+    expect(a.hit.y1).toBeLessThan(6.5);
+    expect(a.hit.y1).toBeGreaterThan(5.5);
+    const points = a.blade.split(" ").map((p) => p.split(",").map(Number) as [number, number]);
+    expect(points).toHaveLength(7);
+    expect(points[3]![0]).toBeCloseTo(4.5);
+    expect(points[3]![1]).toBeCloseTo(4.6);
+    expect(a.badge.x).toBeCloseTo(4.5);
+    expect(a.badge.y).toBeGreaterThan(4.6);
+    expect(a.badge.y).toBeLessThan(a.hit.y1);
   });
 });
 
