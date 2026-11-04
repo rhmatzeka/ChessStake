@@ -28,7 +28,7 @@ Sponsors pay to run a named event with their logo, their prize text and a report
 
 ## Tech
 
-It is a Next.js app with Postgres through Prisma, a Stockfish WASM engine for the Boss and the candidate moves, and wallet sign-in with SIWE.
+It is a Next.js app with Postgres through Prisma, a Stockfish WASM engine for the Boss and the candidate moves, and sign-in through Privy (email or any wallet) finished with a free SIWE signature.
 
 ## Run it locally
 
@@ -75,7 +75,7 @@ The integration tests use the database in `TEST_DATABASE_URL`, which defaults to
 
 ## Deploy
 
-The site runs on Vercel with a Neon Postgres database. In the Vercel project set the Root Directory to `apps/web`, which reads `apps/web/vercel.json`. Add the variables from `apps/web/.env.example` (database URLs, `SESSION_SECRET`, `ADMIN_ADDRESSES`, `CRON_SECRET`, and optionally the WalletConnect id and site URL). On Neon, `DATABASE_URL` is the pooled URL and must end with `?pgbouncer=true&connect_timeout=15` (or `&pgbouncer=true&connect_timeout=15` when it already has a query string). `DIRECT_URL` is the non-pooled URL and is required in every environment, because the build runs `prisma migrate deploy` whenever `DATABASE_URL` is set and fails without it. `vercel.json` pins the functions to `sin1` to sit next to the Singapore database. After the first deploy, seed the practice room once with `pnpm --filter web db:seed`. A daily cron calls `/api/cron`.
+The site runs on Vercel with a Neon Postgres database. In the Vercel project set the Root Directory to `apps/web`, which reads `apps/web/vercel.json`. Add the variables from `apps/web/.env.example` (database URLs, `SESSION_SECRET`, `ADMIN_ADDRESSES`, `CRON_SECRET`, `NEXT_PUBLIC_PRIVY_APP_ID`, and optionally the site URL). In the Privy dashboard add the site domain to the allowed origins. On Neon, `DATABASE_URL` is the pooled URL and must end with `?pgbouncer=true&connect_timeout=15` (or `&pgbouncer=true&connect_timeout=15` when it already has a query string). `DIRECT_URL` is the non-pooled URL and is required in every environment, because the build runs `prisma migrate deploy` whenever `DATABASE_URL` is set and fails without it. `vercel.json` pins the functions to `sin1` to sit next to the Singapore database. After the first deploy, seed the practice room once with `pnpm --filter web db:seed`. A daily cron calls `/api/cron`.
 
 ## Stockfish
 

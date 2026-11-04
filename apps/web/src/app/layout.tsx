@@ -1,25 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
+// Self-hosted so a build never depends on reaching Google Fonts.
 // Display: a heavy grotesk for the big uppercase headlines. Mono: labels and buttons. Body: Hanken.
-const display = Archivo({
+const display = localFont({
+  src: "./fonts/archivo-latin-wght-normal.woff2",
   variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["700", "800", "900"],
+  weight: "100 900",
   display: "swap",
 });
 
-const mono = JetBrains_Mono({
+const mono = localFont({
+  src: "./fonts/jetbrains-mono-latin-wght-normal.woff2",
   variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["500", "700"],
+  weight: "100 800",
   display: "swap",
 });
 
-const body = Hanken_Grotesk({
+const body = localFont({
+  src: "./fonts/hanken-grotesk-latin-wght-normal.woff2",
   variable: "--font-body",
-  subsets: ["latin"],
+  weight: "100 900",
   display: "swap",
 });
 
