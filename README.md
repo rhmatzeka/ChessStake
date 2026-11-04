@@ -14,6 +14,10 @@ You earn points for every turn you pick. Showing up gives 10 points. On top of t
 
 If you picked in at least 5 turns you get an end-of-event bonus. It is 500 points when the crowd checkmates the Boss, and 200 when the crowd survives to the move limit or draws. To be eligible for the prizes of an event you need to have picked in at least 10 turns. Points count on a per-event leaderboard and on a monthly season leaderboard. Practice rooms never have prizes.
 
+The events page lists the battle that is live now, the next ones and the finished ones. The practice arena is always open.
+
+![PawnPool events page](docs/images/events.png)
+
 ## Why it is free
 
 There is no betting in PawnPool. Playing is free and you never put money in. Sponsors and creators are the ones who pay, so the prizes come from them.
