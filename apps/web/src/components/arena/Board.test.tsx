@@ -27,6 +27,14 @@ describe("candidate arrows", () => {
   });
 });
 
+describe("last move", () => {
+  it("marks both squares with corner ticks and leaves the board color alone", () => {
+    const html = renderToStaticMarkup(<Board fen={START} lastMove={{ uci: "e2e4" }} animate={false} />);
+    expect(html).not.toContain("bg-gold");
+    expect(html.match(/data-last-move/g)).toHaveLength(2);
+  });
+});
+
 describe("board art never depends on a separate request", () => {
   it("renders the board and pieces without fetching an image", () => {
     const html = renderToStaticMarkup(<Board fen={START} lastMove={null} animate={false} />);

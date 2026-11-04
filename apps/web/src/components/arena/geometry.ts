@@ -39,6 +39,25 @@ export function parseFen(fen: string): BoardPiece[] {
   return out;
 }
 
+/** SVG path of four small corner marks inside a square, used to show the last move without tinting the board. */
+export function cornerTicks(sq: string): string {
+  const { x, y } = squareCenter(sq);
+  const near = 0.42;
+  const tick = 0.15;
+  return [
+    [-1, -1],
+    [1, -1],
+    [1, 1],
+    [-1, 1],
+  ]
+    .map(([sx, sy]) => {
+      const cx = Number((x + sx! * near).toFixed(3));
+      const cy = Number((y + sy! * near).toFixed(3));
+      return `M${cx - sx! * tick} ${cy}L${cx} ${cy}L${cx} ${cy - sy! * tick}`;
+    })
+    .join("");
+}
+
 /** Slim arrow from the origin square to the destination: a tapered blade with a swept-back head, as one polygon. */
 export function arrowGeometry(uci: string): {
   blade: string;

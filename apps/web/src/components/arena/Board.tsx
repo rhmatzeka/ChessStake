@@ -1,4 +1,4 @@
-import { arrowGeometry, parseFen, squareCoords } from "./geometry";
+import { arrowGeometry, cornerTicks, parseFen, squareCoords } from "./geometry";
 import "./chess-board.css";
 import "./chess-pieces.css";
 
@@ -37,13 +37,6 @@ export function Board({
       {/* Board.png has its dark corner at a8; chess wants it at a1, so mirror the picture only. */}
       <div className="chess-board-art pixel absolute inset-0 -scale-x-100 bg-contain bg-center bg-no-repeat" />
       <div className="absolute" style={{ inset: `${INSET}%` }}>
-        {[from, to].map(
-          (sq, i) =>
-            sq && (
-              <div key={`hl-${i}-${sq}`} className="absolute h-[12.5%] w-[12.5%] bg-gold/45" style={cell(sq)} />
-            ),
-        )}
-
         {pieces.map((p) => {
           const slide =
             animate && lastMove && p.sq === to
@@ -63,6 +56,16 @@ export function Board({
         })}
 
         <svg viewBox="0 0 8 8" className="absolute inset-0 z-20 h-full w-full" aria-hidden="true">
+          {[from, to].map((sq) => {
+            if (!sq) return null;
+            const d = cornerTicks(sq);
+            return (
+              <g key={sq} data-last-move="">
+                <path d={d} fill="none" stroke={INK} strokeOpacity={0.6} strokeWidth={0.075} strokeLinecap="square" />
+                <path d={d} fill="none" stroke={IVORY} strokeWidth={0.032} strokeLinecap="square" />
+              </g>
+            );
+          })}
           {arrows.map((a) => {
             const g = arrowGeometry(a.uci);
             const tone = a.state === "picked" ? GOLD : IVORY;
