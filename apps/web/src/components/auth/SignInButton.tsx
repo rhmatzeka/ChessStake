@@ -17,7 +17,7 @@ type Props = {
   openSignal: number;
 };
 
-/** Log in with Privy (email, Google or a wallet), then sign one free message. Also shows who is signed in, lets them rename or sign out. */
+/** Log in with Privy (email or a wallet), then sign one free message. Also shows who is signed in, lets them rename or sign out. */
 export function SignInButton(props: Props) {
   if (!privyAppId) {
     return (
@@ -182,7 +182,7 @@ function PrivySignIn({ user, onUser, openSignal }: Props) {
       >
         {busy ? "Signing in…" : "Sign in"}
       </button>
-      <p className="mt-2 text-xs text-muted">Free. Email, Google or any wallet. No transaction is ever sent.</p>
+      <p className="mt-2 text-xs text-muted">Free. Use your email or any wallet. No transaction is ever sent.</p>
       {error && (
         <p role="alert" className="mt-2 text-xs text-red-300">
           {error}

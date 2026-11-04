@@ -28,7 +28,7 @@ Sponsors pay to run a named event with their logo, their prize text and a report
 
 ## Tech
 
-It is a Next.js app with Postgres through Prisma, a Stockfish WASM engine for the Boss and the candidate moves, and sign-in through Privy (email, Google or any wallet) finished with a free SIWE signature.
+It is a Next.js app with Postgres through Prisma, a Stockfish WASM engine for the Boss and the candidate moves, and sign-in through Privy (email or any wallet) finished with a free SIWE signature.
 
 ## Run it locally
 
