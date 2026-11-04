@@ -8,18 +8,15 @@ import { formatCountdown, remainingMs } from "@/lib/time";
 import { buildIcsDataUrl } from "@/lib/ics";
 import { formatWib } from "@/components/site/EventCard";
 import { Sprite } from "@/components/site/Sprite";
-import { Panel } from "./SidePanel";
 
 export function RulesSummary() {
   return (
-    <Panel title="How it works">
-      <ol className="list-decimal space-y-1.5 pl-5 text-sm text-muted">
-        <li>The crowd plays White against an AI Boss. Everyone gets the same 3 candidate moves each turn.</li>
-        <li>You have 15 seconds to tap the move you like. The most-picked move is played.</li>
-        <li>The Boss answers. Then you see how good each of the 3 moves was.</li>
-        <li>Better picks earn more points. Sponsors give prizes to the top players. Playing is free.</li>
-      </ol>
-    </Panel>
+    <ol className="list-decimal space-y-1.5 pl-5 text-sm text-muted">
+      <li>The crowd plays White against an AI Boss. Everyone gets the same 3 candidate moves each turn.</li>
+      <li>You have 15 seconds to tap the move you like. The most-picked move is played.</li>
+      <li>The Boss answers. Then you see how good each of the 3 moves was.</li>
+      <li>Better picks earn more points. Sponsors give prizes to the top players. Playing is free.</li>
+    </ol>
   );
 }
 
