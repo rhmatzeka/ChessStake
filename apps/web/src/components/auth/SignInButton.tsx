@@ -1,29 +1,38 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAccount, useDisconnect, useSignMessage } from "wagmi";
-import { useModal } from "connectkit";
+import { getAddress } from "viem";
+import { useConnectWallet, useLogin, useLogout, usePrivy, useWallets } from "@privy-io/react-auth";
 import { ApiError, apiFetch } from "@/lib/api";
 import type { AuthUser } from "@/hooks/useMyState";
+import { privyAppId } from "./SignInProvider";
 import { buildSignInMessage } from "./siwe";
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
-/** Connect wallet, then sign one free message. Also shows who is signed in, lets them rename or sign out. */
-export function SignInButton({
-  user,
-  onUser,
-  openSignal,
-}: {
+type Props = {
   user: AuthUser | null | undefined;
   onUser: (u: AuthUser | null) => void;
   /** Bump this number to start the sign-in flow from outside (for example after a pick while signed out). */
   openSignal: number;
-}) {
-  const { address, isConnected, chainId } = useAccount();
-  const { open, setOpen } = useModal();
-  const { signMessageAsync } = useSignMessage();
-  const { disconnect } = useDisconnect();
+};
+
+/** Log in with Privy (email, Google or a wallet), then sign one free message. Also shows who is signed in, lets them rename or sign out. */
+export function SignInButton(props: Props) {
+  if (!privyAppId) {
+    return (
+      <p role="status" className="text-xs text-muted">
+        Sign-in is not configured on this server yet.
+      </p>
+    );
+  }
+  return <PrivySignIn {...props} />;
+}
+
+function PrivySignIn({ user, onUser, openSignal }: Props) {
+  const { ready, authenticated, user: privyUser } = usePrivy();
+  const { wallets, ready: walletsReady } = useWallets();
+  const { logout } = useLogout();
   const wanting = useRef(false);
   const busyRef = useRef(false);
   const handledSignal = useRef(0);
@@ -32,21 +41,32 @@ export function SignInButton({
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
 
+  const cancel = useCallback(() => {
+    wanting.current = false;
+  }, []);
+  const { login } = useLogin({ onError: cancel });
+  const { connectWallet } = useConnectWallet({ onError: cancel });
+
+  // The wallet to sign with: the one Privy marks as the user's, else any connected one.
+  const primary = privyUser?.wallet?.address?.toLowerCase();
+  const wallet = wallets.find((w) => w.address.toLowerCase() === primary) ?? wallets[0];
+
   const run = useCallback(async () => {
-    if (!address || busyRef.current) return;
+    if (!wallet || busyRef.current) return;
     busyRef.current = true;
     setBusy(true);
     setError(null);
     try {
       const { nonce } = await apiFetch<{ nonce: string }>("/api/auth/nonce");
+      const chainId = Number(wallet.chainId.split(":")[1]) || 1;
       const message = buildSignInMessage({
-        address,
-        chainId: chainId ?? 1,
+        address: getAddress(wallet.address),
+        chainId,
         nonce,
         host: window.location.host,
         origin: window.location.origin,
       });
-      const signature = await signMessageAsync({ message });
+      const signature = (await wallet.sign(message)) as `0x${string}`;
       const me = await apiFetch<AuthUser>("/api/auth/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -60,38 +80,35 @@ export function SignInButton({
       busyRef.current = false;
       setBusy(false);
     }
-  }, [address, chainId, onUser, signMessageAsync]);
+  }, [wallet, onUser]);
 
   const start = useCallback(() => {
+    if (!ready) return;
     setError(null);
     wanting.current = true;
-    if (isConnected && address) void run();
-    else setOpen(true);
-  }, [address, isConnected, run, setOpen]);
+    if (!authenticated) login();
+    else if (wallet) void run();
+    else if (walletsReady) connectWallet();
+  }, [ready, authenticated, wallet, walletsReady, login, run, connectWallet]);
 
-  // After the wallet connects, carry on to the signature without another click.
+  // After Privy login finishes and the wallet is ready, carry on to the signature without another click.
   useEffect(() => {
-    if (wanting.current && isConnected && address && user === null) void run();
-  }, [isConnected, address, user, run]);
-
-  // Closing the wallet sheet without connecting cancels the pending sign-in.
-  useEffect(() => {
-    if (!open && !isConnected) wanting.current = false;
-  }, [open, isConnected]);
+    if (wanting.current && authenticated && wallet && user === null) void run();
+  }, [authenticated, wallet, user, run]);
 
   useEffect(() => {
-    if (openSignal > handledSignal.current && user === null) {
+    if (openSignal > handledSignal.current && user === null && ready) {
       handledSignal.current = openSignal;
       start();
     }
-  }, [openSignal, user, start]);
+  }, [openSignal, user, ready, start]);
 
   async function signOut() {
     try {
       await apiFetch("/api/auth/logout", { method: "POST" });
     } finally {
-      disconnect();
       onUser(null);
+      void logout().catch(() => {});
     }
   }
 
@@ -160,12 +177,12 @@ export function SignInButton({
     <div>
       <button
         onClick={start}
-        disabled={busy || user === undefined}
+        disabled={busy || !ready || user === undefined}
         className="btn btn-gold w-full"
       >
-        {busy ? "Check your wallet…" : "Sign in with wallet"}
+        {busy ? "Signing in…" : "Sign in"}
       </button>
-      <p className="mt-2 text-xs text-muted">Free. You sign one message, no transaction is sent.</p>
+      <p className="mt-2 text-xs text-muted">Free. Email, Google or any wallet. No transaction is ever sent.</p>
       {error && (
         <p role="alert" className="mt-2 text-xs text-red-300">
           {error}

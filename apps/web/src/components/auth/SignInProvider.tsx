@@ -1,44 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider, createConfig, http } from "wagmi";
-import { mainnet } from "wagmi/chains";
-import { injected } from "wagmi/connectors";
-import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+import { PrivyProvider } from "@privy-io/react-auth";
 
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+export const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
 
-/** Mainnet only, read-only transport: signing in never sends a transaction. Without a WalletConnect id only browser wallets are offered. */
-const config = projectId
-  ? createConfig(
-      getDefaultConfig({
-        chains: [mainnet],
-        transports: { [mainnet.id]: http() },
-        walletConnectProjectId: projectId,
-        appName: "PawnPool",
-        ssr: false,
-      }),
-    )
-  : createConfig({
-      chains: [mainnet],
-      transports: { [mainnet.id]: http() },
-      connectors: [injected()],
-      ssr: false,
-    });
-
+/**
+ * Privy handles the login sheet: email or social login gets a free embedded wallet, and
+ * MetaMask, WalletConnect and other external wallets still work. Signing in never sends a transaction.
+ */
 export function SignInProvider({ children }: { children: React.ReactNode }) {
-  const [client] = useState(() => new QueryClient());
+  if (!privyAppId) return <>{children}</>;
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={client}>
-        <ConnectKitProvider
-          theme="midnight"
-          customTheme={{ "--ck-accent-color": "#e6a855", "--ck-accent-text-color": "#000000" }}
-        >
-          {children}
-        </ConnectKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <PrivyProvider
+      appId={privyAppId}
+      config={{
+        appearance: {
+          theme: "dark",
+          accentColor: "#e6a855",
+          landingHeader: "Sign in to PawnPool",
+          loginMessage: "Free. No transaction is ever sent.",
+          walletChainType: "ethereum-only",
+        },
+        embeddedWallets: {
+          ethereum: { createOnLogin: "users-without-wallets" },
+          // The sign-in message is free and harmless, so embedded wallets sign it without a second popup.
+          showWalletUIs: false,
+        },
+      }}
+    >
+      {children}
+    </PrivyProvider>
   );
 }
