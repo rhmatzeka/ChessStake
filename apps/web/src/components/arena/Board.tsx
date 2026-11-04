@@ -1,8 +1,8 @@
-import { arrowGeometry, parseFen, squareCoords, type PieceKind } from "./geometry";
+import { arrowGeometry, parseFen, squareCoords } from "./geometry";
+import "./chess-board.css";
+import "./chess-pieces.css";
 
 export type BoardArrow = { uci: string; color: string; state: "normal" | "picked" | "dim" };
-
-const NAMES: Record<PieceKind, string> = { p: "Pawn", n: "Knight", b: "Bishop", r: "Rook", q: "Queen", k: "King" };
 
 /** The 8x8 grid sits inside the decorative frame of Board.png: 16px of 288px on every side. */
 const INSET = (16 / 288) * 100;
@@ -31,10 +31,7 @@ export function Board({
   return (
     <div className="relative aspect-square w-full select-none">
       {/* Board.png has its dark corner at a8; chess wants it at a1, so mirror the picture only. */}
-      <div
-        className="pixel absolute inset-0 -scale-x-100 bg-contain bg-center bg-no-repeat"
-        style={{ backgroundImage: "url(/assets/chess/Board.png)" }}
-      />
+      <div className="chess-board-art pixel absolute inset-0 -scale-x-100 bg-contain bg-center bg-no-repeat" />
       <div className="absolute" style={{ inset: `${INSET}%` }}>
         {[from, to].map(
           (sq, i) =>
@@ -53,13 +50,9 @@ export function Board({
                 })()
               : undefined;
           return (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <div
               key={slide ? `${p.sq}-${p.kind}-${fen}` : `${p.sq}-${p.kind}${p.color}`}
-              src={`/assets/chess/${p.color === "w" ? "White" : "Black"}${NAMES[p.kind]}.png`}
-              alt=""
-              draggable={false}
-              className={`pixel pointer-events-none absolute h-[12.5%] w-[12.5%] ${slide ? "piece-glide z-10" : ""}`}
+              className={`chess-piece chess-${p.color}${p.kind} pixel pointer-events-none absolute h-[12.5%] w-[12.5%] ${slide ? "piece-glide z-10" : ""}`}
               style={{ ...cell(p.sq), ...slide }}
             />
           );

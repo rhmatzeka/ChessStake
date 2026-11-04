@@ -1,17 +1,10 @@
-import Image from "next/image";
+import "@/components/arena/chess-pieces.css";
 
-const FILES = {
-  pawn: "Pawn",
-  knight: "Knight",
-  bishop: "Bishop",
-  rook: "Rook",
-  queen: "Queen",
-  king: "King",
-} as const;
+const KINDS = { pawn: "p", knight: "n", bishop: "b", rook: "r", queen: "q", king: "k" } as const;
 
-export type SpriteKind = keyof typeof FILES;
+export type SpriteKind = keyof typeof KINDS;
 
-/** Pixel chess piece from /public/assets/chess, never smoothed. */
+/** Pixel chess piece, embedded in the stylesheet and never smoothed. */
 export function Sprite({
   piece,
   side = "White",
@@ -24,13 +17,9 @@ export function Sprite({
   className?: string;
 }) {
   return (
-    <Image
-      src={`/assets/chess/${side}${FILES[piece]}.png`}
-      alt=""
-      width={size}
-      height={size}
-      unoptimized
-      className={`pixel ${className}`}
+    <span
+      aria-hidden="true"
+      className={`chess-piece chess-${side === "White" ? "w" : "b"}${KINDS[piece]} pixel ${className}`}
       style={{ width: size, height: size }}
     />
   );

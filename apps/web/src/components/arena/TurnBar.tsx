@@ -40,10 +40,20 @@ export function TurnBar({
           </p>
         </div>
         <div className="shrink-0 text-right">
-          <p className="font-display text-3xl font-black sm:text-4xl leading-none tabular-nums text-gold" aria-hidden="true">
-            {clock && open ? secs : "-"}
-          </p>
-          <p className="th hidden !text-[0.6rem] sm:block">seconds</p>
+          {clock && open ? (
+            <>
+              <p className="font-display text-3xl font-black sm:text-4xl leading-none tabular-nums text-gold" aria-hidden="true">
+                {secs}
+              </p>
+              <p className="th hidden !text-[0.6rem] sm:block">seconds</p>
+            </>
+          ) : (
+            <span aria-hidden="true" className="inline-flex gap-1.5">
+              <span className="thinking-dot h-2 w-2 rounded-full bg-gold" />
+              <span className="thinking-dot h-2 w-2 rounded-full bg-gold" />
+              <span className="thinking-dot h-2 w-2 rounded-full bg-gold" />
+            </span>
+          )}
         </div>
       </div>
       <div className="mt-1.5 h-1.5 sm:mt-3 overflow-hidden rounded-full bg-line" aria-hidden="true">
