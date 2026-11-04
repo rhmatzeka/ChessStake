@@ -7,6 +7,7 @@ import { turnClock, useEventState, useServerNow } from "@/hooks/useEventState";
 import { useAuthUser, useMyState } from "@/hooks/useMyState";
 import { usePresentation } from "@/hooks/usePresentation";
 import { Sprite } from "@/components/site/Sprite";
+import { ArenaTabs } from "./ArenaTabs";
 import { Board, type BoardArrow } from "./Board";
 import { CandidateCards, RevealCards } from "./CandidateCards";
 import { candidateLetter } from "./geometry";
@@ -91,11 +92,11 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
   const finished = state.status === "FINISHED" || state.status === "ABANDONED";
 
   return (
-    <div className="mx-auto max-w-6xl px-3 pb-6 pt-2 sm:px-5 sm:pt-4">
-      <div className="mb-2 flex items-center justify-between gap-x-6 gap-y-1 sm:mb-3">
+    <div className="mx-auto flex max-w-6xl flex-col px-3 pb-6 pt-2 sm:px-5 sm:pt-3 lg:h-full lg:max-w-[max(72rem,calc(100dvh+19.5rem))] lg:pb-4">
+      <div className="mb-2 flex shrink-0 items-center justify-between gap-x-6 gap-y-1 sm:mb-3">
         <div className="min-w-0">
-          <h1 className="display text-xl !leading-none sm:text-4xl">{state.title}</h1>
-          <p className="mt-1 hidden text-sm text-muted sm:block">
+          <h1 className="display text-xl !leading-none sm:text-3xl">{state.title}</h1>
+          <p className="mt-1 hidden truncate text-sm text-muted sm:block">
             The crowd (White) vs the AI Boss, level {state.bossLevel}. Hosted by {state.hostName}.
           </p>
         </div>
@@ -111,12 +112,12 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
       </div>
 
       {offline && (
-        <p role="status" className="mb-3 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-sm text-amber-200">
+        <p role="status" className="mb-3 shrink-0 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-sm text-amber-200">
           Reconnecting… the board may be a few seconds behind.
         </p>
       )}
 
-      <div className="grid gap-2.5 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-x-6 lg:gap-y-3">
+      <div className="grid gap-2.5 lg:min-h-0 lg:flex-1 lg:grid-cols-[min(calc(100dvh-10.2rem),calc(100%-26.5rem))_minmax(0,1fr)] lg:grid-rows-[auto_auto_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-2">
         <div className="order-1 space-y-2 lg:col-start-2 lg:row-start-1">
           {live && <TurnBar turnNumber={turn?.number ?? null} clock={clock} thinking={thinking} note={turn ? undefined : "Setting up the next turn"} />}
           {message && (
@@ -126,7 +127,8 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
           )}
         </div>
 
-        <div className="order-2 mx-auto w-full max-w-[620px] lg:col-start-1 lg:row-span-4 lg:row-start-1 lg:max-w-[min(100%,calc(100svh-13rem))] lg:self-start">
+        <div className="order-2 lg:col-start-1 lg:row-span-3 lg:row-start-1 lg:min-h-0 lg:[container-type:size]">
+          <div className="mx-auto w-full max-w-[620px] lg:w-[min(100cqw,100cqh)] lg:max-w-none">
           <Board
             fen={frame.fen}
             lastMove={frame.lastMove}
@@ -134,9 +136,10 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
             arrows={arrows}
             onArrow={live && turn ? onPick : undefined}
           />
+          </div>
         </div>
 
-        <div className="order-3 lg:col-start-2 lg:row-start-2">
+        <div className="order-3 lg:col-start-2 lg:row-start-2 lg:min-h-0">
           {live && reveal && <RevealCards item={reveal} bossSan={reveal.bossSan} />}
           {live && !reveal && turn && (
             <CandidateCards turn={turn} pick={pick} canPick={canPick} onPick={onPick} />
@@ -150,29 +153,18 @@ export function Arena({ slug, initial }: { slug: string; initial: PublicState })
           {state.status === "SCHEDULED" && <ScheduledCard state={state} serverNow={serverNow} />}
         </div>
 
-        {live && !user && user !== undefined && turn && (
-          <div className="order-4 flex items-center justify-between gap-3 panel panel-gold px-3 py-2 lg:col-start-2 lg:row-start-3 lg:px-4 lg:py-3">
-            <p className="text-sm">
-              <span className="lg:hidden">Sign in to pick. Free, no transaction.</span>
-              <span className="hidden lg:inline">Sign in to pick a move. It is free and sends no transaction.</span>
-            </p>
-            <button
-              onClick={() => setOpenSignal((n) => n + 1)}
-              className="btn btn-gold btn-sm shrink-0 !min-h-8 !px-3 !py-1"
-            >
-              Sign in
-            </button>
-          </div>
-        )}
-
-        <aside className="order-5 space-y-4 lg:col-start-2 lg:row-start-4">
+        <div className="scroll-quiet order-3 flex flex-col gap-2 lg:col-start-2 lg:row-start-3 lg:min-h-0 lg:overflow-y-auto">
           {finished && <ResultCard state={state} user={user} me={me} />}
-          {state.status === "SCHEDULED" && <RulesSummary />}
-          <MeCard user={user} onUser={setUser} openSignal={openSignal} me={me} />
           {state.sponsor && <SponsorCard sponsor={state.sponsor} />}
-          <TopList top={state.top} />
-          <MoveLog history={state.history} />
-        </aside>
+          <ArenaTabs
+            tabs={[
+              ...(state.status === "SCHEDULED" ? [{ id: "rules", label: "How it works", content: <RulesSummary /> }] : []),
+              { id: "you", label: "You", content: <MeCard user={user} onUser={setUser} openSignal={openSignal} me={me} /> },
+              { id: "top", label: "Top players", content: <TopList top={state.top} /> },
+              { id: "moves", label: "Moves", content: <MoveLog history={state.history} /> },
+            ]}
+          />
+        </div>
       </div>
     </div>
   );

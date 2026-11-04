@@ -29,7 +29,7 @@ export function TurnBar({
           </p>
           <p className="hidden text-sm text-muted sm:block">
             {turnNumber ? `Turn ${turnNumber}. ` : ""}
-            {open ? "Pick one of the 3 moves. The most-picked move is played." : thinking ? "The crowd's move is in. The Boss replies next." : ""}
+            {open ? "Pick one of the 3 moves." : thinking ? "The Boss replies next." : ""}
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -49,7 +49,7 @@ export function TurnBar({
           )}
         </div>
       </div>
-      <div className="mt-1.5 h-1.5 sm:mt-3 overflow-hidden rounded-full bg-line" aria-hidden="true">
+      <div className="mt-1.5 h-1.5 sm:mt-2 overflow-hidden rounded-full bg-line" aria-hidden="true">
         <div
           className="h-full rounded-full bg-gold"
           style={{ width: `${open ? Math.min(100, (left / TURN_MS) * 100) : 0}%`, transition: "width 250ms linear" }}
