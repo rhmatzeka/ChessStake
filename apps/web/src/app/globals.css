@@ -288,7 +288,140 @@ body {
 .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
 .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
 
+/* ---------- Entrance motion ----------
+   Load: a dark board clears square by square (.checker), the photo settles, headline lines rise out of a
+   mask, then the rest follows. Scroll: one IntersectionObserver (RevealObserver) sets data-in; everything
+   here only moves transform/opacity/clip-path, and fills "backwards" so hover styles win once it is done. */
+:root { --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1); --ease-io: cubic-bezier(0.65, 0, 0.35, 1); }
+
+.checker { position: absolute; inset: 0; container-type: size; pointer-events: none; overflow: hidden;
+  animation: checker-done 0s linear 2.6s forwards; }
+.checker-grid {
+  position: absolute; inset: 0; display: grid; justify-content: center;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-columns: repeat(20, calc(100cqh / var(--rows)));
+  grid-template-rows: repeat(var(--rows), 1fr);
+}
+.checker-grid > span {
+  background: #070605;
+  box-shadow: 0 0 0 0.5px #070605;
+  animation: checker-out 560ms var(--ease-io) both;
+}
+.checker-grid > span[data-dark] {
+  background: #0f0c0a;
+  box-shadow: 0 0 0 0.5px #0f0c0a, inset 0 0 0 1px rgb(230 168 85 / 0.05);
+}
+@keyframes checker-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-10%) scale(0.72); }
+}
+@keyframes checker-done { to { visibility: hidden; } }
+
+/* The hero photo settles in from a slow zoom. */
+.hero-intro { animation: hero-in 2000ms var(--ease-out) both; }
+@keyframes hero-in {
+  from { opacity: 0.15; transform: scale(1.14); }
+  to { opacity: 1; transform: none; }
+}
+.head-photo { animation: head-in 1600ms var(--ease-out) both; }
+@keyframes head-in {
+  from { opacity: 0.2; transform: scale(1.1); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Fine grid lines fade up behind the board as it clears (opacity only, so it stays on the compositor). */
+.grid-draw { animation: grid-draw 1600ms ease 300ms both; }
+@keyframes grid-draw {
+  from { opacity: 0; }
+  to { opacity: 0.6; }
+}
+
+/* Headline lines rise out of a mask. */
+.line-mask { display: block; overflow: hidden; padding: 0.06em 0.12em 0.1em; margin: -0.06em -0.12em -0.1em; }
+.line-in { display: block; animation: line-up 1050ms var(--ease-out) both; }
+@keyframes line-up {
+  from { transform: translateY(108%); }
+  to { transform: none; }
+}
+
+/* One sweep of light across the gold words after they land. */
+.gold-sheen {
+  background-image:
+    linear-gradient(105deg, transparent 38%, rgb(255 244 222 / 0.95) 50%, transparent 62%),
+    linear-gradient(180deg, #f3c27a 0%, #e6a855 45%, #b9822f 100%);
+  background-size: 260% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  background-position: 160% 0, 0 0;
+}
+.gold-sheen.line-in { animation: line-up 1050ms var(--ease-out) both, sheen 950ms ease-in-out 1300ms both; }
+@keyframes sheen {
+  from { background-position: 160% 0, 0 0; }
+  to { background-position: -60% 0, 0 0; }
+}
+
+/* A thin gold line runs along an edge, then fades into the border. */
+.edge-line {
+  position: absolute; left: 0; right: 0; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--color-gold) 20%, var(--color-gold) 80%, transparent);
+  transform-origin: left;
+  animation: edge-sweep 1500ms var(--ease-io) both;
+}
+@keyframes edge-sweep {
+  0% { transform: scaleX(0); opacity: 1; }
+  65% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+
+/* Header items drop in once per full page load (the layout stays mounted across client navigations). */
+.hdr-in > * { animation: hdr-drop 700ms var(--ease-out) backwards; }
+.hdr-in > :nth-child(2) { animation-delay: 90ms; }
+.hdr-in > :nth-child(3) { animation-delay: 180ms; }
+@keyframes hdr-drop {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Scroll reveals. `rv` is set on <html> by a head script; `rv-off` is the safety net if JS never runs. */
+.rv:not(.rv-off) [data-reveal]:not([data-in]),
+.rv:not(.rv-off) [data-reveal-stagger]:not([data-in]) > * { opacity: 0; }
+.rv:not(.rv-off) [data-reveal-stagger]:not([data-in]) .bar-fill { animation-play-state: paused; }
+
+.rv [data-reveal][data-in] { animation: rv-up 900ms var(--ease-out) var(--d, 0ms) backwards; }
+.rv [data-reveal="mask"][data-in] { animation-name: rv-mask; animation-duration: 1000ms; }
+.rv [data-reveal="scale"][data-in] { animation-name: rv-scale; animation-duration: 1100ms; }
+.rv [data-reveal="drop"][data-in] { animation-name: rv-drop; animation-duration: 800ms; }
+.rv [data-reveal-stagger][data-in] > * {
+  animation: rv-up 800ms var(--ease-out) backwards;
+  animation-delay: calc(var(--d, 0ms) + var(--i, 0) * 85ms);
+}
+.rv [data-reveal-stagger][data-in] .bar-fill {
+  animation-duration: 1100ms;
+  animation-delay: calc(350ms + var(--i, 0) * 85ms);
+}
+.rv [data-in][data-instant], .rv [data-in][data-instant] > *, .rv [data-in][data-instant] .bar-fill { animation: none; }
+@keyframes rv-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rv-mask {
+  from { opacity: 0; transform: translateY(0.35em); clip-path: inset(100% -5% -20% -5%); }
+  30% { opacity: 1; }
+  to { opacity: 1; transform: none; clip-path: inset(-20% -5% -20% -5%); }
+}
+@keyframes rv-scale {
+  from { opacity: 0; transform: translateY(24px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rv-drop {
+  from { opacity: 0; transform: translateY(-26px) scale(1.08); }
+  60% { opacity: 1; }
+  to { opacity: 1; transform: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .bar-fill, .piece-glide, .thinking-dot, .rise, .live-dot, .hero-media { animation: none; }
-  .hero-video { display: none; }
+  .bar-fill, .piece-glide, .thinking-dot, .rise, .live-dot, .hero-media,
+  .hero-intro, .head-photo, .grid-draw, .line-in, .edge-line, .hdr-in > * { animation: none; }
+  .gold-sheen.line-in { animation: none; }
+  .edge-line { opacity: 0; }
+  .checker, .hero-video { display: none; }
 }

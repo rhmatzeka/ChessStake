@@ -16,10 +16,10 @@ export default function Sponsor() {
         lead="Put up the prizes for a live crowd game. Players see your name on every turn and your prizes on the leaderboard."
       />
       <div className="mx-auto max-w-6xl px-5 pt-12">
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-2" data-reveal-stagger>
           <article className="panel panel-gold p-7">
             <p className="kicker">Sponsored Event</p>
-            <h2 className="display display-md mt-3 text-gold">From Rp3.000.000</h2>
+            <h2 className="display display-md mt-3 text-gold">From Rp<span data-count="3000000" data-count-locale="id-ID">3.000.000</span></h2>
             <p className="mt-2 font-mono text-xs font-bold uppercase tracking-[0.16em] text-muted">per event, about US$190</p>
             <p className="mt-4 text-muted">One scheduled Boss Battle, branded with you.</p>
             <ul className="mt-4 grid list-disc gap-2 pl-5 text-[#c9c0b3]">
@@ -32,7 +32,7 @@ export default function Sponsor() {
           </article>
           <article className="panel p-7">
             <p className="kicker">Season Sponsor</p>
-            <h2 className="display display-md mt-3 text-gold">From Rp10.000.000</h2>
+            <h2 className="display display-md mt-3 text-gold">From Rp<span data-count="10000000" data-count-locale="id-ID">10.000.000</span></h2>
             <p className="mt-2 font-mono text-xs font-bold uppercase tracking-[0.16em] text-muted">per month</p>
             <p className="mt-4 text-muted">Be the name behind the whole month.</p>
             <ul className="mt-4 grid list-disc gap-2 pl-5 text-[#c9c0b3]">
@@ -42,11 +42,11 @@ export default function Sponsor() {
             </ul>
           </article>
         </div>
-        <p className="mt-5 text-sm text-muted">
+        <p className="mt-5 text-sm text-muted" data-reveal>
           Prices are starting points and can change. Creator Pro and cosmetics are coming later and are not part of sponsoring.
         </p>
 
-        <section className="mt-24 grid gap-10 md:grid-cols-[1fr_1.3fr]">
+        <section className="mt-24 grid gap-10 md:grid-cols-[1fr_1.3fr]" data-reveal-stagger>
           <div>
             <p className="kicker">Get in touch</p>
             <h2 className="display display-md mt-3">Tell us what you have in mind</h2>

@@ -44,7 +44,7 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
     <>
       <PageHead kicker="This month" title="Season leaderboard" lead="Points from every event and the Practice Arena this month. Resets on the 1st." />
       <div className="mx-auto max-w-3xl px-5 pt-10">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3" data-reveal>
           <Link href={`/leaderboard?month=${shift(month, -1)}`} className={nav} rel="nofollow">
             Previous month
           </Link>
@@ -63,16 +63,16 @@ export default async function Leaderboard({ searchParams }: { searchParams: Prom
             We could not load the leaderboard. Refresh in a moment.
           </p>
         ) : rows.length === 0 ? (
-          <p className="mt-8 text-muted">No points yet in {label(month)}. Play the Practice Arena to get on the board.</p>
+          <p className="mt-8 text-muted" data-reveal>No points yet in {label(month)}. Play the Practice Arena to get on the board.</p>
         ) : (
-          <ol className="mt-6 divide-y divide-line overflow-hidden panel">
+          <ol className="mt-6 divide-y divide-line overflow-hidden panel" data-reveal data-reveal-stagger>
             {rows.map((r) => (
               <li key={r.rank} className={`flex items-center gap-4 px-4 py-3.5 ${r.rank <= 3 ? "bg-panel-hi" : ""}`}>
                 <span className={`w-10 text-right font-display text-2xl font-black tabular-nums ${r.rank === 1 ? "gold-text" : r.rank <= 3 ? "text-gold" : "text-muted"}`}>
                   {String(r.rank).padStart(2, "0")}
                 </span>
                 <span className="min-w-0 flex-1 truncate">{r.name}</span>
-                <span className="font-mono font-bold tabular-nums text-foreground">{r.points.toLocaleString("en-US")}</span>
+                <span className="font-mono font-bold tabular-nums text-foreground" data-count={r.points}>{r.points.toLocaleString("en-US")}</span>
                 <span className="th">pts</span>
               </li>
             ))}

@@ -1,6 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { RevealObserver } from "@/components/site/RevealObserver";
+
+// Runs before first paint: marks the page as able to animate so scroll reveals start hidden.
+// Skipped for reduced motion; if the app never hydrates, everything is shown after 4 s.
+const RV_SCRIPT =
+  "(function(){try{var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('rv');setTimeout(function(){if(!window.__rv)d.classList.add('rv-off')},4000)}catch(e){}})()";
 
 // Self-hosted so a build never depends on reaching Google Fonts.
 // Display: a heavy grotesk for the big uppercase headlines. Mono: labels and buttons. Body: Hanken.
@@ -40,9 +46,13 @@ export const viewport: Viewport = { themeColor: "#070605" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable} ${body.variable} h-full antialiased`}>
+    <html lang="en" className={`${display.variable} ${mono.variable} ${body.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: RV_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col">
         {children}
+        <RevealObserver />
       </body>
     </html>
   );
