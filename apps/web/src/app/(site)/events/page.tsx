@@ -13,15 +13,15 @@ export const metadata: Metadata = {
 function Group({ title, items, empty }: { title: string; items: LobbyItem[]; empty: string }) {
   return (
     <section className="mt-14">
-      <h2 className="kicker">{title}</h2>
+      <h2 className="kicker" data-reveal>{title}</h2>
       {items.length ? (
-        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3" data-reveal-stagger>
           {items.map((e) => (
             <EventCard key={e.slug} e={e} />
           ))}
         </div>
       ) : (
-        <p className="panel mt-4 px-5 py-4 text-muted">{empty}</p>
+        <p className="panel mt-4 px-5 py-4 text-muted" data-reveal>{empty}</p>
       )}
     </section>
   );

@@ -12,7 +12,7 @@ const NAV = [
 export function Header() {
   return (
     <header className="relative z-20 border-b border-line bg-background/90">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-1 px-5 py-3 md:flex-nowrap">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-1 px-5 py-3 md:flex-nowrap hdr-in">
         <Link href="/" className="flex items-center gap-3" aria-label="PawnPool home">
           <span className="grid h-9 w-9 place-items-center rounded-md border border-gold/50 bg-panel">
             <Sprite piece="pawn" size={24} />

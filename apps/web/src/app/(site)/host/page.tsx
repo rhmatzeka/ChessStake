@@ -24,7 +24,7 @@ export default function Host() {
         lead="Creator Pro is coming. Join the waitlist and we will tell you when it opens."
       />
       <div className="mx-auto max-w-6xl px-5 pt-12">
-        <div className="grid gap-10 md:grid-cols-[1fr_1.3fr]">
+        <div className="grid gap-10 md:grid-cols-[1fr_1.3fr]" data-reveal-stagger>
           <div>
             <p className="kicker">Creator Pro</p>
             <h2 className="display display-sm mt-3">What it will include</h2>

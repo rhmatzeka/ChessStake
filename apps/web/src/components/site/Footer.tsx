@@ -6,7 +6,7 @@ const link = "nav-link";
 export function Footer() {
   return (
     <footer className="mt-24 border-t border-line bg-[#050403]">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-[1.2fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-[1.2fr_1fr_1fr]" data-reveal-stagger>
         <div className="max-w-xs">
           <p className="flex items-center gap-3">
             <span className="grid h-9 w-9 place-items-center rounded-md border border-gold/50 bg-panel">
